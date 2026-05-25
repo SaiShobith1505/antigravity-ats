@@ -23,7 +23,14 @@ import {
   Smartphone,
   ArrowRight,
   TrendingUp,
-  Award
+  Award,
+  Sparkles,
+  FileText,
+  Check,
+  AlertCircle,
+  Trash2,
+  Briefcase,
+  RotateCcw
 } from "lucide-react";
 import Link from "next/link";
 
@@ -51,6 +58,87 @@ export default function DashboardPage() {
   const [showMockModal, setShowMockModal] = useState(false);
   const [mockOrderId, setMockOrderId] = useState("");
   const [mockAmount, setMockAmount] = useState(8000);
+
+  // AI JD Matcher & Optimizer states
+  const [activeTab, setActiveTab] = useState<"edit" | "matcher">("edit");
+  const [jobDescription, setJobDescription] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [matchResult, setMatchResult] = useState<{
+    matchScore: number;
+    extractedKeywords: string[];
+    missingKeywords: string[];
+    suggestions: string[];
+    scoreImprovement: number;
+    beforeAfterComparison: Array<{ original: string; optimized: string }>;
+    tailoredResume: typeof defaultResumeData;
+  } | null>(null);
+  const [tailorApplied, setTailorApplied] = useState(false);
+  const [originalResumeDraft, setOriginalResumeDraft] = useState<typeof defaultResumeData | null>(null);
+
+  const handleOptimizeResume = async () => {
+    if (!jobDescription.trim()) {
+      setPaymentError("Please paste a job description first.");
+      return;
+    }
+    setPaymentError("");
+    setIsAnalyzing(true);
+    setTailorApplied(false);
+
+    try {
+      // Save current draft for rollback capability
+      setOriginalResumeDraft(resumeData);
+
+      const res = await fetch("/api/resume/tailor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jobDescription,
+          resumeData
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to tailor resume draft.");
+      }
+
+      const data = await res.json();
+      setMatchResult(data);
+      
+      // Auto-apply tailored changes to current draft for live preview rendering
+      setResumeData(data.tailoredResume);
+      setAtsScore(data.scoreImprovement);
+      setTailorApplied(true);
+
+      // Save to cache securely
+      if (user) {
+        saveResume(user.uid, resumeId, data.tailoredResume, data.scoreImprovement);
+      }
+    } catch (err: any) {
+      console.error("Tailoring action failed:", err);
+      setPaymentError(err.message || "Unable to parse and optimize resume draft.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleUndoTailoring = () => {
+    if (originalResumeDraft) {
+      setResumeData(originalResumeDraft);
+      const prevScore = calculateHeuristicAtsScore(originalResumeDraft);
+      setAtsScore(prevScore);
+      setTailorApplied(false);
+      setMatchResult(null);
+      if (user) {
+        saveResume(user.uid, resumeId, originalResumeDraft, prevScore);
+      }
+    }
+  };
+
+  const handleConfirmTailoring = () => {
+    setTailorApplied(true);
+    // Keep the tailored draft as active and clear match overlay comparison
+    setMatchResult(null);
+  };
 
   const resumeId = user ? `resume_${user.uid}` : "default-resume";
 
@@ -390,9 +478,247 @@ export default function DashboardPage() {
       {/* Split Work Panels */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         
-        {/* Left Input Fields Panel (Form) */}
-        <div className="w-full lg:w-1/2 p-4 md:p-6 overflow-y-auto border-r border-zinc-900 h-full flex flex-col">
-          <ResumeForm data={resumeData} onChange={handleFormChange} />
+        {/* Left Input Fields Panel (Form & AI Job Description Matcher) */}
+        <div className="w-full lg:w-1/2 p-4 md:p-6 overflow-y-auto border-r border-zinc-900 h-full flex flex-col space-y-6 text-left">
+          
+          {/* Tabs Selector Bar */}
+          <div className="grid grid-cols-2 gap-2 p-1 bg-zinc-900/50 border border-zinc-850 rounded-xl flex-shrink-0">
+            <button
+              onClick={() => setActiveTab("edit")}
+              className={`py-2.5 px-3 rounded-lg font-bold font-mono text-xs transition-all flex items-center justify-center space-x-2 ${
+                activeTab === "edit"
+                  ? "bg-zinc-800 text-cyan-400 shadow-sm border border-zinc-700/50"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              <FileText className="h-4 w-4" />
+              <span>Edit Resume Draft</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("matcher")}
+              className={`py-2.5 px-3 rounded-lg font-bold font-mono text-xs transition-all flex items-center justify-center space-x-2 relative ${
+                activeTab === "matcher"
+                  ? "bg-zinc-800 text-cyan-400 shadow-sm border border-zinc-700/50"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>AI Job Matcher</span>
+              {tailorApplied && (
+                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
+              )}
+            </button>
+          </div>
+
+          {/* Conditional Content Panel */}
+          {activeTab === "edit" ? (
+            <ResumeForm data={resumeData} onChange={handleFormChange} />
+          ) : (
+            <div className="space-y-6 flex-grow flex flex-col">
+              
+              {/* Job Description Input Card */}
+              <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+                <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="h-7 w-7 rounded bg-cyan-950 border border-cyan-800/35 flex items-center justify-center">
+                      <Briefcase className="h-4 w-4 text-cyan-400" />
+                    </div>
+                    <span className="text-xs font-black text-white font-mono uppercase tracking-wider">
+                      Target Job Description
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase">
+                    Max 3,000 chars
+                  </span>
+                </div>
+
+                <div className="space-y-2 relative text-left">
+                  <textarea
+                    rows={6}
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value.slice(0, 3000))}
+                    placeholder="Paste the target company job description here (e.g. required frameworks, technologies, roles, verbs)..."
+                    className="bg-zinc-900/30 border border-zinc-900 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 placeholder-zinc-600 rounded-xl p-4 w-full text-xs leading-relaxed outline-none transition-all font-sans resize-none"
+                  />
+                  <div className="flex justify-between items-center text-[10px] font-mono font-bold text-zinc-500 px-1">
+                    <span>{jobDescription.length} / 3000 characters</span>
+                    {jobDescription && (
+                      <button
+                        onClick={() => setJobDescription("")}
+                        className="text-zinc-500 hover:text-red-400 flex items-center space-x-1 transition-colors"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        <span>Clear</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleOptimizeResume}
+                  disabled={isAnalyzing || !jobDescription.trim()}
+                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-zinc-950 font-black text-xs shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2 cursor-pointer"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <div className="h-4 w-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
+                      <span>Extracting Keywords & Tailoring Score...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4 text-zinc-950 fill-zinc-950 stroke-[2.5]" />
+                      <span>Optimize for Job Description</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* AI Analysis Staging Overlay */}
+              {matchResult && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                  
+                  {/* ATS Compatibility Improvement Indicator */}
+                  <div className="glass-panel border border-cyan-500/25 bg-gradient-to-tr from-cyan-950/20 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)]">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none" />
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black font-mono text-cyan-400 tracking-wider uppercase">
+                        ⚡ ATS Match Compatibility Optimized
+                      </span>
+                      <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded">
+                        +{matchResult.scoreImprovement - matchResult.matchScore}% Boost
+                      </span>
+                    </div>
+
+                    <div className="flex items-baseline space-x-2.5 pt-1.5 justify-start">
+                      <span className="text-3xl font-black font-mono text-zinc-600 line-through">
+                        {matchResult.matchScore}%
+                      </span>
+                      <span className="text-xl font-bold font-mono text-zinc-400">→</span>
+                      <span className="text-4xl font-black font-mono text-white tracking-tight drop-shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                        {matchResult.scoreImprovement}% Match
+                      </span>
+                    </div>
+
+                    <p className="text-[10px] text-zinc-400 leading-relaxed font-semibold text-left">
+                      Extracted semantic alignment keywords. The optimization injected missing high-yield B.Tech placements technical tags into experience bullets and skills.
+                    </p>
+
+                    {/* Tailor state controller buttons */}
+                    <div className="flex items-center space-x-3 pt-3 border-t border-zinc-900">
+                      <button
+                        onClick={handleUndoTailoring}
+                        className="flex-1 py-2 px-3 rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900/20 text-zinc-400 hover:text-white font-extrabold text-[10px] transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                        <span>Discard Optimizations</span>
+                      </button>
+                      <button
+                        onClick={handleConfirmTailoring}
+                        className="flex-1 py-2 px-3 rounded-lg bg-cyan-950/40 border border-cyan-800/40 hover:bg-cyan-900/40 text-cyan-400 font-black text-[10px] transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                      >
+                        <Check className="h-3 w-3" />
+                        <span>Confirm & Keep Tailored</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Extracted & Missing Keywords Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    {/* Extracted JD Keywords */}
+                    <div className="glass-panel border border-zinc-900 rounded-2xl p-4 space-y-3">
+                      <h4 className="text-[10px] font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-2 text-left">
+                        🎯 Extracted Keywords ({matchResult.extractedKeywords.length})
+                      </h4>
+                      <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto pt-1 justify-start">
+                        {matchResult.extractedKeywords.map((kw, idx) => (
+                          <span 
+                            key={idx} 
+                            className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-850 text-zinc-300 font-mono text-[9px] font-bold"
+                          >
+                            {kw}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Missing Keywords (Amber Chips) */}
+                    <div className="glass-panel border border-zinc-900 rounded-2xl p-4 space-y-3">
+                      <h4 className="text-[10px] font-black text-amber-400 font-mono uppercase tracking-wider border-b border-zinc-900 pb-2 text-left">
+                        ⚠️ Missing Keywords ({matchResult.missingKeywords.length})
+                      </h4>
+                      <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto pt-1 justify-start">
+                        {matchResult.missingKeywords.length === 0 ? (
+                          <span className="text-[9px] font-semibold text-zinc-500 italic">No missing keywords found! Excellent match!</span>
+                        ) : (
+                          matchResult.missingKeywords.map((kw, idx) => (
+                            <span 
+                              key={idx} 
+                              className="px-2 py-0.5 rounded bg-amber-950/20 border border-amber-900/40 text-amber-400 font-mono text-[9px] font-bold"
+                            >
+                              {kw}
+                            </span>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Before vs After Bullet Comparisons */}
+                  <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+                    <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center justify-between">
+                      <span>🔄 AI Bullet Optimization Pipeline</span>
+                      <span className="text-[9px] font-bold font-mono text-zinc-500 lowercase">Compare improvements</span>
+                    </h4>
+
+                    <div className="space-y-4 max-h-80 overflow-y-auto pr-1">
+                      {matchResult.beforeAfterComparison.map((comp, idx) => (
+                        <div key={idx} className="space-y-2 border-b border-zinc-900 pb-4 last:border-0 last:pb-0">
+                          
+                          {/* Original Bullet */}
+                          <div className="p-3 rounded-lg bg-red-950/10 border border-red-950/30 text-left relative overflow-hidden">
+                            <span className="absolute top-1 right-2 text-[8px] font-black font-mono text-red-500 uppercase opacity-60">Original Draft</span>
+                            <p className="text-[10px] text-zinc-500 font-medium font-sans leading-normal leading-relaxed pr-12">
+                              {comp.original}
+                            </p>
+                          </div>
+
+                          {/* Optimized Bullet */}
+                          <div className="p-3 rounded-lg bg-emerald-950/10 border border-emerald-900/20 text-left relative overflow-hidden">
+                            <span className="absolute top-1 right-2 text-[8px] font-black font-mono text-emerald-400 uppercase opacity-80">Tailored Optimization</span>
+                            <p className="text-[10px] text-zinc-200 font-bold font-sans leading-normal leading-relaxed pr-12">
+                              {comp.optimized}
+                            </p>
+                          </div>
+
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Heuristic Improvement suggestions list */}
+                  <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-3">
+                    <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-2 text-left">
+                      💡 Placement Strategy Recommendations
+                    </h4>
+                    <ul className="space-y-2 text-[10px] font-medium leading-relaxed text-zinc-400 pl-1 text-left">
+                      {matchResult.suggestions.map((sug, idx) => (
+                        <li key={idx} className="flex items-start space-x-2">
+                          <span className="text-cyan-400 font-black font-mono">•</span>
+                          <span>{sug}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                </div>
+              )}
+
+            </div>
+          )}
+
         </div>
 
         {/* Right Output Panel (ATS Score Tracker & Live Blurrable HTML Preview) */}
