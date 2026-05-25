@@ -127,7 +127,7 @@ export default function DashboardPage() {
 
       // Save to cache securely
       if (user) {
-        saveResume(user.uid, resumeId, data.tailoredResume, data.scoreImprovement);
+        saveResume(user.uid, resumeId, data.tailoredResume, data.scoreImprovement, true);
       }
     } catch (err: any) {
       console.error("Tailoring action failed:", err);
@@ -145,7 +145,7 @@ export default function DashboardPage() {
       setTailorApplied(false);
       setMatchResult(null);
       if (user) {
-        saveResume(user.uid, resumeId, originalResumeDraft, prevScore);
+        saveResume(user.uid, resumeId, originalResumeDraft, prevScore, false);
       }
     }
   };
@@ -326,6 +326,9 @@ export default function DashboardPage() {
           if (res.atsScore !== undefined && res.atsScore !== null) {
             setAtsScore(res.atsScore);
           }
+          if (res.usedAITailor !== undefined && res.usedAITailor !== null) {
+            setTailorApplied(res.usedAITailor);
+          }
         }
         if (user.email === "admin@cvboost.co") {
           setIsPaid(true);
@@ -379,7 +382,7 @@ export default function DashboardPage() {
 
     // Persistent cache
     if (user) {
-      saveResume(user.uid, resumeId, newData, newScore);
+      saveResume(user.uid, resumeId, newData, newScore, tailorApplied);
     }
   };
 
@@ -449,7 +452,7 @@ export default function DashboardPage() {
       const response = await fetch("/api/payment/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resumeId, userId: user.uid }),
+        body: JSON.stringify({ resumeId, userId: user.uid, usedAITailor: tailorApplied }),
       });
       
       if (!response.ok) {
@@ -998,7 +1001,7 @@ export default function DashboardPage() {
                     className="px-6 py-3 text-xs font-black rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-600 text-zinc-950 hover:brightness-110 active:scale-98 transition-all shadow-[0_0_15px_rgba(6,182,212,0.35)] flex items-center space-x-2 cursor-pointer"
                   >
                     <Download className="h-4 w-4 text-zinc-950" />
-                    <span>Unlock Selection PDF (₹80)</span>
+                    <span>Unlock Selection PDF (₹{tailorApplied ? 149 : 80})</span>
                   </button>
                 )}
               </div>
@@ -1191,7 +1194,7 @@ export default function DashboardPage() {
                       className="w-full py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-zinc-950 font-black text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all transform active:scale-98 flex items-center justify-center space-x-1.5"
                     >
                       <Zap className="h-4 w-4 text-zinc-950 fill-zinc-950 stroke-[2.5]" />
-                      <span>Unlock & Download Now — ₹80</span>
+                      <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 80}</span>
                     </button>
 
                     {/* Classmate referral share widget for free access */}

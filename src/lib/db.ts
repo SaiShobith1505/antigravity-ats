@@ -52,29 +52,33 @@ export async function saveResume(
   userId: string,
   resumeId: string,
   data: ResumeData,
-  atsScore: number
+  atsScore: number,
+  usedAITailor?: boolean
 ): Promise<void> {
   try {
     const resumeRef = doc(db, "resumes", resumeId);
-    await setDoc(
-      resumeRef,
-      {
-        id: resumeId,
-        userId,
-        atsScore,
-        data,
-        paymentStatus: "unpaid",
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
+    const payload: any = {
+      id: resumeId,
+      userId,
+      atsScore,
+      data,
+      paymentStatus: "unpaid",
+      updatedAt: serverTimestamp(),
+    };
+    if (usedAITailor !== undefined) {
+      payload.usedAITailor = usedAITailor;
+    }
+    await setDoc(resumeRef, payload, { merge: true });
   } catch (error) {
     console.warn("Firestore saveResume failed, falling back to localStorage:", error);
     let paymentStatus = "unpaid";
+    let isTailored = false;
     const existing = localStorage.getItem(`cv_boost_resume_${resumeId}`);
     if (existing) {
       try {
-        paymentStatus = JSON.parse(existing).paymentStatus || "unpaid";
+        const parsed = JSON.parse(existing);
+        paymentStatus = parsed.paymentStatus || "unpaid";
+        isTailored = parsed.usedAITailor || false;
       } catch (_) {}
     }
     localStorage.setItem(
@@ -85,6 +89,7 @@ export async function saveResume(
         atsScore,
         data,
         paymentStatus,
+        usedAITailor: usedAITailor !== undefined ? usedAITailor : isTailored,
         updatedAt: new Date().toISOString(),
       })
     );

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -11,9 +13,30 @@ const razorpay = keyId && keySecret ? new Razorpay({
 
 export async function POST(req: Request) {
   try {
-    const { resumeId, userId } = await req.json();
+    const { resumeId, userId, usedAITailor } = await req.json();
 
-    const amount = 8000; // ₹80.00 in paise
+    let amount = 8000; // Default ₹80 in paise
+
+    // Verify tailored status directly from Firestore for secure billing check
+    try {
+      const resumeRef = doc(db, "resumes", resumeId);
+      const resumeSnap = await getDoc(resumeRef);
+      if (resumeSnap.exists()) {
+        const resumeData = resumeSnap.data();
+        if (resumeData.usedAITailor === true) {
+          amount = 14900; // ₹149 in paise
+          console.log(`[CREATE ORDER] Confirmed tailored status for ${resumeId}. Upgraded price to ₹149.`);
+        }
+      } else if (usedAITailor === true) {
+        amount = 14900; // Mock fallback
+      }
+    } catch (dbErr) {
+      console.warn("[CREATE ORDER] Firestore read failed, relying on request context parameter fallback:", dbErr);
+      if (usedAITailor === true) {
+        amount = 14900;
+      }
+    }
+
     const receipt = `rcpt_${resumeId.slice(0, 10)}_${Date.now().toString().slice(-6)}`;
 
     // If Razorpay SDK is configured, create live checkout order
