@@ -75,6 +75,22 @@ export default function DashboardPage() {
   const [tailorApplied, setTailorApplied] = useState(false);
   const [originalResumeDraft, setOriginalResumeDraft] = useState<typeof defaultResumeData | null>(null);
 
+  // AI Resume Parser States
+  const [isParsing, setIsParsing] = useState(false);
+  const [parsingProgress, setParsingProgress] = useState(0);
+  const [parsedReport, setParsedReport] = useState<{
+    warnings: string[];
+    keywordGaps: string[];
+    metricEnhancements: string[];
+    breakdown: {
+      formatting: number;
+      keywords: number;
+      experienceQuality: number;
+      technicalSkills: number;
+      readability: number;
+    };
+  } | null>(null);
+
   const handleOptimizeResume = async () => {
     if (!jobDescription.trim()) {
       setPaymentError("Please paste a job description first.");
@@ -138,6 +154,133 @@ export default function DashboardPage() {
     setTailorApplied(true);
     // Keep the tailored draft as active and clear match overlay comparison
     setMatchResult(null);
+  };
+
+  // Dynamic Script Loading Helpers
+  const loadPdfJs = (): Promise<any> => {
+    return new Promise<any>((resolve) => {
+      if ((window as any).pdfjsLib) {
+        resolve((window as any).pdfjsLib);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js";
+      script.async = true;
+      script.onload = () => {
+        const pdfjsLib = (window as any).pdfjsLib;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
+        resolve(pdfjsLib);
+      };
+      script.onerror = () => resolve(null);
+      document.body.appendChild(script);
+    });
+  };
+
+  const loadMammoth = (): Promise<any> => {
+    return new Promise<any>((resolve) => {
+      if ((window as any).mammoth) {
+        resolve((window as any).mammoth);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js";
+      script.async = true;
+      script.onload = () => resolve((window as any).mammoth);
+      script.onerror = () => resolve(null);
+      document.body.appendChild(script);
+    });
+  };
+
+  const extractTextFromPdf = async (file: File): Promise<string> => {
+    const pdfjsLib: any = await loadPdfJs();
+    if (!pdfjsLib) {
+      throw new Error("Failed to load PDF extraction engine. Check your connection.");
+    }
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let text = "";
+    
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const strings = content.items.map((item: any) => item.str);
+      text += strings.join(" ") + "\n";
+    }
+    return text;
+  };
+
+  const extractTextFromDocx = async (file: File): Promise<string> => {
+    const mammoth: any = await loadMammoth();
+    if (!mammoth) {
+      throw new Error("Failed to load Word document parser. Check your connection.");
+    }
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await (mammoth as any).extractRawText({ arrayBuffer });
+    return result.value;
+  };
+
+  const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsParsing(true);
+    setParsingProgress(10);
+    setPaymentError("");
+
+    try {
+      let extractedText = "";
+
+      if (file.name.endsWith(".pdf")) {
+        setParsingProgress(25);
+        extractedText = await extractTextFromPdf(file);
+      } else if (file.name.endsWith(".docx")) {
+        setParsingProgress(25);
+        extractedText = await extractTextFromDocx(file);
+      } else if (file.name.endsWith(".txt")) {
+        setParsingProgress(35);
+        extractedText = await file.text();
+      } else {
+        throw new Error("Unsupported file type. Please upload a PDF, DOCX, or TXT file.");
+      }
+
+      setParsingProgress(60);
+      
+      const response = await fetch("/api/resume/parse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: extractedText, filename: file.name }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to parse resume text using AI.");
+      }
+
+      setParsingProgress(90);
+      const data = await response.json();
+      
+      // Auto-populate dashboard states
+      setResumeData(data.parsedResume);
+      setAtsScore(data.atsScore);
+      setParsedReport({
+        warnings: data.warnings,
+        keywordGaps: data.keywordGaps,
+        metricEnhancements: data.metricEnhancements,
+        breakdown: data.breakdown
+      });
+
+      setParsingProgress(100);
+
+      // Save to cache securely
+      if (user) {
+        saveResume(user.uid, resumeId, data.parsedResume, data.atsScore);
+      }
+    } catch (err: any) {
+      console.error("AI Upload parsing failed:", err);
+      setPaymentError(err.message || "Unable to extract and parse your uploaded resume.");
+    } finally {
+      setIsParsing(false);
+      setParsingProgress(0);
+    }
   };
 
   const resumeId = user ? `resume_${user.uid}` : "default-resume";
@@ -730,32 +873,114 @@ export default function DashboardPage() {
               <AtsScoreGauge score={atsScore} size={130} />
             </div>
             
-            <div className="md:col-span-8 space-y-3">
+            <div className="md:col-span-8 space-y-3 text-left">
               <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-mono">
                 ATS Compatibility Report
               </h3>
               
-              <ul className="text-xs space-y-2 text-zinc-400">
-                <li className="flex items-start space-x-2">
-                  <CheckCircle2 className="h-4 w-4 text-cyan-400 mt-0.5 flex-shrink-0" />
-                  <span><strong>Format check:</strong> Clean single-column layout detected (Pass).</span>
-                </li>
-                <li className="flex items-start space-x-2">
-                  <CheckCircle2 className="h-4 w-4 text-cyan-400 mt-0.5 flex-shrink-0" />
-                  <span><strong>Fonts standard:</strong> Helvetica / Arial parsed cleanly.</span>
-                </li>
-                {atsScore < 85 ? (
-                  <li className="flex items-start space-x-2 text-amber-500">
-                    <span className="h-4 w-4 rounded-full bg-amber-500/10 flex items-center justify-center font-bold text-[10px] mt-0.5 flex-shrink-0">!</span>
-                    <span><strong>Quantify suggestion:</strong> Add metrics to experience for 98%+ score.</span>
-                  </li>
-                ) : (
-                  <li className="flex items-start space-x-2 text-cyan-400">
+              {parsedReport ? (
+                <div className="space-y-4">
+                  {/* Visual Score Breakdown Progress Bars */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[9px] font-bold font-mono border-b border-zinc-900 pb-3">
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-zinc-400">
+                        <span>Formatting & Grid:</span>
+                        <span className="text-cyan-400">{parsedReport.breakdown.formatting}%</span>
+                      </div>
+                      <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                        <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${parsedReport.breakdown.formatting}%` }} />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-zinc-400">
+                        <span>Keyword Density:</span>
+                        <span className="text-cyan-400">{parsedReport.breakdown.keywords}%</span>
+                      </div>
+                      <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                        <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${parsedReport.breakdown.keywords}%` }} />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-zinc-400">
+                        <span>Experience Metrics:</span>
+                        <span className="text-cyan-400">{parsedReport.breakdown.experienceQuality}%</span>
+                      </div>
+                      <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                        <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${parsedReport.breakdown.experienceQuality}%` }} />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-zinc-400">
+                        <span>Skills Completeness:</span>
+                        <span className="text-cyan-400">{parsedReport.breakdown.technicalSkills}%</span>
+                      </div>
+                      <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                        <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${parsedReport.breakdown.technicalSkills}%` }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Format & Checklist diagnostics */}
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest font-mono block">
+                      Formatting Violations ({parsedReport.warnings.length})
+                    </span>
+                    <ul className="space-y-1.5 text-[9px] font-bold font-mono max-h-24 overflow-y-auto pr-1">
+                      {parsedReport.warnings.map((warn, idx) => (
+                        <li key={idx} className="flex items-start space-x-1.5 text-zinc-400">
+                          <span className="h-3 w-3 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center font-bold text-[7px] mt-0.5 flex-shrink-0">!</span>
+                          <span>{warn}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Missing keyword chip Cloud highlights */}
+                  {parsedReport.keywordGaps.length > 0 && (
+                    <div className="space-y-2 border-t border-zinc-900 pt-2.5">
+                      <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest font-mono block">
+                        Target Keyword Gaps ({parsedReport.keywordGaps.length})
+                      </span>
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {parsedReport.keywordGaps.map((word, idx) => (
+                          <span 
+                            key={idx}
+                            className="px-2 py-0.5 rounded bg-amber-950/20 border border-amber-900/30 text-[8px] font-mono text-amber-400 font-bold"
+                          >
+                            + {word}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              ) : (
+                <ul className="text-xs space-y-2 text-zinc-400">
+                  <li className="flex items-start space-x-2">
                     <CheckCircle2 className="h-4 w-4 text-cyan-400 mt-0.5 flex-shrink-0" />
-                    <span><strong>Quantified bullets:</strong> Standard XYZ numbers detected!</span>
+                    <span><strong>Format check:</strong> Clean single-column layout detected (Pass).</span>
                   </li>
-                )}
-              </ul>
+                  <li className="flex items-start space-x-2">
+                    <CheckCircle2 className="h-4 w-4 text-cyan-400 mt-0.5 flex-shrink-0" />
+                    <span><strong>Fonts standard:</strong> Helvetica / Arial parsed cleanly.</span>
+                  </li>
+                  {atsScore < 85 ? (
+                    <li className="flex items-start space-x-2 text-amber-500">
+                      <span className="h-4 w-4 rounded-full bg-amber-500/10 flex items-center justify-center font-bold text-[10px] mt-0.5 flex-shrink-0">!</span>
+                      <span><strong>Quantify suggestion:</strong> Add metrics to experience for 98%+ score.</span>
+                    </li>
+                  ) : (
+                    <li className="flex items-start space-x-2 text-cyan-400">
+                      <CheckCircle2 className="h-4 w-4 text-cyan-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Quantified bullets:</strong> Standard XYZ numbers detected!</span>
+                    </li>
+                  )}
+                </ul>
+              )}
 
               {/* Paywall Action / Download Trigger */}
               <div className="pt-2">
