@@ -25,7 +25,7 @@ export function Footer() {
                 <Zap className="h-5 w-5 text-zinc-950 stroke-[2.5]" />
               </div>
               <span className="text-xl font-black tracking-tight text-white font-mono">
-                CV<span className="text-cyan-400">⚡</span>BOOST
+                BOOSTCV
               </span>
             </Link>
             
@@ -119,14 +119,14 @@ export function Footer() {
         {/* Bottom copyright/support strip */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-zinc-500 font-bold font-mono space-y-4 md:space-y-0">
           <div className="text-center md:text-left">
-            © {currentYear} CV⚡BOOST. Built for Placements. Optimized for ATS.
+            © {currentYear} BOOSTCV. Built for Placements. Optimized for ATS.
           </div>
 
           <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-zinc-900/40 border border-zinc-900 hover:border-cyan-500/20 transition-all">
             <Mail className="h-3.5 w-3.5 text-cyan-400" />
             <span className="text-zinc-400">Support:</span>
-            <a href="mailto:support@cvboost.co" className="text-white hover:text-cyan-400 transition-colors">
-              support@cvboost.co
+            <a href="mailto:support@boostcv.in" className="text-white hover:text-cyan-400 transition-colors">
+              support@boostcv.in
             </a>
           </div>
         </div>

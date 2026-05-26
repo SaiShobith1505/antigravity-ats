@@ -450,7 +450,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                     <div className="p-4 bg-cyan-950/20 border border-cyan-900/30 rounded-xl space-y-3">
                       <div className="flex items-center space-x-1 text-xs font-bold text-cyan-400">
                         <Sparkles className="h-4 w-4" />
-                        <span>CV⚡BOOST AI Optimizer (Google XYZ Format)</span>
+                        <span>BOOSTCV AI Optimizer (Google XYZ Format)</span>
                       </div>
                       <textarea
                         value={aiMessyText}
@@ -529,7 +529,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       type="text"
                       value={proj.title}
                       onChange={(e) => updateProject(idx, "title", e.target.value)}
-                      placeholder="CV⚡BOOST (ATS SaaS Compiler)"
+                      placeholder="BOOSTCV (ATS SaaS Compiler)"
                       className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>

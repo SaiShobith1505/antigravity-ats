@@ -14,10 +14,10 @@ export default function TermsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <div className="h-9 w-9 rounded-lg bg-gradient-to-tr from-cyan-500 to-electric-blue flex items-center justify-center shadow-md">
-              <Zap className="h-5 w-5 text-zinc-950 stroke-[2.5]" />
+              <Zap className="h-5.5 w-5.5 text-zinc-950 stroke-[2.5]" />
             </div>
             <span className="text-xl font-black tracking-tight text-white font-mono">
-              CV<span className="text-cyan-400">⚡</span>BOOST
+              BOOSTCV
             </span>
           </Link>
 
@@ -61,7 +61,7 @@ export default function TermsPage() {
                 <span>Acceptance of Agreement</span>
               </h2>
               <p>
-                By signing up for CV⚡BOOST, accessing our student dashboard, using our AI-heuristic scoring models, 
+                By signing up for BOOSTCV, accessing our student dashboard, using our AI-heuristic scoring models, 
                 or completing a Razorpay checkout, you agree to comply with and be bound by these Terms & Conditions. 
                 If you are creating resumes on behalf of other undergraduates, you warrant that you have their explicit consent.
               </p>
@@ -89,7 +89,7 @@ export default function TermsPage() {
                 <span>Micro-Payments & Commercial Purchases</span>
               </h2>
               <p>
-                CV⚡BOOST charges a one-time placement campaign fee of ₹80 (inclusive of relevant taxes) to unlock 
+                BOOSTCV charges a one-time placement campaign fee of ₹80 (inclusive of relevant taxes) to unlock 
                 the downloadable, high-fidelity selectable text PDF of your custom resume layout. All transactions 
                 are securely routed via Razorpay Checkout protocols. Verification states are saved cryptographically.
               </p>
@@ -101,7 +101,7 @@ export default function TermsPage() {
                 <span>Limitations of Placement Placement</span>
               </h2>
               <p>
-                CV⚡BOOST is an engineering tool designed to optimize resume parsing structures based on standard single-column 
+                BOOSTCV is an engineering tool designed to optimize resume parsing structures based on standard single-column 
                 recruiter schemas. We do NOT guarantee job callbacks, shortlist outcomes, placement clearances, 
                 or interview success. Results vary based on actual student merit, market requirements, and hiring seasons.
               </p>
@@ -114,7 +114,7 @@ export default function TermsPage() {
               </h2>
               <p>
                 We reserve the right to alter features, micro-pricing bounds (such as placement discount schemes), 
-                and terms of use without prior notice. Continued use of CV⚡BOOST after updates implies full acceptance.
+                and terms of use without prior notice. Continued use of BOOSTCV after updates implies full acceptance.
               </p>
             </section>
 

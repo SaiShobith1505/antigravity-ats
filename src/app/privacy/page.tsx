@@ -17,7 +17,7 @@ export default function PrivacyPage() {
               <Zap className="h-5 w-5 text-zinc-950 stroke-[2.5]" />
             </div>
             <span className="text-xl font-black tracking-tight text-white font-mono">
-              CV<span className="text-cyan-400">⚡</span>BOOST
+              BOOSTCV
             </span>
           </Link>
 
@@ -61,7 +61,7 @@ export default function PrivacyPage() {
                 <span>Information We Collect</span>
               </h2>
               <p>
-                At CV⚡BOOST, we collect personal information you explicitly provide when creating your resume. 
+                At BOOSTCV, we collect personal information you explicitly provide when creating your resume. 
                 This includes names, contact details (phone, email, links), academic records, career history, skills, 
                 and list of projects. We also sync your profile identity using Google OAuth secure sign-in variables.
               </p>
@@ -115,7 +115,7 @@ export default function PrivacyPage() {
                 <span>Legal Disclosures</span>
               </h2>
               <p>
-                CV⚡BOOST will only disclose user data when strictly required under Indian placement regulatory provisions, 
+                BOOSTCV will only disclose user data when strictly required under Indian placement regulatory provisions, 
                 court warrants, or to defend our systems against active cybersecurity threats.
               </p>
             </section>

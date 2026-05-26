@@ -249,7 +249,7 @@ export const defaultResumeData: ResumeData = {
 
   projects: [
     {
-      title: "CV⚡BOOST (ATS SaaS Compiler)",
+      title: "BOOSTCV (ATS SaaS Compiler)",
       techStack: "Next.js, Tailwind, React, Node.js",
       description:
         "Engineered ATS-optimized resume generation platform with clean parsing structure.",

@@ -60,7 +60,7 @@ export default function LoginPage() {
             <Zap className="h-5.5 w-5.5 text-zinc-950 stroke-[2.5]" />
           </div>
           <span className="text-xl font-black tracking-tight text-white font-mono">
-            CV⚡BOOST
+            BOOSTCV
           </span>
         </Link>
         <h2 className="mt-6 text-center text-2xl sm:text-3xl font-black tracking-tight text-white">

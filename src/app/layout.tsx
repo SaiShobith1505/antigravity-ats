@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CV⚡BOOST - 98%+ ATS Resume Builder for College Students",
+  title: "BOOSTCV — ATS Resume Optimizer",
   description: "Stop getting rejected by HR scripts. Build a single-column, recruiter-approved, highly optimized ATS resume in 5 minutes.",
 };
 

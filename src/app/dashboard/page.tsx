@@ -474,7 +474,7 @@ export default function DashboardPage() {
         key: order.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: "INR",
-        name: "CV⚡BOOST",
+        name: "BOOSTCV",
         description: "ATS Standard Selectable Text PDF Unlock",
         order_id: order.id,
         handler: async function (res: any) {
@@ -569,7 +569,7 @@ export default function DashboardPage() {
             <Zap className="h-6 w-6 text-zinc-950 stroke-[2.5]" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-white">Unlock CV⚡BOOST Dashboard</h2>
+            <h2 className="text-2xl font-black text-white">Unlock BOOSTCV Dashboard</h2>
             <p className="text-zinc-400 text-sm">
               We sync your resume progress and real-time ATS scores to your student profile automatically.
             </p>
@@ -601,9 +601,9 @@ export default function DashboardPage() {
             <div className="h-8 w-8 rounded bg-gradient-to-tr from-cyan-500 to-electric-blue flex items-center justify-center">
               <Zap className="h-4.5 w-4.5 text-zinc-950 stroke-[2.5]" />
             </div>
-            <span className="text-base font-black tracking-tight text-white font-mono hidden sm:inline">
-              CV⚡BOOST
-            </span>
+             <span className="text-base font-black tracking-tight text-white font-mono hidden sm:inline">
+              BOOSTCV
+             </span>
           </Link>
         </div>
 
@@ -1019,7 +1019,7 @@ export default function DashboardPage() {
                 <div 
                   className="absolute inset-0 pointer-events-none select-none z-10" 
                   style={{
-                    backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='120' viewBox='0 0 160 120'><text x='50%' y='50%' fill='%23000000' font-family='monospace' font-weight='bold' font-size='7.5' opacity='0.04' transform='rotate(-25 80 60)' text-anchor='middle'>CV⚡BOOST PREVIEW</text></svg>")`,
+                    backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='120' viewBox='0 0 160 120'><text x='50%' y='50%' fill='%23000000' font-family='monospace' font-weight='bold' font-size='7.5' opacity='0.04' transform='rotate(-25 80 60)' text-anchor='middle'>BOOSTCV PREVIEW</text></svg>")`,
                     backgroundRepeat: "repeat",
                   }}
                 />
@@ -1261,7 +1261,7 @@ export default function DashboardPage() {
             <div className="bg-zinc-900/40 border border-zinc-900 rounded-xl p-4 space-y-3 text-xs font-mono">
               <div className="flex justify-between">
                 <span className="text-zinc-500">Merchandiser:</span>
-                <span className="text-slate-200 font-bold">CV⚡BOOST Professional</span>
+                <span className="text-slate-200 font-bold">BOOSTCV Professional</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-zinc-500">Simulated Order:</span>

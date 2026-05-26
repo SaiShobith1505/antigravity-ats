@@ -17,7 +17,7 @@ export default function RefundPage() {
               <Zap className="h-5 w-5 text-zinc-950 stroke-[2.5]" />
             </div>
             <span className="text-xl font-black tracking-tight text-white font-mono">
-              CV<span className="text-cyan-400">⚡</span>BOOST
+              BOOSTCV
             </span>
           </Link>
 
@@ -61,7 +61,7 @@ export default function RefundPage() {
                 <span>General Refund Principles</span>
               </h2>
               <p>
-                CV⚡BOOST operates under strict undergraduate micro-payment guidelines (₹80 campaign). Since downloading 
+                BOOSTCV operates under strict undergraduate micro-payment guidelines (₹80 campaign). Since downloading 
                 a resume PDF constitutes immediate consumption of digital data services, we operate a 
                 <strong className="text-white"> no-questions-asked refund policy under specific technical conditions</strong>.
               </p>
@@ -103,7 +103,7 @@ export default function RefundPage() {
                 <span>How to Submit a Refund Claim</span>
               </h2>
               <p>
-                To file a support claim, email us at <a href="mailto:support@cvboost.co" className="text-cyan-400 font-mono hover:underline">support@cvboost.co</a> with:
+                To file a support claim, email us at <a href="mailto:support@boostcv.in" className="text-cyan-400 font-mono hover:underline">support@boostcv.in</a> with:
               </p>
               <div className="bg-zinc-900/50 rounded-xl p-4 border border-zinc-900 text-xs font-mono space-y-1.5">
                 <div>- Subject: <span className="text-white font-bold">PLACEMENT REFUND - [Your Order ID]</span></div>

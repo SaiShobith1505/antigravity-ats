@@ -42,7 +42,7 @@ export default function LandingPage() {
     },
     {
       q: "Can I use colors, profile pictures, or skill bars?",
-      a: "No! Absolutely not. Skill bars and circular graphics are completely invisible to ATS systems. Profile pictures are ignored or can cause rejection due to hiring bias regulations. CV⚡BOOST generates standard, recruiter-approved black-and-white, single-column structures that guarantee a 98%+ parse score."
+      a: "No! Absolutely not. Skill bars and circular graphics are completely invisible to ATS systems. Profile pictures are ignored or can cause rejection due to hiring bias regulations. BOOSTCV generates standard, recruiter-approved black-and-white, single-column structures that guarantee a 98%+ parse score."
     },
     {
       q: "How does the ₹80 micro-payment work?",
@@ -65,7 +65,7 @@ export default function LandingPage() {
               <Zap className="h-5 w-5 text-zinc-950 stroke-[2.5]" />
             </div>
             <span className="text-xl font-black tracking-tight text-white font-mono">
-              CV<span className="text-cyan-400">⚡</span>BOOST
+              BOOSTCV
             </span>
           </Link>
 
@@ -124,7 +124,7 @@ export default function LandingPage() {
               </h1>
               
               <p className="text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 font-medium">
-                92% of B.Tech resumes fail basic ATS parser scripts due to columns, tables, and Canva grids. CV⚡BOOST generates clean, single-column layouts engineered to hit 98%+ parse scores and secure callbacks.
+                92% of B.Tech resumes fail basic ATS parser scripts due to columns, tables, and Canva grids. BOOSTCV generates clean, single-column layouts engineered to hit 98%+ parse scores and secure callbacks.
               </p>
 
               {/* Real-time Statistics Ticker */}
@@ -270,7 +270,7 @@ export default function LandingPage() {
               Canva-Style Graphic Resumes Are Instantly Rejected
             </p>
             <p className="text-zinc-400 text-sm sm:text-base font-medium">
-              Check out how standard ATS parsers see a fancy graphic resume versus our clean single-column CV⚡BOOST template.
+              Check out how standard ATS parsers see a fancy graphic resume versus our clean single-column BOOSTCV template.
             </p>
           </div>
 
@@ -312,14 +312,14 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* CV BOOST Success */}
+            {/* BOOSTCV Success */}
             <div className="glass-panel rounded-2xl p-6 border border-cyan-900/30 bg-cyan-950/5 relative overflow-hidden flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-6 pb-3 border-b border-cyan-900/20">
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="h-5 w-5 text-cyan-400" />
                     <span className="text-sm font-extrabold text-cyan-400 tracking-tight">
-                      CV⚡BOOST Single-Column
+                      BOOSTCV Single-Column
                     </span>
                   </div>
                   <span className="text-xs font-bold font-mono px-2 py-0.5 rounded bg-cyan-950/50 text-cyan-400 border border-cyan-900/30">

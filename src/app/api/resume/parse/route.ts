@@ -218,7 +218,7 @@ Resume Text:
       ],
       projects: [
         {
-          title: "CV⚡BOOST Compiler",
+          title: "BOOSTCV Compiler",
           techStack: "Next.js, Tailwind, React, Node.js",
           description: "Engineered single-column ATS resume compiler to bypass Taleo applicant filters."
         }

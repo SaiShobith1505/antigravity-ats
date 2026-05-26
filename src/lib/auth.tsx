@@ -116,7 +116,7 @@ export const AuthProvider: React.FC<{
       const adminUser = {
         uid: "admin-uid-999",
         email: "admin@cvboost.co",
-        displayName: "Antigravity Admin 👑",
+        displayName: "BOOSTCV Admin 👑",
       };
       setUser(adminUser);
       localStorage.setItem("cv_boost_user", JSON.stringify(adminUser));

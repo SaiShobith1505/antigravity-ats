@@ -32,7 +32,7 @@ export default function ContactPage() {
               <Zap className="h-5 w-5 text-zinc-950 stroke-[2.5]" />
             </div>
             <span className="text-xl font-black tracking-tight text-white font-mono">
-              CV<span className="text-cyan-400">⚡</span>BOOST
+              BOOSTCV
             </span>
           </Link>
 
@@ -64,7 +64,7 @@ export default function ContactPage() {
               Contact Information
             </h1>
             <p className="text-zinc-500 text-xs font-mono font-bold uppercase tracking-wider">
-              Get in touch with the CV⚡BOOST Placements Campaign Support Team
+              Get in touch with the BOOSTCV Placements Campaign Support Team
             </p>
           </div>
 
@@ -88,8 +88,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="text-white font-bold text-xs uppercase tracking-wider font-mono">Email Support</div>
-                      <a href="mailto:support@cvboost.co" className="hover:text-cyan-400 transition-colors">
-                        support@cvboost.co
+                      <a href="mailto:support@boostcv.in" className="hover:text-cyan-400 transition-colors">
+                        support@boostcv.in
                       </a>
                       <div className="text-[10px] text-zinc-500 mt-1 font-mono">Average response time: &lt; 4 hours</div>
                     </div>
@@ -113,7 +113,7 @@ export default function ContactPage() {
                       <MapPin className="h-5 w-5 text-cyan-400" />
                     </div>
                     <div>
-                      <div className="text-white font-bold text-xs uppercase tracking-wider font-mono">Antigravity HQ</div>
+                      <div className="text-white font-bold text-xs uppercase tracking-wider font-mono">BOOSTCV HQ</div>
                       <span>
                         HSR Layout Sector 2, 24th Main Road,<br />
                         Bengaluru, Karnataka, 560102<br />
