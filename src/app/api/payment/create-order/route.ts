@@ -52,6 +52,7 @@ export async function POST(req: Request) {
         amount: order.amount,
         currency: order.currency,
         receipt: order.receipt,
+        keyId: process.env.RAZORPAY_KEY_ID,
       });
     }
 

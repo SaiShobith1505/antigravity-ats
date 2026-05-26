@@ -471,7 +471,7 @@ export default function DashboardPage() {
       }
       // Configure Razorpay client options
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_mockKey12345",
+        key: order.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: "INR",
         name: "CV⚡BOOST",
