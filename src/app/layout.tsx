@@ -14,8 +14,40 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://boostcv.in"),
   title: "BOOSTCV — ATS Resume Optimizer",
   description: "Stop getting rejected by HR scripts. Build a single-column, recruiter-approved, highly optimized ATS resume in 5 minutes.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" }
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }
+    ]
+  },
+  openGraph: {
+    title: "BOOSTCV — ATS Resume Optimizer",
+    description: "Stop getting rejected by HR scripts. Build a single-column, recruiter-approved, highly optimized ATS resume in 5 minutes.",
+    url: "https://boostcv.in",
+    siteName: "BOOSTCV",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "BOOSTCV — ATS Resume Optimizer"
+      }
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BOOSTCV — ATS Resume Optimizer",
+    description: "Stop getting rejected by HR scripts. Build a single-column, recruiter-approved, highly optimized ATS resume in 5 minutes.",
+    images: ["/twitter-image.png"],
+  }
 };
 
 export default function RootLayout({
