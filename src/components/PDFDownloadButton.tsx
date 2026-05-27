@@ -10,9 +10,10 @@ interface PDFDownloadButtonProps {
   data: ResumeData;
   isPaid: boolean;
   userEmail?: string | null;
+  template?: "classic" | "minimal" | "technical";
 }
 
-export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ data, isPaid, userEmail }) => {
+export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ data, isPaid, userEmail, template = "classic" }) => {
   const isAdmin = userEmail === "admin@cvboost.co";
 
   if (!isPaid && !isAdmin) {
@@ -26,7 +27,7 @@ export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ data, isPa
   return (
     <div className="inline-block">
       <PDFDownloadLink
-        document={<ResumeTemplatePdf data={data} />}
+        document={<ResumeTemplatePdf data={data} template={template} />}
         fileName={`${data.personal.fullName.replace(/\s+/g, "_")}_ATS_Resume.pdf`}
       >
         {({ loading }) => (

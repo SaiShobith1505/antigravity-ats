@@ -1,77 +1,240 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+// @ts-ignore
+import mammoth from "mammoth";
+
+export const dynamic = "force-dynamic";
+
 
 const aiApiKey = process.env.GEMINI_API_KEY;
 const ai = aiApiKey ? new GoogleGenAI({ apiKey: aiApiKey }) : null;
 
+// Heuristic synonyms list for matching normalization
+const SYNONYM_MAP: Record<string, string[]> = {
+  javascript: ["js", "javascript", "reactjs", "node", "nodejs"],
+  typescript: ["ts", "typescript"],
+  react: ["react", "reactjs", "react.js"],
+  nextjs: ["next", "nextjs", "next.js"],
+  nodejs: ["node", "nodejs", "node.js"],
+  docker: ["docker", "containerization"],
+  git: ["git", "github", "gitlab"],
+  kubernetes: ["k8s", "kubernetes"],
+  aws: ["aws", "amazon web services"],
+  gcp: ["gcp", "google cloud"],
+  sql: ["sql", "mysql", "postgresql", "sqlite"],
+  nosql: ["nosql", "mongodb", "redis"],
+};
+
+// Buzzwords to penalize if overused
+const BUZZWORDS = ["synergy", "dynamic", "motivated", "detail-oriented", "results-driven", "innovative", "passionate", "detail-oriented", "team-player"];
+
 export async function POST(req: Request) {
   try {
-    const { text, filename } = await req.json();
+    const formData = await req.formData();
+    const file = formData.get("file") as File;
+    const jobDescription = (formData.get("jobDescription") as string) || "";
 
-    if (!text || text.trim().length === 0) {
+    if (!file) {
       return NextResponse.json(
-        { error: "No text content provided for parsing." },
+        { error: "No file was uploaded." },
         { status: 400 }
       );
     }
 
-    // Heuristics checks (Always run alongside Gemini to serve detailed analysis)
+    const filename = file.name.toLowerCase();
+    let text = "";
+
+    // Server-side text extraction based on file type
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    if (filename.endsWith(".pdf")) {
+      try {
+        // @ts-ignore
+        const pdfParse = require("pdf-parse");
+        const parsedPdf = await pdfParse(buffer);
+        text = parsedPdf.text || "";
+      } catch (pdfErr) {
+        console.error("[PARSER] Server-side PDF extraction failed:", pdfErr);
+        return NextResponse.json(
+          { error: "Failed to parse PDF document. Ensure the file is not corrupted." },
+          { status: 500 }
+        );
+      }
+    } else if (filename.endsWith(".docx")) {
+      try {
+        const result = await mammoth.extractRawText({ buffer });
+        text = result.value || "";
+      } catch (docxErr) {
+        console.error("[PARSER] Server-side DOCX extraction failed:", docxErr);
+        return NextResponse.json(
+          { error: "Failed to parse Word document. Ensure the file is not corrupted." },
+          { status: 500 }
+        );
+      }
+    } else {
+      // Treat as plain text or .txt file
+      text = buffer.toString("utf-8");
+    }
+
+    if (!text || text.trim().length === 0) {
+      return NextResponse.json(
+        { error: "Extracted resume content is empty. Ensure the file contains readable text (not scanned images)." },
+        { status: 400 }
+      );
+    }
+
+    // Initialize Heuristic Scorer Parameters
+    let formatScore = 20;
+    let keywordScore = 30;
+    let qualityScore = 20;
+    let technicalScore = 10;
+    let completenessScore = 10;
+
     const warnings: string[] = [];
     const keywordGaps: string[] = [];
     const metricEnhancements: string[] = [];
-    let computedScore = 85;
-
-    // Check for multi-column / graphic patterns in file text
     const lowerText = text.toLowerCase();
-    
-    // Graphic resume indicators
-    if (lowerText.includes("cocurricular") || lowerText.includes("hobbies") || lowerText.includes("skills:") && lowerText.includes("|")) {
-      warnings.push("Detected multi-column text separators (| or tab alignments) indicating potential parsing conflicts.");
-      computedScore -= 15;
+
+    // 1. Format & Structure Check (20 pts)
+    if (lowerText.includes("|") || lowerText.includes("  \t") || lowerText.includes(" • ") && filename.includes("canva")) {
+      warnings.push("Detected complex multi-column grids or visual separators (Canva indicators). Clean single-column layout recommended.");
+      formatScore -= 10;
+    }
+    if (lowerText.includes("table") || lowerText.includes("cell") && text.match(/\n.*\t.*\t/)) {
+      warnings.push("Potential hidden tables or grid charts detected. ATS scanners ignore table cell data or read it in garbled order.");
+      formatScore -= 5;
+    }
+    // Section order checklist
+    const sections = ["education", "experience", "projects", "skills"];
+    const sectionIndex = sections.map(sec => lowerText.indexOf(sec));
+    const isSorted = sectionIndex.every((val, i, arr) => !i || arr[i - 1] === -1 || val === -1 || val >= arr[i - 1]);
+    if (!isSorted) {
+      warnings.push("Chronological section flow issue: Recommended order is Header -> Summary -> Education -> Experience -> Projects -> Skills.");
+      formatScore -= 5;
     }
 
-    // Checking core placement B.Tech keyword gaps
-    const techWords = ["react", "next.js", "node.js", "docker", "git", "typescript", "kubernetes", "aws", "gcp"];
-    const missedTech = techWords.filter(word => !lowerText.includes(word));
-    if (missedTech.length > 3) {
-      warnings.push(`Missing critical industry keywords: ${missedTech.slice(0, 3).join(", ")}`);
-      computedScore -= 10;
-      missedTech.slice(0, 4).forEach(w => keywordGaps.push(w));
-    }
+    // 2. Keyword Matching & Normalization (30 pts)
+    const targetKeywords = jobDescription
+      ? jobDescription.toLowerCase().match(/\b[a-z]{3,}\b/g) || []
+      : ["react", "next.js", "nodejs", "typescript", "docker", "git", "sql", "nosql", "aws", "gcp"];
 
-    // Quantifications validation check
-    const sentences = text.split(/[.!?\n]/);
-    let lacksMetricsCount = 0;
-    sentences.forEach((sentence: string) => {
-      const s = sentence.trim();
-      if (s.length > 20 && !/\d+%?|\b(percent|CGPA|CGPA\b)\b/.test(s)) {
-        lacksMetricsCount++;
-        if (metricEnhancements.length < 3) {
-          metricEnhancements.push(`Suggest adding metric to: "${s.slice(0, 50)}..."`);
+    const uniqueTargets = Array.from(new Set(targetKeywords)).slice(0, 15);
+    let matchedCount = 0;
+
+    uniqueTargets.forEach(word => {
+      // Synonym support
+      let found = false;
+      const synonyms = SYNONYM_MAP[word] || [word];
+      for (const syn of synonyms) {
+        if (lowerText.includes(syn)) {
+          found = true;
+          break;
         }
+      }
+
+      if (found) {
+        matchedCount++;
+      } else {
+        keywordGaps.push(word.charAt(0).toUpperCase() + word.slice(1));
       }
     });
 
-    if (lacksMetricsCount > 2) {
-      warnings.push("Multiple unquantified accomplishments found (lacks percentages, metrics, or performance ratios).");
-      computedScore -= 15;
+    const matchRatio = uniqueTargets.length > 0 ? matchedCount / uniqueTargets.length : 1;
+    keywordScore = Math.round(matchRatio * 30);
+
+    // Overused Buzzword Penalty
+    let buzzwordPenalties = 0;
+    BUZZWORDS.forEach(word => {
+      const occurrences = (lowerText.match(new RegExp(`\\b${word}\\b`, "g")) || []).length;
+      if (occurrences > 2) {
+        buzzwordPenalties += 2;
+        warnings.push(`Overused generic buzzword: "${word}" (${occurrences} times). Replace with strong action-oriented accomplishments.`);
+      }
+    });
+    keywordScore = Math.max(5, keywordScore - buzzwordPenalties);
+
+    // 3. Content Quality Check (20 pts)
+    const summaryMatch = lowerText.includes("summary") || lowerText.includes("profile") || lowerText.includes("about me");
+    if (summaryMatch) {
+      qualityScore += 5;
+    } else {
+      warnings.push("Missing professional summary section. HR recruiters expect a 2-3 line target profile at the very top.");
+      qualityScore -= 5;
     }
 
-    // If Gemini client is active, fetch deep semantic parsing analysis
+    // Quantifications check (Google XYZ Metrics)
+    const bullets = text.split(/[•\n\-\*]/).map(b => b.trim()).filter(b => b.length > 15);
+    let quantifiedBullets = 0;
+    bullets.forEach(bullet => {
+      if (/\d+%?|\b(percent|CGPA|CGPA\b)\b/.test(bullet)) {
+        quantifiedBullets++;
+      } else if (metricEnhancements.length < 3 && bullet.length > 30) {
+        metricEnhancements.push(`In bullet: "${bullet.slice(0, 45)}..." -> Add exact placement statistics, speed increases, or percentages.`);
+      }
+    });
+
+    const bulletMetricsRatio = bullets.length > 0 ? quantifiedBullets / bullets.length : 0;
+    if (bulletMetricsRatio < 0.3) {
+      warnings.push("Lacks quantified accomplishments. Recruiters require metrics, scale increases, and measurable outputs (XYZ structure).");
+      qualityScore -= 10;
+    } else {
+      qualityScore += 10;
+    }
+
+    // 4. Technical Depth Check (10 pts)
+    const technicalKeyCount = ["javascript", "python", "typescript", "c++", "java", "react", "next.js", "docker", "git", "aws"].filter(term => lowerText.includes(term)).length;
+    technicalScore = Math.min(10, Math.round((technicalKeyCount / 5) * 10));
+
+    // 5. Completeness Check (10 pts)
+    const hasEducation = lowerText.includes("education") || lowerText.includes("college") || lowerText.includes("university");
+    const hasExperience = lowerText.includes("experience") || lowerText.includes("work") || lowerText.includes("employment");
+    const hasProjects = lowerText.includes("projects") || lowerText.includes("project");
+    const hasSkills = lowerText.includes("skills") || lowerText.includes("technologies");
+
+    let completeCount = 0;
+    if (hasEducation) completeCount++;
+    else warnings.push("Missing Education Section. Critical for academic qualification checks.");
+
+    if (hasExperience) completeCount++;
+    if (hasProjects) completeCount++;
+    else warnings.push("Missing Technical Projects Section. Critical for engineering callbacks.");
+
+    if (hasSkills) completeCount++;
+    else warnings.push("Missing Technical Skills Section. Critical for recruiter search filters.");
+
+    completenessScore = Math.round((completeCount / 4) * 10);
+
+    const heuristicScore = Math.min(99, Math.max(35, formatScore + keywordScore + qualityScore + technicalScore + completenessScore));
+
+    const breakdown = {
+      formatting: Math.max(10, formatScore * 5),
+      keywords: Math.max(10, Math.round((keywordScore / 30) * 100)),
+      experienceQuality: Math.max(10, Math.round((qualityScore / 20) * 100)),
+      technicalSkills: Math.max(10, technicalScore * 10),
+      readability: Math.max(10, completenessScore * 10),
+    };
+
+    // If Gemini client is active, merge heuristic checks with semantic evaluation
     if (ai) {
       try {
-        const prompt = `Analyze the following B.Tech student resume text against tech placement requirements.
-Check for columns, table structures, graphics, keyword gaps, and metrics/quantifications.
-Text:
-${text.slice(0, 2500)}
+        const prompt = `You are a high-level technical recruiter analyzing a candidate's B.Tech resume text against automated ATS filters.
+Analyze the following extracted resume text, compare it against the job description (if provided), and calculate a high-precision ATS score (0 to 100).
+Check for multi-column grids, Canva graphics, standard section order, synonym metrics, buzzword density, Google XYZ accomplishments, and completeness.
 
-Strict JSON format return:
+Extracted Resume Text:
+${text.slice(0, 3000)}
+
+${jobDescription ? `Job Description:\n${jobDescription}` : ""}
+
+Provide your response in EXACTLY the following JSON format:
 {
   "atsScore": number (0 to 100),
-  "warnings": ["string"],
-  "keywordGaps": ["string"],
-  "metricEnhancements": ["string"]
-}`;
+  "warnings": ["detailed formatting/structure warnings"],
+  "keywordGaps": ["skills or keyword gaps to add"],
+  "metricEnhancements": ["actionable recommendations to rewrite bullet points using Google XYZ metrics (e.g. Accomplished X, as measured by Y, by doing Z)"]
+}
+Do not include any markdown wrappers (no \`\`\`json), comments, or commentary. Only return a raw JSON string.`;
 
         const response = await ai.models.generateContent({
           model: "gemini-1.5-flash",
@@ -84,25 +247,34 @@ Strict JSON format return:
         const resultText = response.text?.trim() || "";
         if (resultText) {
           const aiResult = JSON.parse(resultText);
-          return NextResponse.json(aiResult);
+          if (typeof aiResult.atsScore === "number") {
+            return NextResponse.json({
+              atsScore: aiResult.atsScore,
+              warnings: aiResult.warnings && aiResult.warnings.length > 0 ? aiResult.warnings : warnings,
+              keywordGaps: aiResult.keywordGaps && aiResult.keywordGaps.length > 0 ? aiResult.keywordGaps : keywordGaps,
+              metricEnhancements: aiResult.metricEnhancements && aiResult.metricEnhancements.length > 0 ? aiResult.metricEnhancements : metricEnhancements,
+              breakdown,
+            });
+          }
         }
       } catch (aiErr) {
-        console.error("Gemini ATS Sandbox analysis failed, falling back to heuristics:", aiErr);
+        console.error("Gemini ATS analysis failed, relying on dynamic heuristic scoring engine:", aiErr);
       }
     }
 
     // Dynamic Heuristics return
     return NextResponse.json({
-      atsScore: Math.max(30, computedScore),
-      warnings: warnings.length > 0 ? warnings : ["No critical formatting errors found! Keep it up."],
-      keywordGaps: keywordGaps.length > 0 ? keywordGaps : ["Docker", "TypeScript", "Redis"],
-      metricEnhancements: metricEnhancements.length > 0 ? metricEnhancements : ["Optimize project metrics using the XYZ formula (e.g. Accomplished X, as measured by Y, by doing Z)."]
+      atsScore: heuristicScore,
+      warnings: warnings.length > 0 ? warnings : ["Your resume matches standard recruiter formatting guidelines beautifully. Good structure."],
+      keywordGaps: keywordGaps.length > 0 ? keywordGaps.slice(0, 6) : ["TypeScript", "Docker", "AWS"],
+      metricEnhancements: metricEnhancements.length > 0 ? metricEnhancements.slice(0, 3) : ["Rewrite accomplishments: 'Assisted in React layouts' -> 'Designed 8 responsive React dashboards, decreasing customer latency by 24%.'"],
+      breakdown,
     });
 
   } catch (err: any) {
-    console.error("ATS scan route crashed:", err);
+    console.error("ATS scanner route crashed:", err);
     return NextResponse.json(
-      { error: "Internal server error occurred during scan." },
+      { error: "Internal server error occurred during scanning. Ensure uploaded files are valid PDF or Word documents." },
       { status: 500 }
     );
   }

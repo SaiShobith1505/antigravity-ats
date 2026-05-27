@@ -74,6 +74,7 @@ export default function DashboardPage() {
   } | null>(null);
   const [tailorApplied, setTailorApplied] = useState(false);
   const [originalResumeDraft, setOriginalResumeDraft] = useState<typeof defaultResumeData | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<"classic" | "minimal" | "technical">("classic");
 
   // AI Resume Parser States
   const [isParsing, setIsParsing] = useState(false);
@@ -994,7 +995,7 @@ export default function DashboardPage() {
                   </div>
                 )}
                 {isPaid ? (
-                  <PDFDownloadButton data={resumeData} isPaid={isPaid} userEmail={user.email} />
+                  <PDFDownloadButton data={resumeData} isPaid={isPaid} userEmail={user.email} template={selectedTemplate} />
                 ) : (
                   <button
                     onClick={triggerRazorpayCheckout}
@@ -1011,8 +1012,36 @@ export default function DashboardPage() {
           {/* Dynamic HTML Document Live Preview Panel */}
           <div className="flex-1 bg-zinc-950 rounded-xl border border-zinc-900 overflow-hidden relative min-h-[450px] shadow-lg flex flex-col">
             
+            {/* Template Selector Bar */}
+            <div className="bg-zinc-900 border-b border-zinc-800 px-4 py-2.5 flex items-center justify-between flex-shrink-0">
+              <span className="text-[10px] font-black font-mono tracking-wider text-zinc-400 uppercase">
+                ATS Template Compiler
+              </span>
+              <div className="flex items-center space-x-1.5 p-0.5 bg-zinc-950 border border-zinc-850 rounded-lg">
+                {(["classic", "minimal", "technical"] as const).map((temp) => (
+                  <button
+                    key={temp}
+                    onClick={() => setSelectedTemplate(temp)}
+                    className={`px-2.5 py-1 text-[9px] font-bold font-mono tracking-wide rounded-md transition-all uppercase cursor-pointer ${
+                      selectedTemplate === temp
+                        ? "bg-cyan-500 text-zinc-950 shadow-sm font-black"
+                        : "text-zinc-400 hover:text-zinc-200"
+                    }`}
+                  >
+                    {temp}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Resume HTML-layout replica (Simulated Preview) */}
-            <div className="w-full h-full p-8 text-[9px] text-[#111] leading-normal font-sans bg-white overflow-y-auto relative select-none flex flex-col min-h-full">
+            <div className={`w-full h-full p-8 text-[9px] text-[#111] leading-normal bg-white overflow-y-auto relative select-none flex flex-col min-h-full ${
+              selectedTemplate === "minimal" 
+                ? "font-sans px-10 py-10" 
+                : selectedTemplate === "technical" 
+                ? "font-sans px-6 py-6 text-[8.5px]" 
+                : "font-sans px-8 py-8"
+            }`}>
               
               {/* Subtle repeating watermark pattern over the sheet if not paid */}
               {!isPaid && (
@@ -1026,27 +1055,45 @@ export default function DashboardPage() {
               )}
 
               {/* Header */}
-              <div className="text-center mb-4">
-                <h2 className="text-xl font-bold text-black mb-1">{resumeData.personal.fullName || "Your Full Name"}</h2>
-                <div className="flex justify-center space-x-2 text-zinc-600 text-[8px]">
-                  <span>{resumeData.personal.phone || "+91 98765 43210"}</span>
-                  <span>•</span>
-                  <span>{resumeData.personal.email || "student@college.edu"}</span>
-                  <span>•</span>
-                  <span>{resumeData.personal.linkedin || "linkedin.com/in/username"}</span>
-                  <span>•</span>
-                  <span>{resumeData.personal.github || "github.com/username"}</span>
+              <div className={`mb-4 flex flex-col ${
+                selectedTemplate === "minimal" 
+                  ? "items-start text-left mb-6" 
+                  : "items-center text-center"
+              }`}>
+                <h2 className={`font-bold text-black ${
+                  selectedTemplate === "minimal"
+                    ? "text-2xl text-cyan-600 mb-1 tracking-tight"
+                    : selectedTemplate === "technical"
+                    ? "text-lg mb-0.5"
+                    : "text-xl mb-1"
+                }`}>{resumeData.personal.fullName || "Your Full Name"}</h2>
+                <div className={`flex flex-wrap gap-2 text-zinc-650 text-[8px] ${
+                  selectedTemplate === "minimal" 
+                    ? "justify-start" 
+                    : "justify-center"
+                }`}>
+                  {resumeData.personal.phone && <span>{resumeData.personal.phone}</span>}
+                  {resumeData.personal.phone && resumeData.personal.email && <span className="text-zinc-400">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+                  {resumeData.personal.email && <span>{resumeData.personal.email}</span>}
+                  {resumeData.personal.email && resumeData.personal.linkedin && <span className="text-zinc-400">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+                  {resumeData.personal.linkedin && <span>{resumeData.personal.linkedin}</span>}
+                  {resumeData.personal.linkedin && resumeData.personal.github && <span className="text-zinc-400">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+                  {resumeData.personal.github && <span>{resumeData.personal.github}</span>}
                 </div>
               </div>
 
               {/* Education - Unprotected / Crisp and visible */}
               {resumeData.education.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="text-black font-bold uppercase border-b border-zinc-800 pb-0.5 mb-1.5 text-[9px] tracking-wide">
+                <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
+                  <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                    selectedTemplate === "minimal"
+                      ? "text-cyan-600 border-none mb-1 mt-2"
+                      : "text-black border-b border-zinc-800 mb-1.5"
+                  }`}>
                     Education
                   </h3>
                   {resumeData.education.map((edu, idx) => (
-                    <div key={idx} className="mb-2">
+                    <div key={idx} className={selectedTemplate === "technical" ? "mb-1" : "mb-2"}>
                       <div className="flex justify-between font-bold">
                         <span>{edu.institution || "Institution Name"}</span>
                         <span>{edu.year || "2022 - 2026"}</span>
@@ -1061,26 +1108,32 @@ export default function DashboardPage() {
               )}
 
               {/* Technical Skills - Unprotected / Crisp and visible */}
-              <div className="mb-4">
-                <h3 className="text-black font-bold uppercase border-b border-zinc-800 pb-0.5 mb-1.5 text-[9px] tracking-wide">
+              <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
+                <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                  selectedTemplate === "minimal"
+                    ? "text-cyan-600 border-none mb-1 mt-2"
+                    : "text-black border-b border-zinc-800 mb-1.5"
+                }`}>
                   Technical Skills
                 </h3>
-                <div className="space-y-1 text-zinc-800">
+                <div className={`text-zinc-850 ${
+                  selectedTemplate === "technical" ? "space-y-0.5 text-[8px]" : "space-y-1 text-[8.5px]"
+                }`}>
                   {resumeData.skills.languages.length > 0 && (
                     <div>
-                      <strong className="font-bold">Languages: </strong>
+                      <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-cyan-600" : "text-black"}`}>Languages: </strong>
                       <span>{resumeData.skills.languages.join(", ")}</span>
                     </div>
                   )}
                   {resumeData.skills.frameworks.length > 0 && (
                     <div>
-                      <strong className="font-bold">Frameworks: </strong>
+                      <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-cyan-600" : "text-black"}`}>Frameworks: </strong>
                       <span>{resumeData.skills.frameworks.join(", ")}</span>
                     </div>
                   )}
                   {resumeData.skills.tools.length > 0 && (
                     <div>
-                      <strong className="font-bold">Developer Tools: </strong>
+                      <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-cyan-600" : "text-black"}`}>Developer Tools: </strong>
                       <span>{resumeData.skills.tools.join(", ")}</span>
                     </div>
                   )}
@@ -1089,22 +1142,32 @@ export default function DashboardPage() {
 
               {/* Experience - Only visible if paid */}
               {isPaid && resumeData.experience.length > 0 && (
-                <div className="mb-4 relative">
-                  <h3 className="text-black font-bold uppercase border-b border-zinc-800 pb-0.5 mb-1.5 text-[9px] tracking-wide">
+                <div className={selectedTemplate === "technical" ? "mb-2.5 relative" : "mb-4 relative"}>
+                  <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                    selectedTemplate === "minimal"
+                      ? "text-cyan-600 border-none mb-1 mt-2"
+                      : "text-black border-b border-zinc-800 mb-1.5"
+                  }`}>
                     Experience
                   </h3>
                   {resumeData.experience.map((exp, idx) => (
-                    <div key={idx} className="mb-3">
+                    <div key={idx} className={selectedTemplate === "technical" ? "mb-2" : "mb-3"}>
                       <div className="flex justify-between font-bold text-black">
                         <span>{exp.company || "Company Name"}</span>
                         <span className="text-zinc-600 font-normal">{exp.duration || "Duration"}</span>
                       </div>
-                      <div className="italic text-zinc-600 mb-1">{exp.role || "Role"}</div>
+                      <div className={`italic text-zinc-600 mb-1 ${selectedTemplate === "technical" ? "font-bold text-black" : ""}`}>{exp.role || "Role"}</div>
                       
-                      <ul className="list-disc pl-4 space-y-1 text-zinc-800 text-[8.5px]">
+                      <ul className={`list-disc pl-4 text-zinc-800 ${
+                        selectedTemplate === "minimal"
+                          ? "space-y-1.5 text-[8.5px]"
+                          : selectedTemplate === "technical"
+                          ? "space-y-0.5 text-[8.2px]"
+                          : "space-y-1 text-[8.5px]"
+                      }`}>
                         {exp.bullets.map((bullet, bIdx) => (
                           bullet.trim().length > 0 && (
-                            <li key={bIdx}>{bullet}</li>
+                            <li key={bIdx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{bullet}</li>
                           )
                         ))}
                       </ul>
@@ -1115,20 +1178,32 @@ export default function DashboardPage() {
 
               {/* Projects - Only visible if paid */}
               {isPaid && resumeData.projects.length > 0 && (
-                <div className="mb-4 relative">
-                  <h3 className="text-black font-bold uppercase border-b border-zinc-800 pb-0.5 mb-1.5 text-[9px] tracking-wide">
+                <div className={selectedTemplate === "technical" ? "mb-2.5 relative" : "mb-4 relative"}>
+                  <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                    selectedTemplate === "minimal"
+                      ? "text-cyan-600 border-none mb-1 mt-2"
+                      : "text-black border-b border-zinc-800 mb-1.5"
+                  }`}>
                     Projects
                   </h3>
                   {resumeData.projects.map((proj, idx) => (
-                    <div key={idx} className="mb-2">
+                    <div key={idx} className={selectedTemplate === "technical" ? "mb-1.5" : "mb-2"}>
                       <div className="flex justify-between font-bold text-black">
                         <span>{proj.title || "Project Title"}</span>
                         <span className="text-zinc-500 text-[8px] font-normal">Tech: {proj.techStack || "Tech Stack"}</span>
                       </div>
                       
-                      <ul className="list-disc pl-4 space-y-0.5 text-zinc-800 text-[8.5px] mt-1">
+                      <ul className={`list-disc pl-4 text-zinc-800 mt-1 ${
+                        selectedTemplate === "minimal"
+                          ? "space-y-1.5 text-[8.5px]"
+                          : selectedTemplate === "technical"
+                          ? "space-y-0.5 text-[8.2px]"
+                          : "space-y-0.5 text-[8.5px]"
+                      }`}>
                         {proj.description.split("\n").map((line, lIdx) => (
-                          line.trim().length > 0 && <li key={lIdx}>{line}</li>
+                          line.trim().length > 0 && (
+                            <li key={lIdx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{line}</li>
+                          )
                         ))}
                       </ul>
                     </div>

@@ -10,10 +10,10 @@ import {
 } from "@react-pdf/renderer";
 import { ResumeData } from "@/lib/db";
 
-// Strict Recruiter-Approved ATS Styling Tokens
-const styles = StyleSheet.create({
+// 1. STYLE SHEET: CLASSIC PROFESSIONAL
+const stylesClassic = StyleSheet.create({
   page: {
-    padding: 36, // 0.5 inch standard margins
+    padding: 36, // 0.5 inch margins
     fontFamily: "Helvetica",
     fontSize: 9.5,
     lineHeight: 1.35,
@@ -27,9 +27,8 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: "Helvetica-Bold",
     fontSize: 18,
-    letterSpacing: -0.5,
     color: "#000000",
-    marginBottom: 4,
+    marginBottom: 3,
   },
   contactDetails: {
     flexDirection: "row",
@@ -44,8 +43,8 @@ const styles = StyleSheet.create({
     fontSize: 10.5,
     color: "#000000",
     textTransform: "uppercase",
-    borderBottomWidth: 1,
-    borderBottomColor: "#222222",
+    borderBottomWidth: 0.75,
+    borderBottomColor: "#111111",
     paddingBottom: 2,
     marginTop: 12,
     marginBottom: 6,
@@ -77,12 +76,11 @@ const styles = StyleSheet.create({
   },
   bulletList: {
     marginLeft: 12,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   bulletItem: {
     flexDirection: "row",
-    marginBottom: 2,
-    paddingLeft: 4,
+    marginBottom: 1.5,
   },
   bulletMarker: {
     width: 8,
@@ -106,12 +104,208 @@ const styles = StyleSheet.create({
   }
 });
 
+// 2. STYLE SHEET: MODERN MINIMAL
+const stylesMinimal = StyleSheet.create({
+  page: {
+    padding: 40,
+    fontFamily: "Helvetica",
+    fontSize: 9.5,
+    lineHeight: 1.4,
+    color: "#222222",
+    backgroundColor: "#ffffff",
+  },
+  headerContainer: {
+    alignItems: "flex-start", // Left-aligned modern balance
+    marginBottom: 16,
+  },
+  name: {
+    fontFamily: "Helvetica-Bold",
+    fontSize: 20,
+    letterSpacing: -0.5,
+    color: "#0891b2", // Sleek modern cyan accent
+    marginBottom: 4,
+  },
+  contactDetails: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    fontSize: 8.5,
+    color: "#666666",
+  },
+  sectionTitle: {
+    fontFamily: "Helvetica-Bold",
+    fontSize: 11,
+    color: "#0891b2",
+    textTransform: "uppercase",
+    paddingBottom: 2,
+    marginTop: 14,
+    marginBottom: 6,
+    letterSpacing: 0.5,
+  },
+  itemHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    marginBottom: 1,
+  },
+  itemLeftTitle: {
+    fontFamily: "Helvetica-Bold",
+    fontSize: 9.5,
+    color: "#111111",
+  },
+  itemRightDetail: {
+    fontSize: 8.5,
+    color: "#666666",
+  },
+  itemSubRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 4,
+  },
+  itemSubLeft: {
+    fontFamily: "Helvetica",
+    fontSize: 9,
+    color: "#444444",
+  },
+  bulletList: {
+    marginLeft: 8,
+    marginBottom: 4,
+  },
+  bulletItem: {
+    flexDirection: "row",
+    marginBottom: 2,
+  },
+  bulletMarker: {
+    width: 8,
+    color: "#0891b2",
+  },
+  bulletText: {
+    flex: 1,
+    fontSize: 8.8,
+    color: "#333333",
+  },
+  skillsCategory: {
+    flexDirection: "row",
+    marginBottom: 4,
+  },
+  skillsLabel: {
+    fontFamily: "Helvetica-Bold",
+    color: "#0891b2",
+    width: 95,
+  },
+  skillsText: {
+    flex: 1,
+  }
+});
+
+// 3. STYLE SHEET: PREMIUM TECHNICAL
+const stylesTechnical = StyleSheet.create({
+  page: {
+    padding: 28, // Compact padding to fit detailed engineering items on a single page
+    fontFamily: "Helvetica",
+    fontSize: 9,
+    lineHeight: 1.25,
+    color: "#111111",
+    backgroundColor: "#ffffff",
+  },
+  headerContainer: {
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  name: {
+    fontFamily: "Helvetica-Bold",
+    fontSize: 16,
+    color: "#000000",
+    marginBottom: 2,
+  },
+  contactDetails: {
+    flexDirection: "row",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    gap: 6,
+    fontSize: 8,
+    color: "#333333",
+  },
+  sectionTitle: {
+    fontFamily: "Helvetica-Bold",
+    fontSize: 10,
+    color: "#000000",
+    textTransform: "uppercase",
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#333333",
+    paddingBottom: 1.5,
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  itemHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    marginBottom: 1,
+  },
+  itemLeftTitle: {
+    fontFamily: "Helvetica-Bold",
+    fontSize: 9,
+    color: "#000000",
+  },
+  itemRightDetail: {
+    fontSize: 8,
+    color: "#444444",
+  },
+  itemSubRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 2,
+  },
+  itemSubLeft: {
+    fontFamily: "Helvetica-Bold", // Bold roles
+    fontSize: 8.5,
+    color: "#222222",
+  },
+  bulletList: {
+    marginLeft: 10,
+    marginBottom: 3,
+  },
+  bulletItem: {
+    flexDirection: "row",
+    marginBottom: 1.5,
+  },
+  bulletMarker: {
+    width: 6,
+    fontSize: 8.5,
+  },
+  bulletText: {
+    flex: 1,
+    fontSize: 8.5, // High content density bullet points
+    color: "#222222",
+  },
+  skillsCategory: {
+    flexDirection: "row",
+    marginBottom: 2,
+  },
+  skillsLabel: {
+    fontFamily: "Helvetica-Bold",
+    width: 100,
+  },
+  skillsText: {
+    flex: 1,
+  }
+});
+
 interface ResumeTemplatePdfProps {
   data: ResumeData;
+  template?: "classic" | "minimal" | "technical";
 }
 
-export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data }) => {
+export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data, template = "classic" }) => {
   const { personal, education, experience, projects, skills } = data;
+
+  // Dynamically select styles
+  const styles = template === "minimal" 
+    ? stylesMinimal 
+    : template === "technical" 
+    ? stylesTechnical 
+    : stylesClassic;
 
   return (
     <Document>
@@ -122,11 +316,11 @@ export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data }) =>
           <Text style={styles.name}>{personal.fullName || "Your Full Name"}</Text>
           <View style={styles.contactDetails}>
             {personal.phone && <Text>{personal.phone}</Text>}
-            {personal.phone && personal.email && <Text>•</Text>}
+            {personal.phone && personal.email && <Text>{template === "technical" ? "|" : "•"}</Text>}
             {personal.email && <Text>{personal.email}</Text>}
-            {personal.email && personal.linkedin && <Text>•</Text>}
+            {personal.email && personal.linkedin && <Text>{template === "technical" ? "|" : "•"}</Text>}
             {personal.linkedin && <Text>{personal.linkedin}</Text>}
-            {personal.linkedin && personal.github && <Text>•</Text>}
+            {personal.linkedin && personal.github && <Text>{template === "technical" ? "|" : "•"}</Text>}
             {personal.github && <Text>{personal.github}</Text>}
           </View>
         </View>
@@ -136,7 +330,7 @@ export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data }) =>
           <View>
             <Text style={styles.sectionTitle}>Education</Text>
             {education.map((edu, idx) => (
-              <View key={idx} style={{ marginBottom: 6 }}>
+              <View key={idx} style={{ marginBottom: template === "technical" ? 3 : 5 }}>
                 <View style={styles.itemHeaderRow}>
                   <Text style={styles.itemLeftTitle}>{edu.institution}</Text>
                   <Text style={styles.itemRightDetail}>{edu.year}</Text>
@@ -155,7 +349,7 @@ export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data }) =>
           <View>
             <Text style={styles.sectionTitle}>Experience</Text>
             {experience.map((exp, idx) => (
-              <View key={idx} style={{ marginBottom: 8 }}>
+              <View key={idx} style={{ marginBottom: template === "technical" ? 4 : 6 }}>
                 <View style={styles.itemHeaderRow}>
                   <Text style={styles.itemLeftTitle}>{exp.company}</Text>
                   <Text style={styles.itemRightDetail}>{exp.duration}</Text>
@@ -185,7 +379,7 @@ export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data }) =>
           <View>
             <Text style={styles.sectionTitle}>Projects</Text>
             {projects.map((proj, idx) => (
-              <View key={idx} style={{ marginBottom: 8 }}>
+              <View key={idx} style={{ marginBottom: template === "technical" ? 4 : 6 }}>
                 <View style={styles.itemHeaderRow}>
                   <Text style={styles.itemLeftTitle}>{proj.title}</Text>
                   {proj.techStack && (
@@ -232,7 +426,7 @@ export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data }) =>
 
             {skills.tools && skills.tools.length > 0 && (
               <View style={styles.skillsCategory}>
-                <Text style={styles.skillsLabel}>Developer Tools:</Text>
+                <Text style={styles.skillsLabel}>{template === "technical" ? "Developer Tools:" : "Tools:"}</Text>
                 <Text style={styles.skillsText}>{skills.tools.join(", ")}</Text>
               </View>
             )}

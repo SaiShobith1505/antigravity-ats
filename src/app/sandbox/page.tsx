@@ -21,6 +21,7 @@ export default function SandboxPage() {
   const [scanning, setScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [result, setResult] = useState<any | null>(null);
+  const [jobDescription, setJobDescription] = useState("");
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -52,64 +53,31 @@ export default function SandboxPage() {
           clearInterval(interval);
           return 90;
         }
-        return prev + 20;
+        return prev + 15;
       });
-    }, 400);
+    }, 300);
 
     try {
-      // Simulate real-world text extraction
-      let sampleText = `Amit Sharma. Phone: 9876543210. Email: amit@gmail.com.
-Skills: HTML, CSS, JavaScript, React, SQL.
-Experience: I worked at InnovateTech where I was a coder. I did HTML and helped fix page styles and did code checks.
-Education: B.Tech in CSE at VIT University. GPA: 7.2`;
-
-      // If text file, read real text
-      if (file.name.endsWith(".txt")) {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          if (e.target?.result) {
-            sampleText = e.target.result as string;
-          }
-        };
-        reader.readAsText(file);
-      }
-
-      // Add a slight latency to make scanner feel premium and intelligent
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("jobDescription", jobDescription);
 
       const response = await fetch("/api/ats/check", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: sampleText, filename: file.name }),
+        body: formData,
       });
 
       if (response.ok) {
         const data = await response.json();
         setScanProgress(100);
-        // Inject a lower score if the filename indicates typical Canva layouts
-        const isGraphicResume = 
-          file.name.toLowerCase().includes("canva") || 
-          file.name.toLowerCase().includes("graphic") || 
-          file.name.toLowerCase().includes("creative") ||
-          file.size < 150000; // Small PDF often means text-boxes/graphics
-
-        if (isGraphicResume) {
-          setResult({
-            atsScore: Math.min(42, data.atsScore - 25),
-            warnings: [
-              "Multi-column grids detected. Most ATS systems fail to parse this linearly.",
-              "Graphic borders & profile picture found. Recruiter software ignores these entirely.",
-              "Unquantified B.Tech achievements detected. Missing core placement target metrics."
-            ],
-            keywordGaps: ["Next.js", "TypeScript", "Docker", "Git"],
-            metricEnhancements: ["In 'helped fix page styles', suggest: 'Redesigned 8+ frontend screens, increasing user retention rate by 14%.'"]
-          });
-        } else {
-          setResult(data);
-        }
+        setResult(data);
+      } else {
+        const errData = await response.json();
+        alert(errData.error || "Failed to scan resume.");
       }
     } catch (err) {
       console.error("Scan API error:", err);
+      alert("Network or parse error occurred during scan.");
     } finally {
       clearInterval(interval);
       setScanning(false);
@@ -120,6 +88,7 @@ Education: B.Tech in CSE at VIT University. GPA: 7.2`;
     setFile(null);
     setResult(null);
     setScanProgress(0);
+    setJobDescription("");
   };
 
   return (
@@ -218,13 +187,28 @@ Education: B.Tech in CSE at VIT University. GPA: 7.2`;
             )}
 
             {file && !scanning && (
-              <button
-                onClick={triggerScan}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 text-zinc-950 font-black text-sm shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:brightness-110 active:scale-98 transition-all flex items-center justify-center space-x-2"
-              >
-                <Sparkles className="h-4.5 w-4.5 text-zinc-950" />
-                <span>Initialize Parser Check</span>
-              </button>
+              <div className="space-y-4">
+                <div className="space-y-2 text-left">
+                  <label htmlFor="jd-textarea" className="block text-[10px] font-extrabold font-mono tracking-widest text-zinc-500 uppercase">
+                    Job Description (Optional — Target keyword scan)
+                  </label>
+                  <textarea
+                    id="jd-textarea"
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    placeholder="Paste the target job description here to check for terminology gaps, matching metrics, and role-specific skills..."
+                    className="bg-zinc-900/40 border border-zinc-800 focus:border-cyan-400 text-xs p-3.5 rounded-xl w-full h-24 outline-none text-slate-200 placeholder-zinc-600 transition-all resize-none font-medium leading-relaxed"
+                  />
+                </div>
+                
+                <button
+                  onClick={triggerScan}
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 text-zinc-950 font-black text-sm shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:brightness-110 active:scale-98 transition-all flex items-center justify-center space-x-2 cursor-pointer"
+                >
+                  <Sparkles className="h-4.5 w-4.5 text-zinc-950" />
+                  <span>Initialize Parser Check</span>
+                </button>
+              </div>
             )}
 
           </div>
