@@ -11,10 +11,38 @@ interface PDFDownloadButtonProps {
   isPaid: boolean;
   userEmail?: string | null;
   template?: "classic" | "minimal" | "technical";
+  resumeId: string;
+  onDownloadConsumed: () => void;
 }
 
-export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ data, isPaid, userEmail, template = "classic" }) => {
+export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ 
+  data, 
+  isPaid, 
+  userEmail, 
+  template = "classic",
+  resumeId,
+  onDownloadConsumed
+}) => {
   const isAdmin = userEmail === "admin@cvboost.co";
+
+  const handleDownloadClick = async () => {
+    if (isAdmin) return;
+    try {
+      await fetch("/api/payment/consume-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ resumeId }),
+      });
+      // Allow 2 seconds for browser download buffer to spin up before re-locking UI
+      setTimeout(() => {
+        onDownloadConsumed();
+      }, 2000);
+    } catch (err) {
+      console.error("[DOWNLOAD] Error invalidating payment session:", err);
+    }
+  };
 
   if (!isPaid && !isAdmin) {
     return (
@@ -33,6 +61,7 @@ export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ data, isPa
         {({ loading }) => (
           <button
             disabled={loading}
+            onClick={handleDownloadClick}
             className="px-6 py-3 text-xs font-black rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-600 text-zinc-950 hover:brightness-110 active:scale-98 disabled:opacity-50 transition-all shadow-[0_0_15px_rgba(6,182,212,0.35)] flex items-center space-x-2 cursor-pointer"
           >
             {loading ? (

@@ -37,18 +37,26 @@ export async function POST(req: Request) {
       }
     }
 
-    // 1. Update Firestore payment status securely on the server
+    // 1. Create a secure, temporary 10-minute export session on the server
+    const sessionToken = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
+
     try {
       const resumeRef = doc(db, "resumes", resumeId);
       await setDoc(
         resumeRef,
         {
           paymentStatus: "paid",
+          exportSession: {
+            token: sessionToken,
+            expiresAt,
+            downloaded: false
+          },
           updatedAt: new Date().toISOString(),
         },
         { merge: true }
       );
-      console.log(`[PAYMENT VERIFY] Successfully marked resume ${resumeId} as paid in Firestore.`);
+      console.log(`[PAYMENT VERIFY] Successfully created secure temporary export session for resume ${resumeId}.`);
     } catch (dbErr) {
       console.warn("[PAYMENT VERIFY] Firestore update failed, relying on client-side sync fallback:", dbErr);
     }
@@ -57,7 +65,12 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       message: "Payment successfully verified.",
-      resumeId
+      resumeId,
+      exportSession: {
+        token: sessionToken,
+        expiresAt,
+        downloaded: false
+      }
     });
 
   } catch (err: any) {

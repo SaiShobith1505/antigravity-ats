@@ -343,6 +343,21 @@ export default function DashboardPage() {
     }
   }, [user, authLoading, router, resumeId]);
 
+  // Active payment session monitoring and auto-lock
+  useEffect(() => {
+    if (isPaid && user && user.email !== "admin@cvboost.co") {
+      const checkSession = async () => {
+        const active = await getPaymentStatus(resumeId);
+        if (!active) {
+          setIsPaid(false);
+        }
+      };
+      checkSession();
+      const interval = setInterval(checkSession, 10000); // check status every 10 seconds
+      return () => clearInterval(interval);
+    }
+  }, [isPaid, user, resumeId]);
+
   // Real-time heuristic scoring analyzer
   const calculateHeuristicAtsScore = (data: typeof defaultResumeData) => {
     let score = 50;
@@ -994,9 +1009,29 @@ export default function DashboardPage() {
                     <span>{paymentError}</span>
                   </div>
                 )}
-                {isPaid ? (
-                  <PDFDownloadButton data={resumeData} isPaid={isPaid} userEmail={user.email} template={selectedTemplate} />
-                ) : (
+                 {isPaid ? (
+                   <PDFDownloadButton 
+                     data={resumeData} 
+                     isPaid={isPaid} 
+                     userEmail={user.email} 
+                     template={selectedTemplate} 
+                     resumeId={resumeId}
+                     onDownloadConsumed={() => {
+                       setIsPaid(false);
+                       const localData = localStorage.getItem(`cv_boost_resume_${resumeId}`);
+                       if (localData) {
+                         try {
+                           const parsed = JSON.parse(localData);
+                           parsed.paymentStatus = "unpaid";
+                           if (parsed.exportSession) {
+                             parsed.exportSession.downloaded = true;
+                           }
+                           localStorage.setItem(`cv_boost_resume_${resumeId}`, JSON.stringify(parsed));
+                         } catch (_) {}
+                       }
+                     }}
+                   />
+                 ) : (
                   <button
                     onClick={triggerRazorpayCheckout}
                     className="px-6 py-3 text-xs font-black rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-600 text-zinc-950 hover:brightness-110 active:scale-98 transition-all shadow-[0_0_15px_rgba(6,182,212,0.35)] flex items-center space-x-2 cursor-pointer"
@@ -1035,13 +1070,15 @@ export default function DashboardPage() {
             </div>
 
             {/* Resume HTML-layout replica (Simulated Preview) */}
-            <div className={`w-full h-full p-8 text-[9px] text-[#111] leading-normal bg-white overflow-y-auto relative select-none flex flex-col min-h-full ${
-              selectedTemplate === "minimal" 
-                ? "font-sans px-10 py-10" 
-                : selectedTemplate === "technical" 
-                ? "font-sans px-6 py-6 text-[8.5px]" 
-                : "font-sans px-8 py-8"
-            }`}>
+            <div 
+               onContextMenu={!isPaid ? (e) => e.preventDefault() : undefined}
+               className={`w-full h-full p-8 text-[9px] text-[#111] leading-normal bg-white overflow-y-auto relative flex flex-col min-h-full ${
+                 selectedTemplate === "minimal" 
+                   ? "font-sans px-10 py-10" 
+                   : selectedTemplate === "technical" 
+                   ? "font-sans px-6 py-6 text-[8.5px]" 
+                   : "font-sans px-8 py-8"
+               } ${!isPaid ? "select-none" : "select-text"}`}>
               
               {/* Subtle repeating watermark pattern over the sheet if not paid */}
               {!isPaid && (
@@ -1140,78 +1177,85 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Experience - Only visible if paid */}
-              {isPaid && resumeData.experience.length > 0 && (
-                <div className={selectedTemplate === "technical" ? "mb-2.5 relative" : "mb-4 relative"}>
-                  <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
-                    selectedTemplate === "minimal"
-                      ? "text-cyan-600 border-none mb-1 mt-2"
-                      : "text-black border-b border-zinc-800 mb-1.5"
-                  }`}>
-                    Experience
-                  </h3>
-                  {resumeData.experience.map((exp, idx) => (
-                    <div key={idx} className={selectedTemplate === "technical" ? "mb-2" : "mb-3"}>
-                      <div className="flex justify-between font-bold text-black">
-                        <span>{exp.company || "Company Name"}</span>
-                        <span className="text-zinc-600 font-normal">{exp.duration || "Duration"}</span>
-                      </div>
-                      <div className={`italic text-zinc-600 mb-1 ${selectedTemplate === "technical" ? "font-bold text-black" : ""}`}>{exp.role || "Role"}</div>
-                      
-                      <ul className={`list-disc pl-4 text-zinc-800 ${
-                        selectedTemplate === "minimal"
-                          ? "space-y-1.5 text-[8.5px]"
-                          : selectedTemplate === "technical"
-                          ? "space-y-0.5 text-[8.2px]"
-                          : "space-y-1 text-[8.5px]"
-                      }`}>
-                        {exp.bullets.map((bullet, bIdx) => (
-                          bullet.trim().length > 0 && (
-                            <li key={bIdx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{bullet}</li>
-                          )
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Projects - Only visible if paid */}
-              {isPaid && resumeData.projects.length > 0 && (
-                <div className={selectedTemplate === "technical" ? "mb-2.5 relative" : "mb-4 relative"}>
-                  <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
-                    selectedTemplate === "minimal"
-                      ? "text-cyan-600 border-none mb-1 mt-2"
-                      : "text-black border-b border-zinc-800 mb-1.5"
-                  }`}>
-                    Projects
-                  </h3>
-                  {resumeData.projects.map((proj, idx) => (
-                    <div key={idx} className={selectedTemplate === "technical" ? "mb-1.5" : "mb-2"}>
-                      <div className="flex justify-between font-bold text-black">
-                        <span>{proj.title || "Project Title"}</span>
-                        <span className="text-zinc-500 text-[8px] font-normal">Tech: {proj.techStack || "Tech Stack"}</span>
-                      </div>
-                      
-                      <ul className={`list-disc pl-4 text-zinc-800 mt-1 ${
-                        selectedTemplate === "minimal"
-                          ? "space-y-1.5 text-[8.5px]"
-                          : selectedTemplate === "technical"
-                          ? "space-y-0.5 text-[8.2px]"
-                          : "space-y-0.5 text-[8.5px]"
-                      }`}>
-                        {proj.description.split("\n").map((line, lIdx) => (
-                          line.trim().length > 0 && (
-                            <li key={lIdx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{line}</li>
-                          )
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-            </div>
+               {/* Experience and Projects Gated Container */}
+               {((resumeData.experience.length > 0) || (resumeData.projects.length > 0)) && (
+                 <div className={!isPaid ? "relative overflow-hidden max-h-[220px] select-none pointer-events-none blur-[1.5px] border-b border-zinc-200" : ""}>
+                   
+                   {/* Experience */}
+                   {resumeData.experience.length > 0 && (
+                     <div className={selectedTemplate === "technical" ? "mb-2.5 relative" : "mb-4 relative"}>
+                       <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                         selectedTemplate === "minimal"
+                           ? "text-cyan-600 border-none mb-1 mt-2"
+                           : "text-black border-b border-zinc-800 mb-1.5"
+                       }`}>
+                         Experience
+                       </h3>
+                       {resumeData.experience.map((exp, idx) => (
+                         <div key={idx} className={selectedTemplate === "technical" ? "mb-2" : "mb-3"}>
+                           <div className="flex justify-between font-bold text-black">
+                             <span>{exp.company || "Company Name"}</span>
+                             <span className="text-zinc-600 font-normal">{exp.duration || "Duration"}</span>
+                           </div>
+                           <div className={`italic text-zinc-600 mb-1 ${selectedTemplate === "technical" ? "font-bold text-black" : ""}`}>{exp.role || "Role"}</div>
+                           
+                           <ul className={`list-disc pl-4 text-zinc-800 ${
+                             selectedTemplate === "minimal"
+                               ? "space-y-1.5 text-[8.5px]"
+                               : selectedTemplate === "technical"
+                               ? "space-y-0.5 text-[8.2px]"
+                               : "space-y-1 text-[8.5px]"
+                           }`}>
+                             {exp.bullets.map((bullet, bIdx) => (
+                               bullet.trim().length > 0 && (
+                                 <li key={bIdx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{bullet}</li>
+                               )
+                             ))}
+                           </ul>
+                         </div>
+                       ))}
+                     </div>
+                   )}
+ 
+                   {/* Projects */}
+                   {resumeData.projects.length > 0 && (
+                     <div className={selectedTemplate === "technical" ? "mb-2.5 relative" : "mb-4 relative"}>
+                       <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                         selectedTemplate === "minimal"
+                           ? "text-cyan-600 border-none mb-1 mt-2"
+                           : "text-black border-b border-zinc-800 mb-1.5"
+                       }`}>
+                         Projects
+                       </h3>
+                       {resumeData.projects.map((proj, idx) => (
+                         <div key={idx} className={selectedTemplate === "technical" ? "mb-1.5" : "mb-2"}>
+                           <div className="flex justify-between font-bold text-black">
+                             <span>{proj.title || "Project Title"}</span>
+                             <span className="text-zinc-500 text-[8px] font-normal">Tech: {proj.techStack || "Tech Stack"}</span>
+                           </div>
+                           
+                           <ul className={`list-disc pl-4 text-zinc-800 mt-1 ${
+                             selectedTemplate === "minimal"
+                               ? "space-y-1.5 text-[8.5px]"
+                               : selectedTemplate === "technical"
+                               ? "space-y-0.5 text-[8.2px]"
+                               : "space-y-0.5 text-[8.5px]"
+                           }`}>
+                             {proj.description.split("\n").map((line, lIdx) => (
+                               line.trim().length > 0 && (
+                                 <li key={lIdx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{line}</li>
+                               )
+                             ))}
+                           </ul>
+                         </div>
+                       ))}
+                     </div>
+                   )}
+                   
+                 </div>
+               )}
+ 
+             </div>
 
             {/* Paywall Bottom Fade Mask Overlay & Floating glassmorphic CTA */}
             {!isPaid && (

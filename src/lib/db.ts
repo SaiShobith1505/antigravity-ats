@@ -162,6 +162,10 @@ export async function getPaymentStatus(
     const docSnap = await getDoc(resumeRef);
     if (docSnap.exists()) {
       const data = docSnap.data();
+      if (data.exportSession) {
+        const { downloaded, expiresAt } = data.exportSession;
+        return downloaded === false && new Date(expiresAt) > new Date();
+      }
       return data.paymentStatus === "paid";
     }
   } catch (error) {
@@ -170,6 +174,10 @@ export async function getPaymentStatus(
     if (localData) {
       try {
         const parsed = JSON.parse(localData);
+        if (parsed.exportSession) {
+          const { downloaded, expiresAt } = parsed.exportSession;
+          return downloaded === false && new Date(expiresAt) > new Date();
+        }
         return parsed.paymentStatus === "paid";
       } catch (_) {}
     }
@@ -183,35 +191,38 @@ export async function setPaymentStatusPaid(
 ): Promise<void> {
   try {
     const resumeRef = doc(db, "resumes", resumeId);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 min expiry
     await setDoc(
       resumeRef,
       {
         paymentStatus: "paid",
+        exportSession: {
+          token: "mock-local-" + Math.random().toString(36).substring(2, 10),
+          expiresAt,
+          downloaded: false
+        }
       },
       { merge: true }
     );
   } catch (error) {
     console.warn("Firestore setPaymentStatusPaid failed, falling back to localStorage:", error);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
     const localData = localStorage.getItem(`cv_boost_resume_${resumeId}`);
+    let parsed: any = {};
     if (localData) {
       try {
-        const parsed = JSON.parse(localData);
-        parsed.paymentStatus = "paid";
-        localStorage.setItem(`cv_boost_resume_${resumeId}`, JSON.stringify(parsed));
-      } catch (_) {
-        localStorage.setItem(`cv_boost_resume_${resumeId}`, JSON.stringify({
-          id: resumeId,
-          paymentStatus: "paid",
-          updatedAt: new Date().toISOString()
-        }));
-      }
-    } else {
-      localStorage.setItem(`cv_boost_resume_${resumeId}`, JSON.stringify({
-        id: resumeId,
-        paymentStatus: "paid",
-        updatedAt: new Date().toISOString()
-      }));
+        parsed = JSON.parse(localData);
+      } catch (_) {}
     }
+    parsed.id = resumeId;
+    parsed.paymentStatus = "paid";
+    parsed.exportSession = {
+      token: "mock-local-" + Math.random().toString(36).substring(2, 10),
+      expiresAt,
+      downloaded: false
+    };
+    parsed.updatedAt = new Date().toISOString();
+    localStorage.setItem(`cv_boost_resume_${resumeId}`, JSON.stringify(parsed));
   }
 }
 
