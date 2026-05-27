@@ -51,9 +51,20 @@ export async function POST(req: Request) {
     if (filename.endsWith(".pdf")) {
       try {
         // @ts-ignore
-        const pdfParse = require("pdf-parse");
-        const parsedPdf = await pdfParse(buffer);
-        text = parsedPdf.text || "";
+        const { PdfReader } = require("pdfreader");
+        const pdfText = await new Promise<string>((resolve, reject) => {
+          let extracted = "";
+          new PdfReader().parseBuffer(buffer, (err: any, item: any) => {
+            if (err) {
+              reject(err);
+            } else if (!item) {
+              resolve(extracted);
+            } else if (item.text) {
+              extracted += item.text + " ";
+            }
+          });
+        });
+        text = pdfText || "";
       } catch (pdfErr) {
         console.error("[PARSER] Server-side PDF extraction failed:", pdfErr);
         return NextResponse.json(
