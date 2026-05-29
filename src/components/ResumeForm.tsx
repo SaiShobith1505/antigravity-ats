@@ -180,10 +180,10 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-zinc-950 border border-zinc-900 rounded-2xl overflow-hidden">
+    <div className="flex flex-col h-full bg-white border border-stone-200 rounded-2xl overflow-hidden">
       
       {/* Forms Segment Headers */}
-      <div className="flex border-b border-zinc-900 bg-zinc-950/80 p-2 overflow-x-auto space-x-1">
+      <div className="flex border-b border-stone-200 bg-white p-2 overflow-x-auto space-x-1">
         {[
           { id: "personal", label: "Contact", icon: User },
           { id: "education", label: "Education", icon: GraduationCap },
@@ -217,7 +217,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
         {activeTab === "personal" && (
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+              <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                 Full Name
               </label>
               <input
@@ -225,12 +225,12 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 value={data.personal.fullName}
                 onChange={(e) => updatePersonal("fullName", e.target.value)}
                 placeholder="Amit Sharma"
-                className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                   Email Address
                 </label>
                 <input
@@ -238,11 +238,11 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   value={data.personal.email}
                   onChange={(e) => updatePersonal("email", e.target.value)}
                   placeholder="amit@college.edu"
-                  className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                  className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                   Phone Number
                 </label>
                 <input
@@ -250,13 +250,13 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   value={data.personal.phone}
                   onChange={(e) => updatePersonal("phone", e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                  className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                 />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                   LinkedIn URL
                 </label>
                 <input
@@ -264,11 +264,11 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   value={data.personal.linkedin}
                   onChange={(e) => updatePersonal("linkedin", e.target.value)}
                   placeholder="linkedin.com/in/username"
-                  className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                  className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                   GitHub Profile URL
                 </label>
                 <input
@@ -276,7 +276,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   value={data.personal.github}
                   onChange={(e) => updatePersonal("github", e.target.value)}
                   placeholder="github.com/username"
-                  className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                  className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                 />
               </div>
             </div>
@@ -287,19 +287,19 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
         {activeTab === "education" && (
           <div className="space-y-6">
             {data.education.map((edu, idx) => (
-              <div key={idx} className="p-4 bg-zinc-900/30 border border-zinc-900 rounded-xl relative space-y-4">
+              <div key={idx} className="p-4 bg-stone-50 border border-stone-200 rounded-xl relative space-y-4">
                 <button
                   onClick={() => removeEducation(idx)}
-                  className="absolute top-4 right-4 text-zinc-600 hover:text-red-500 transition-colors"
+                  className="absolute top-4 right-4 text-[#666666] hover:text-red-500 transition-colors"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
-                <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-widest">
+                <h4 className="text-xs font-bold text-[#006039] uppercase tracking-widest">
                   Institution #{idx + 1}
                 </h4>
 
                 <div>
-                  <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                  <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                     College / School Name
                   </label>
                   <input
@@ -307,13 +307,13 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                     value={edu.institution}
                     onChange={(e) => updateEducation(idx, "institution", e.target.value)}
                     placeholder="Delhi Technological University (DTU)"
-                    className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                    className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="md:col-span-2">
-                    <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                    <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                       Degree & Major
                     </label>
                     <input
@@ -321,11 +321,11 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={edu.degree}
                       onChange={(e) => updateEducation(idx, "degree", e.target.value)}
                       placeholder="B.Tech in Computer Science"
-                      className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                    <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                       Year / CGPA
                     </label>
                     <input
@@ -333,13 +333,13 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={edu.gpa}
                       onChange={(e) => updateEducation(idx, "gpa", e.target.value)}
                       placeholder="8.85 CGPA"
-                      className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                  <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                     Graduation Period
                   </label>
                   <input
@@ -347,7 +347,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                     value={edu.year}
                     onChange={(e) => updateEducation(idx, "year", e.target.value)}
                     placeholder="2022 - 2026"
-                    className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                    className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                   />
                 </div>
               </div>
@@ -355,7 +355,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
 
             <button
               onClick={addEducation}
-              className="w-full py-3 rounded-lg border border-dashed border-zinc-800 text-xs font-bold text-zinc-400 hover:border-cyan-500 hover:text-cyan-400 transition-all flex items-center justify-center space-x-2"
+              className="w-full py-3 rounded-lg border border-dashed border-stone-200 text-xs font-bold text-[#666666] hover:border-stone-200 hover:text-[#006039] transition-all flex items-center justify-center space-x-2"
             >
               <Plus className="h-4 w-4" />
               <span>Add College / School</span>
@@ -367,21 +367,21 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
         {activeTab === "experience" && (
           <div className="space-y-8">
             {data.experience.map((exp, idx) => (
-              <div key={idx} className="p-5 bg-zinc-900/20 border border-zinc-900 rounded-xl relative space-y-4">
+              <div key={idx} className="p-5 bg-stone-50 border border-stone-200 rounded-xl relative space-y-4">
                 <button
                   onClick={() => removeExperience(idx)}
-                  className="absolute top-4 right-4 text-zinc-600 hover:text-red-500 transition-colors"
+                  className="absolute top-4 right-4 text-[#666666] hover:text-red-500 transition-colors"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
                 
-                <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center space-x-2">
+                <h4 className="text-xs font-bold text-[#006039] uppercase tracking-widest flex items-center space-x-2">
                   <span>Job / Internship #{idx + 1}</span>
                 </h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                    <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                       Company Name
                     </label>
                     <input
@@ -389,11 +389,11 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={exp.company}
                       onChange={(e) => updateExperience(idx, "company", e.target.value)}
                       placeholder="InnovateTech Solutions"
-                      className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                    <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                       Internship Role
                     </label>
                     <input
@@ -401,13 +401,13 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={exp.role}
                       onChange={(e) => updateExperience(idx, "role", e.target.value)}
                       placeholder="Backend Engineering Intern"
-                      className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                  <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                     Duration Period
                   </label>
                   <input
@@ -415,13 +415,13 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                     value={exp.duration}
                     onChange={(e) => updateExperience(idx, "duration", e.target.value)}
                     placeholder="May 2025 - July 2025"
-                    className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                    className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                   />
                 </div>
 
                 {/* Bullets Input Section */}
                 <div className="space-y-3">
-                  <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500">
+                  <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666]">
                     Experience Bullet Points (ATS Safe)
                   </label>
                   
@@ -435,11 +435,11 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                             value={bullet}
                             onChange={(e) => updateBullet(idx, bIdx, e.target.value)}
                             placeholder="Developed backend routing features to support client data."
-                            className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-2.5 flex-1 text-sm outline-none transition-all"
+                            className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-2.5 flex-1 text-sm outline-none transition-all"
                           />
                           <button
                             onClick={() => removeBullet(idx, bIdx)}
-                            className="text-zinc-600 hover:text-red-500 p-1.5"
+                            className="text-[#666666] hover:text-red-500 p-1.5"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -458,7 +458,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
 
                   <button
                     onClick={() => addBullet(idx)}
-                    className="text-xs font-bold text-zinc-500 hover:text-cyan-400 flex items-center space-x-1 py-1"
+                    className="text-xs font-bold text-[#666666] hover:text-[#006039] flex items-center space-x-1 py-1"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     <span>Add Bullet Point</span>
@@ -466,10 +466,10 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 </div>
 
                 {/* AI Tuning Integration Hub */}
-                <div className="border-t border-zinc-900 pt-4 mt-2">
+                <div className="border-t border-stone-200 pt-4 mt-2">
                   {activeAiBox === idx ? (
-                    <div className="p-4 bg-cyan-950/20 border border-cyan-900/30 rounded-xl space-y-3">
-                      <div className="flex items-center space-x-1 text-xs font-bold text-cyan-400">
+                    <div className="p-4 bg-stone-50 border border-stone-200 rounded-xl space-y-3">
+                      <div className="flex items-center space-x-1 text-xs font-bold text-[#006039]">
                         <Sparkles className="h-4 w-4" />
                         <span>BOOSTCV AI Optimizer (Google XYZ Format)</span>
                       </div>
@@ -477,7 +477,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                         value={aiMessyText}
                         onChange={(e) => setAiMessyText(e.target.value)}
                         placeholder="Paste rough notes: 'I worked on database speed, made queries better, also fixed front page bugs.'"
-                        className="bg-zinc-950 border border-zinc-800 focus:border-cyan-400 text-sm p-3 rounded-lg w-full h-20 outline-none text-slate-100 placeholder-zinc-600 transition-all resize-none"
+                        className="bg-white border border-stone-200 focus:border-stone-200 text-sm p-3 rounded-lg w-full h-20 outline-none text-[#1E1E1E] placeholder-stone-400 transition-all resize-none"
                       />
                       <div className="flex justify-end space-x-2">
                         <button
@@ -485,19 +485,19 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                             setActiveAiBox(null);
                             setAiMessyText("");
                           }}
-                          className="px-3 py-1.5 text-xs text-zinc-500 font-bold hover:text-zinc-300"
+                          className="px-3 py-1.5 text-xs text-[#666666] font-bold hover:text-[#666666]"
                         >
                           Cancel
                         </button>
                         <button
                           onClick={() => triggerAiEnhancement(idx)}
                           disabled={aiLoadingIdx === idx || !aiMessyText.trim()}
-                          className="px-4 py-1.5 text-xs font-extrabold rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-600 text-zinc-950 hover:brightness-110 disabled:opacity-40 transition-all shadow-md flex items-center space-x-1"
+                          className="px-4 py-1.5 text-xs font-extrabold rounded-lg text-white hover:brightness-110 disabled:opacity-40 transition-all shadow-md flex items-center space-x-1"
                         >
                           {aiLoadingIdx === idx ? (
-                            <span className="h-3 w-3 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin mr-1" />
+                            <span className="h-3 w-3 border-2 border-stone-200 border-t-transparent rounded-full animate-spin mr-1" />
                           ) : (
-                            <Sparkles className="h-3 w-3 text-zinc-950 stroke-[2.5]" />
+                            <Sparkles className="h-3 w-3 text-white stroke-[2.5]" />
                           )}
                           <span>Optimize Bullets</span>
                         </button>
@@ -506,7 +506,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   ) : (
                     <button
                       onClick={() => setActiveAiBox(idx)}
-                      className="px-3 py-1.5 rounded-lg border border-cyan-900/30 bg-cyan-950/10 text-cyan-400 text-xs font-bold hover:bg-cyan-950/30 transition-all flex items-center space-x-1.5"
+                      className="px-3 py-1.5 rounded-lg border border-stone-200 bg-stone-50 text-[#006039] text-xs font-bold hover:bg-stone-50 transition-all flex items-center space-x-1.5"
                     >
                       <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
                       <span>Optimize Experience with Gemini AI</span>
@@ -518,7 +518,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
 
             <button
               onClick={addExperience}
-              className="w-full py-3 rounded-lg border border-dashed border-zinc-800 text-xs font-bold text-zinc-400 hover:border-cyan-500 hover:text-cyan-400 transition-all flex items-center justify-center space-x-2"
+              className="w-full py-3 rounded-lg border border-dashed border-stone-200 text-xs font-bold text-[#666666] hover:border-stone-200 hover:text-[#006039] transition-all flex items-center justify-center space-x-2"
             >
               <Plus className="h-4 w-4" />
               <span>Add Job / Internship</span>
@@ -530,20 +530,20 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
         {activeTab === "projects" && (
           <div className="space-y-6">
             {data.projects.map((proj, idx) => (
-              <div key={idx} className="p-4 bg-zinc-900/30 border border-zinc-900 rounded-xl relative space-y-4">
+              <div key={idx} className="p-4 bg-stone-50 border border-stone-200 rounded-xl relative space-y-4">
                 <button
                   onClick={() => removeProject(idx)}
-                  className="absolute top-4 right-4 text-zinc-600 hover:text-red-500 transition-colors"
+                  className="absolute top-4 right-4 text-[#666666] hover:text-red-500 transition-colors"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
-                <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-widest">
+                <h4 className="text-xs font-bold text-[#006039] uppercase tracking-widest">
                   Technical Project #{idx + 1}
                 </h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                    <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                       Project Title
                     </label>
                     <input
@@ -551,11 +551,11 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={proj.title}
                       onChange={(e) => updateProject(idx, "title", e.target.value)}
                       placeholder="BOOSTCV (ATS SaaS Compiler)"
-                      className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                    <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                       Technology Stack
                     </label>
                     <input
@@ -563,20 +563,20 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={proj.techStack}
                       onChange={(e) => updateProject(idx, "techStack", e.target.value)}
                       placeholder="Next.js, React, Node.js, @react-pdf/renderer"
-                      className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+                  <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                     Project Achievements (Newline separated bullets)
                   </label>
                   <textarea
                     value={proj.description}
                     onChange={(e) => updateProject(idx, "description", e.target.value)}
                     placeholder="Engineered single-column document generator, yielding 98%+ ATS parsability rates.&#10;Integrated Razorpay checkout client endpoints, lowering paywall abandonment rates by 12%."
-                    className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-sm p-3 rounded-lg w-full h-24 outline-none text-slate-100 placeholder-zinc-600 transition-all resize-none"
+                    className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-sm p-3 rounded-lg w-full h-24 outline-none text-[#1E1E1E] placeholder-stone-400 transition-all resize-none"
                   />
                 </div>
               </div>
@@ -584,7 +584,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
 
             <button
               onClick={addProject}
-              className="w-full py-3 rounded-lg border border-dashed border-zinc-800 text-xs font-bold text-zinc-400 hover:border-cyan-500 hover:text-cyan-400 transition-all flex items-center justify-center space-x-2"
+              className="w-full py-3 rounded-lg border border-dashed border-stone-200 text-xs font-bold text-[#666666] hover:border-stone-200 hover:text-[#006039] transition-all flex items-center justify-center space-x-2"
             >
               <Plus className="h-4 w-4" />
               <span>Add Technical Project</span>
@@ -595,15 +595,15 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
         {/* TECHNICAL SKILLS DETAILS FORM */}
         {activeTab === "skills" && (
           <div className="space-y-4">
-            <div className="p-4 bg-cyan-950/10 border border-cyan-900/20 rounded-xl flex items-start space-x-2 mb-2">
-              <Lightbulb className="h-5 w-5 text-cyan-400 mt-0.5 flex-shrink-0" />
-              <div className="text-xs text-cyan-300 leading-relaxed">
+            <div className="p-4 bg-stone-50 border border-stone-200 rounded-xl flex items-start space-x-2 mb-2">
+              <Lightbulb className="h-5 w-5 text-[#006039] mt-0.5 flex-shrink-0" />
+              <div className="text-xs text-[#006039] leading-relaxed">
                 <strong>ATS Tip:</strong> Separate keywords with commas. Ensure you incorporate terms from placement job cards (e.g. \"Docker\", \"TypeScript\", \"Redis\"). Do not build complex graphics or stars.
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+              <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                 Languages (comma separated)
               </label>
               <input
@@ -611,12 +611,12 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 value={data.skills.languages.join(", ")}
                 onChange={(e) => updateSkillsArray("languages", e.target.value)}
                 placeholder="JavaScript, TypeScript, Python, SQL, C++"
-                className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+              <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                 Frameworks & Libraries (comma separated)
               </label>
               <input
@@ -624,12 +624,12 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 value={data.skills.frameworks.join(", ")}
                 onChange={(e) => updateSkillsArray("frameworks", e.target.value)}
                 placeholder="React, Next.js, Express, Node.js, Tailwind CSS"
-                className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
+              <label className="block text-xs font-extrabold uppercase tracking-widest text-[#666666] mb-1.5">
                 Developer Tools (comma separated)
               </label>
               <input
@@ -637,7 +637,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 value={data.skills.tools.join(", ")}
                 onChange={(e) => updateSkillsArray("tools", e.target.value)}
                 placeholder="Git, GitHub Actions, Docker, Firebase, AWS"
-                className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
               />
             </div>
           </div>
@@ -648,17 +648,17 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-mono">
+                <h3 className="text-sm font-extrabold text-[#1E1E1E] uppercase tracking-wider font-sans">
                   Certifications & Accomplishments
                 </h3>
-                <p className="text-xs text-zinc-500 font-medium">
+                <p className="text-xs text-[#666666] font-medium">
                   Add professional licenses, certifications, awards, or key credentials.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={addCertification}
-                className="py-2 px-4 rounded-lg bg-cyan-950 border border-cyan-800 text-cyan-400 hover:bg-cyan-900 transition-colors font-bold text-xs flex items-center space-x-1 cursor-pointer"
+                className="py-2 px-4 rounded-lg bg-stone-50 border border-stone-200 text-[#006039] hover:bg-[#004d2e] transition-colors font-bold text-xs flex items-center space-x-1 cursor-pointer"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>Add Certification</span>
@@ -667,7 +667,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
 
             <div className="space-y-3">
               {!(data.certifications && data.certifications.length > 0) ? (
-                <div className="text-center py-6 border border-dashed border-zinc-900 rounded-xl text-zinc-500 font-medium text-xs">
+                <div className="text-center py-6 border border-dashed border-stone-200 rounded-xl text-[#666666] font-medium text-xs">
                   No certifications added yet. Click above to add!
                 </div>
               ) : (
@@ -678,12 +678,12 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={cert}
                       onChange={(e) => updateCertification(idx, e.target.value)}
                       placeholder="e.g. AWS Certified Solutions Architect - Associate"
-                      className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 flex-1 text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 flex-1 text-sm outline-none transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => removeCertification(idx)}
-                      className="p-3 text-zinc-500 hover:text-red-400 border border-zinc-900 hover:border-red-950 rounded-lg bg-zinc-900/20 hover:bg-red-950/10 transition-colors cursor-pointer"
+                      className="p-3 text-[#666666] hover:text-red-400 border border-stone-200 hover:border-red-950 rounded-lg bg-stone-50 hover:bg-red-950/10 transition-colors cursor-pointer"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>

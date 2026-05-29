@@ -856,8 +856,8 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 bg-zinc-950 flex items-center justify-center">
-        <div className="h-8 w-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+      <div className="flex-1 bg-[#FAF8F3] flex items-center justify-center">
+        <div className="h-8 w-8 border-4 border-[#006039] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -865,25 +865,25 @@ export default function DashboardPage() {
   // FORCE ONBOARDING IF NOT AUTHENTICATED
   if (!user) {
     return (
-      <div className="flex-1 bg-zinc-950 flex flex-col items-center justify-center p-4">
-        <div className="max-w-md w-full glass-panel border border-zinc-900 rounded-2xl p-8 text-center space-y-6">
-          <div className="h-12 w-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-electric-blue flex items-center justify-center mx-auto shadow-md">
-            <Zap className="h-6 w-6 text-zinc-950 stroke-[2.5]" />
+      <div className="flex-1 bg-[#FAF8F3] flex flex-col items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-8 text-center space-y-6">
+          <div className="h-12 w-12 rounded-xl bg-[#006039] flex items-center justify-center mx-auto shadow-sm">
+            <Zap className="h-6 w-6 text-[#1E1E1E] stroke-[2.5]" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-white">Unlock BOOSTCV Dashboard</h2>
-            <p className="text-zinc-400 text-sm">
+            <h2 className="text-2xl font-black text-[#1E1E1E]">Unlock BOOSTCV Dashboard</h2>
+            <p className="text-[#666666] text-sm">
               We sync your resume progress and real-time shortlisting readiness to your student profile automatically.
             </p>
           </div>
           <button
             onClick={signInWithGoogle}
-            className="w-full py-3.5 px-4 rounded-xl bg-slate-100 hover:bg-white text-zinc-950 font-extrabold text-sm shadow-md transition-all flex items-center justify-center space-x-2"
+            className="w-full py-3.5 px-4 rounded-xl bg-[#006039] hover:bg-[#004f2f] text-[#1E1E1E] font-extrabold text-sm shadow-sm transition-all flex items-center justify-center space-x-2"
           >
             <span>Continue with Google Sign-In</span>
           </button>
-          <Link href="/" className="text-xs text-zinc-500 hover:text-zinc-300 block">
-            ← Return to Landing Page
+          <Link href="/" className="text-xs text-[#666666] hover:text-[#006039] block">
+            ← Return to Homepage
           </Link>
         </div>
       </div>
@@ -893,21 +893,21 @@ export default function DashboardPage() {
   // Premium Onboarding & Workspace Helpers
   const renderEmptyState = (type: "ats" | "matcher" | "company" | "history") => {
     return (
-      <div className="glass-panel border border-zinc-900 rounded-3xl p-10 flex flex-col items-center justify-center text-center space-y-4 max-w-md mx-auto mt-12 animate-in fade-in duration-300">
-        <div className="h-14 w-14 rounded-2xl bg-zinc-900 border border-zinc-850 flex items-center justify-center shadow-md">
-          {type === "ats" && <BarChart3 className="h-6 w-6 text-cyan-400" />}
-          {type === "matcher" && <Sparkles className="h-6 w-6 text-cyan-400" />}
-          {type === "company" && <Building2 className="h-6 w-6 text-cyan-400" />}
-          {type === "history" && <History className="h-6 w-6 text-cyan-400" />}
+      <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-10 flex flex-col items-center justify-center text-center space-y-4 max-w-md mx-auto mt-12 animate-in fade-in duration-300">
+        <div className="h-14 w-14 rounded-2xl bg-stone-50 border border-stone-200 flex items-center justify-center shadow-md">
+          {type === "ats" && <BarChart3 className="h-6 w-6 text-[#006039]" />}
+          {type === "matcher" && <Sparkles className="h-6 w-6 text-[#006039]" />}
+          {type === "company" && <Building2 className="h-6 w-6 text-[#006039]" />}
+          {type === "history" && <History className="h-6 w-6 text-[#006039]" />}
         </div>
         <div className="space-y-1">
-          <h3 className="text-xs font-black text-white uppercase tracking-wider font-mono">
+          <h3 className="text-xs font-black text-[#1E1E1E] uppercase tracking-wider font-sans">
             {type === "ats" && "No Analysis Audits Found"}
             {type === "matcher" && "No Job Matches Computed"}
             {type === "company" && "No Company Fit Calculations"}
             {type === "history" && "No Scan History Recorded"}
           </h3>
-          <p className="text-[10px] text-zinc-550 leading-relaxed font-semibold max-w-xs">
+          <p className="text-[10px] text-[#666666] leading-relaxed font-semibold max-w-xs">
             {type === "ats" && "Upload a resume PDF/DOCX or fill out the details inside our Resume Builder tab to trigger a real-time deep diagnostics report."}
             {type === "matcher" && "Paste a target job description inside our Job Matcher tab to see a side-by-side gap audit and keyword cloud."}
             {type === "company" && "Select a target corporation and job role to calculate structural sequencing guidelines and recruiter observations."}
@@ -920,7 +920,7 @@ export default function DashboardPage() {
             else if (type === "matcher") setActiveTab("matcher");
             else if (type === "company") setActiveTab("company");
           }}
-          className="py-2 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-[10px] font-bold text-slate-200 transition-all cursor-pointer"
+          className="py-2 px-4 rounded-xl bg-stone-50 hover:bg-stone-100 border border-stone-200 text-[10px] font-bold text-[#1E1E1E] transition-all cursor-pointer"
         >
           {type === "ats" || type === "history" ? "Open Resume Builder" : "Start New Scan"}
         </button>
@@ -936,41 +936,41 @@ export default function DashboardPage() {
     const isStep5Done = isPaid;
 
     return (
-      <div className="grid grid-cols-5 gap-2 p-3 bg-zinc-900/30 border border-zinc-900/80 rounded-2xl flex-shrink-0 text-center items-center">
+      <div className="grid grid-cols-5 gap-2 p-3 bg-white border border-stone-200 rounded-2xl flex-shrink-0 text-center items-center shadow-sm">
         <button 
           onClick={() => setActiveTab("edit")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep1Done ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : activeTab === "edit" ? "bg-cyan-400 animate-pulse" : "bg-zinc-800"}`} />
-          <span className={`text-[8px] font-mono font-black uppercase tracking-wider ${activeTab === "edit" ? "text-cyan-400" : isStep1Done ? "text-zinc-400" : "text-zinc-650"}`}>1. Upload</span>
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep1Done ? "bg-[#006039]" : activeTab === "edit" ? "bg-[#C6A769] animate-pulse" : "bg-stone-150"}`} />
+          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "edit" ? "text-[#006039]" : isStep1Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>1. Upload</span>
         </button>
         <button 
           onClick={() => setActiveTab("ats")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep2Done ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : activeTab === "ats" ? "bg-cyan-400 animate-pulse" : "bg-zinc-800"}`} />
-          <span className={`text-[8px] font-mono font-black uppercase tracking-wider ${activeTab === "ats" ? "text-cyan-400" : isStep2Done ? "text-zinc-400" : "text-zinc-655"}`}>2. Shortlist Scan</span>
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep2Done ? "bg-[#006039]" : activeTab === "ats" ? "bg-[#C6A769] animate-pulse" : "bg-stone-150"}`} />
+          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "ats" ? "text-[#006039]" : isStep2Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>2. Diagnostics</span>
         </button>
         <button 
           onClick={() => setActiveTab("matcher")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep3Done ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : activeTab === "matcher" ? "bg-cyan-400 animate-pulse" : "bg-zinc-800"}`} />
-          <span className={`text-[8px] font-mono font-black uppercase tracking-wider ${activeTab === "matcher" ? "text-cyan-400" : isStep3Done ? "text-zinc-400" : "text-zinc-655"}`}>3. Match JD</span>
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep3Done ? "bg-[#006039]" : activeTab === "matcher" ? "bg-[#C6A769] animate-pulse" : "bg-stone-150"}`} />
+          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "matcher" ? "text-[#006039]" : isStep3Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>3. Match JD</span>
         </button>
         <button 
           onClick={() => setActiveTab("company")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep4Done ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : activeTab === "company" ? "bg-cyan-400 animate-pulse" : "bg-zinc-800"}`} />
-          <span className={`text-[8px] font-mono font-black uppercase tracking-wider ${activeTab === "company" ? "text-cyan-400" : isStep4Done ? "text-zinc-400" : "text-zinc-655"}`}>4. Company Fit</span>
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep4Done ? "bg-[#006039]" : activeTab === "company" ? "bg-[#C6A769] animate-pulse" : "bg-stone-150"}`} />
+          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "company" ? "text-[#006039]" : isStep4Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>4. Company Fit</span>
         </button>
         <button 
           onClick={() => setActiveTab("account")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep5Done ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : activeTab === "account" ? "bg-cyan-400 animate-pulse" : "bg-zinc-800"}`} />
-          <span className={`text-[8px] font-mono font-black uppercase tracking-wider ${activeTab === "account" ? "text-cyan-400" : isStep5Done ? "text-zinc-400" : "text-zinc-655"}`}>5. Export</span>
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep5Done ? "bg-[#006039]" : activeTab === "account" ? "bg-[#C6A769] animate-pulse" : "bg-stone-150"}`} />
+          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "account" ? "text-[#006039]" : isStep5Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>5. Export</span>
         </button>
       </div>
     );
@@ -992,88 +992,88 @@ export default function DashboardPage() {
     return (
       <div className="space-y-6 text-left animate-in fade-in duration-300">
         {/* Header card with ring score */}
-        <div className="flex flex-col md:flex-row gap-6 items-center justify-between bg-zinc-900/10 border border-zinc-900 rounded-3xl p-6 text-left hover-card-premium">
+        <div className="flex flex-col md:flex-row gap-6 items-center justify-between bg-stone-50 border border-stone-200 rounded-3xl p-6 text-left hover-card-premium">
           <div className="flex flex-col justify-center items-center flex-shrink-0">
             <AtsScoreGauge score={atsScore} size={140} />
-            <span className="text-[9px] font-black font-mono text-zinc-500 uppercase tracking-widest mt-2.5">Shortlist Readiness</span>
+            <span className="text-[9px] font-black font-sans text-[#666666] uppercase tracking-widest mt-2.5">Shortlist Readiness</span>
           </div>
           <div className="flex-grow space-y-2">
             <div className="flex items-center space-x-2">
-              <span className="text-[9px] font-mono font-black text-cyan-400 uppercase tracking-wider">⚡ SHORTLIST READY REPORT</span>
-              <span className="text-[8px] font-mono font-bold text-emerald-455 bg-emerald-955/20 border border-emerald-900/50 px-2 py-0.5 rounded uppercase">Verified Shortlisting Format</span>
+              <span className="text-[9px] font-sans font-black text-[#006039] uppercase tracking-wider">⚡ SHORTLIST READY REPORT</span>
+              <span className="text-[8px] font-sans font-bold text-emerald-455 bg-emerald-955/20 border border-emerald-900/50 px-2 py-0.5 rounded uppercase">Verified Shortlisting Format</span>
             </div>
-            <h3 className="text-base font-black text-white leading-tight uppercase font-mono">Dynamic Content-Quality Assessment</h3>
-            <p className="text-xs text-zinc-450 leading-relaxed font-medium">
+            <h3 className="text-base font-black text-[#1E1E1E] leading-tight uppercase font-sans">Dynamic Content-Quality Assessment</h3>
+            <p className="text-xs text-[#666666] leading-relaxed font-medium">
               Your overall score of {atsScore}% represents your shortlisting readiness, derived from structure completeness, typography layout formatting, parser readability scores, keyword density checks, project complexity, and action verbs achievement quality metrics.
             </p>
           </div>
         </div>
 
         {/* Score Breakdown Progress Bars */}
-        <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
-          <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-            <BarChart3 className="h-4 w-4 text-cyan-400" />
+        <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
+          <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
+            <BarChart3 className="h-4 w-4 text-[#006039]" />
             <span>Category Optimization Matrix</span>
           </h4>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[10px] font-bold font-mono">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[10px] font-bold font-sans">
             <div className="space-y-1.5">
               <div className="flex justify-between text-zinc-455">
                 <span>Structure Completeness</span>
-                <span className="text-cyan-455">{structureVal}%</span>
+                <span className="text-[#006039]">{structureVal}%</span>
               </div>
-              <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${structureVal}%` }} />
+              <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
+                <div className="h-full transition-all duration-500" style={{ width: `${structureVal}%` }} />
               </div>
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between text-zinc-455">
                 <span>Formatting & Emojis</span>
-                <span className="text-cyan-455">{formattingVal}%</span>
+                <span className="text-[#006039]">{formattingVal}%</span>
               </div>
-              <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${formattingVal}%` }} />
+              <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
+                <div className="h-full transition-all duration-500" style={{ width: `${formattingVal}%` }} />
               </div>
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between text-zinc-455">
                 <span>Recruiter Readability</span>
-                <span className="text-cyan-455">{readabilityVal}%</span>
+                <span className="text-[#006039]">{readabilityVal}%</span>
               </div>
-              <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${readabilityVal}%` }} />
+              <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
+                <div className="h-full transition-all duration-500" style={{ width: `${readabilityVal}%` }} />
               </div>
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between text-zinc-455">
                 <span>Keywords Density</span>
-                <span className="text-cyan-455">{keywordsVal}%</span>
+                <span className="text-[#006039]">{keywordsVal}%</span>
               </div>
-              <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${keywordsVal}%` }} />
+              <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
+                <div className="h-full transition-all duration-500" style={{ width: `${keywordsVal}%` }} />
               </div>
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between text-zinc-455">
                 <span>Projects Depth</span>
-                <span className="text-cyan-455">{projectsVal}%</span>
+                <span className="text-[#006039]">{projectsVal}%</span>
               </div>
-              <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${projectsVal}%` }} />
+              <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
+                <div className="h-full transition-all duration-500" style={{ width: `${projectsVal}%` }} />
               </div>
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between text-zinc-455">
                 <span>Achievements Quality</span>
-                <span className="text-cyan-455">{achievementsVal}%</span>
+                <span className="text-[#006039]">{achievementsVal}%</span>
               </div>
-              <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${achievementsVal}%` }} />
+              <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
+                <div className="h-full transition-all duration-500" style={{ width: `${achievementsVal}%` }} />
               </div>
             </div>
           </div>
@@ -1083,39 +1083,39 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Key Strengths */}
-          <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
-            <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+          <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
+            <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
               <CheckCircle2 className="h-4 w-4 text-emerald-450" />
               <span>Recruiter Strengths Detected</span>
             </h4>
             <div className="space-y-2.5">
               {parsedReport.warnings?.slice(0, 4).map((str: string, idx: number) => (
-                <div key={idx} className="flex items-start space-x-2.5 text-xs text-zinc-350 font-semibold leading-relaxed">
+                <div key={idx} className="flex items-start space-x-2.5 text-xs text-[#666666] font-semibold leading-relaxed">
                   <span className="text-emerald-500 font-extrabold mt-0.5">•</span>
                   <span>{str}</span>
                 </div>
               ))}
               {(!parsedReport.warnings || parsedReport.warnings.length === 0) && (
-                <p className="text-[10px] text-zinc-550 italic font-semibold">No particular highlights found.</p>
+                <p className="text-[10px] text-[#666666] italic font-semibold">No particular highlights found.</p>
               )}
             </div>
           </div>
 
           {/* Warnings / Weaknesses */}
-          <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
-            <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+          <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
+            <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
               <AlertCircle className="h-4 w-4 text-red-400" />
               <span>Warnings & Format Gaps</span>
             </h4>
             <div className="space-y-2.5">
               {parsedReport.keywordGaps?.slice(0, 4).map((warn: string, idx: number) => (
-                <div key={idx} className="flex items-start space-x-2.5 text-xs text-zinc-350 font-semibold leading-relaxed">
+                <div key={idx} className="flex items-start space-x-2.5 text-xs text-[#666666] font-semibold leading-relaxed">
                   <span className="text-red-500 font-extrabold mt-0.5">•</span>
                   <span>{warn}</span>
                 </div>
               ))}
               {(!parsedReport.keywordGaps || parsedReport.keywordGaps.length === 0) && (
-                <p className="text-[10px] text-zinc-550 italic font-semibold">No format warnings or keyword gaps noted.</p>
+                <p className="text-[10px] text-[#666666] italic font-semibold">No format warnings or keyword gaps noted.</p>
               )}
             </div>
           </div>
@@ -1123,28 +1123,28 @@ export default function DashboardPage() {
         </div>
 
         {/* Action checklist items */}
-        <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
-          <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-            <ListChecks className="h-4 w-4 text-cyan-400" />
+        <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
+          <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
+            <ListChecks className="h-4 w-4 text-[#006039]" />
             <span>Placement Preparation Sprints Checklist</span>
           </h4>
           <div className="space-y-3">
             {parsedReport.metricEnhancements?.map((item: string, idx: number) => (
               <div 
                 key={idx} 
-                className="p-3.5 rounded-2xl bg-zinc-900/40 border border-zinc-900/60 text-xs text-zinc-250 font-semibold leading-relaxed flex items-start space-x-3 hover:border-zinc-800 transition-all text-left"
+                className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-xs text-[#1E1E1E] font-semibold leading-relaxed flex items-start space-x-3 hover:border-stone-200 transition-all text-left"
               >
-                <div className="h-5 w-5 rounded-full border border-cyan-500/30 text-cyan-400 font-mono text-[9px] font-black flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="h-5 w-5 rounded-full border border-stone-200 text-[#006039] font-sans text-[9px] font-black flex items-center justify-center flex-shrink-0 mt-0.5">
                   !
                 </div>
                 <div className="space-y-0.5">
-                  <p className="font-bold text-slate-200">{item}</p>
-                  <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider">Priority: Placements optimization milestone</p>
+                  <p className="font-bold text-[#1E1E1E]">{item}</p>
+                  <p className="text-[9px] font-sans text-[#666666] uppercase tracking-wider">Priority: Placements optimization milestone</p>
                 </div>
               </div>
             ))}
             {(!parsedReport.metricEnhancements || parsedReport.metricEnhancements.length === 0) && (
-              <p className="text-[10px] text-zinc-550 italic font-semibold">Perfect! No urgent improvements required.</p>
+              <p className="text-[10px] text-[#666666] italic font-semibold">Perfect! No urgent improvements required.</p>
             )}
           </div>
         </div>
@@ -1158,10 +1158,10 @@ export default function DashboardPage() {
         
         {/* Job Analysis History Logs */}
         {analysisHistory.length > 0 && (
-          <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-3 relative overflow-hidden">
-            <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
-              <span className="text-[10px] font-black text-white font-mono uppercase tracking-wider flex items-center space-x-1.5">
-                <History className="h-3.5 w-3.5 text-cyan-400" />
+          <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-3 relative overflow-hidden">
+            <div className="flex items-center justify-between border-b border-stone-200 pb-2.5">
+              <span className="text-[10px] font-black text-[#1E1E1E] font-sans uppercase tracking-wider flex items-center space-x-1.5">
+                <History className="h-3.5 w-3.5 text-[#006039]" />
                 <span>JD Scan History Logs ({analysisHistory.length})</span>
               </span>
               <button
@@ -1169,7 +1169,7 @@ export default function DashboardPage() {
                   setAnalysisHistory([]);
                   if (user) saveResume(user.uid, resumeId, resumeData, atsScore, tailorApplied, parsedReport, [], companyHistory);
                 }}
-                className="text-[9px] font-bold text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
+                className="text-[9px] font-bold text-[#666666] hover:text-red-400 transition-colors cursor-pointer"
               >
                 Clear History
               </button>
@@ -1191,11 +1191,11 @@ export default function DashboardPage() {
                   }`}
                 >
                   <div className="space-y-0.5 max-w-[70%]">
-                    <div className="text-[10px] font-bold font-mono truncate">{hist.jobTitle}</div>
-                    <div className="text-[8px] font-mono text-zinc-500">{hist.companyName} • {hist.timestamp}</div>
+                    <div className="text-[10px] font-bold font-sans truncate">{hist.jobTitle}</div>
+                    <div className="text-[8px] font-sans text-[#666666]">{hist.companyName} • {hist.timestamp}</div>
                   </div>
                   <div className="text-right flex items-center space-x-2">
-                    <span className="text-xs font-black font-mono bg-zinc-950 border border-zinc-800/80 px-2 py-0.5 rounded text-slate-100">
+                    <span className="text-xs font-black font-sans bg-white border border-stone-200 px-2 py-0.5 rounded text-[#1E1E1E]">
                       {hist.matchScore}%
                     </span>
                   </div>
@@ -1206,17 +1206,17 @@ export default function DashboardPage() {
         )}
 
         {/* Job Description Input Card */}
-        <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
+        <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-stone-200 pb-3">
             <div className="flex items-center space-x-2">
-              <div className="h-7 w-7 rounded bg-cyan-950 border border-cyan-800/35 flex items-center justify-center">
-                <Briefcase className="h-4 w-4 text-cyan-400" />
+              <div className="h-7 w-7 rounded bg-stone-50 border border-stone-200 flex items-center justify-center">
+                <Briefcase className="h-4 w-4 text-[#006039]" />
               </div>
-              <span className="text-xs font-black text-white font-mono uppercase tracking-wider">
+              <span className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider">
                 Target Job Description
               </span>
             </div>
-            <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase">
+            <span className="text-[10px] font-bold font-sans text-[#666666] uppercase">
               Max 3,000 chars
             </span>
           </div>
@@ -1227,14 +1227,14 @@ export default function DashboardPage() {
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value.slice(0, 3000))}
               placeholder="Paste the target company job description here (e.g. required frameworks, technologies, roles, verbs)..."
-              className="bg-zinc-900/30 border border-zinc-900 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 placeholder-zinc-650 rounded-xl p-4 w-full text-xs leading-relaxed outline-none transition-all font-sans resize-none"
+              className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-xl p-4 w-full text-xs leading-relaxed outline-none transition-all font-sans resize-none"
             />
-            <div className="flex justify-between items-center text-[10px] font-mono font-bold text-zinc-500 px-1">
+            <div className="flex justify-between items-center text-[10px] font-sans font-bold text-[#666666] px-1">
               <span>{jobDescription.length} / 3000 characters</span>
               {jobDescription && (
                 <button
                   onClick={() => setJobDescription("")}
-                  className="text-zinc-500 hover:text-red-400 flex items-center space-x-1 transition-colors cursor-pointer"
+                  className="text-[#666666] hover:text-red-400 flex items-center space-x-1 transition-colors cursor-pointer"
                 >
                   <Trash2 className="h-3 w-3" />
                   <span>Clear</span>
@@ -1246,16 +1246,16 @@ export default function DashboardPage() {
           <button
             onClick={handleOptimizeResume}
             disabled={isAnalyzing || !jobDescription.trim()}
-            className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-zinc-950 font-black text-xs shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2 cursor-pointer"
+            className="w-full py-3.5 px-4 rounded-xl hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-white font-black text-xs shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2 cursor-pointer"
           >
             {isAnalyzing ? (
               <>
-                <div className="h-4 w-4 border-2 border-zinc-955 border-t-transparent rounded-full animate-spin" />
+                <div className="h-4 w-4 border-2 border-stone-200 border-t-transparent rounded-full animate-spin" />
                 <span>Extracting Keywords & Gap Analysis...</span>
               </>
             ) : (
               <>
-                <Sparkles className="h-4 w-4 text-zinc-955 fill-zinc-955 stroke-[2.5]" />
+                <Sparkles className="h-4 w-4 text-white fill-zinc-955 stroke-[2.5]" />
                 <span>Scan & Match for Job Description</span>
               </>
             )}
@@ -1269,105 +1269,105 @@ export default function DashboardPage() {
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
             
             {/* ATS Compatibility Improvement Indicator */}
-            <div className="glass-panel border border-cyan-500/25 bg-gradient-to-tr from-cyan-950/20 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)] text-left">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none" />
+            <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)] text-left">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#006039]/5 rounded-full blur-2xl pointer-events-none" />
               
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black font-mono text-cyan-400 tracking-wider uppercase">
+                <span className="text-[10px] font-black font-sans text-[#006039] tracking-wider uppercase">
                   ⚡ ATS Match Compatibility Optimized
                 </span>
-                <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded">
+                <span className="text-[10px] font-sans font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded">
                   +{matchResult.scoreImprovement - matchResult.matchScore}% Boost
                 </span>
               </div>
 
               <div className="flex items-baseline space-x-2.5 pt-1.5 justify-start">
-                <span className="text-3xl font-black font-mono text-zinc-655 line-through">
+                <span className="text-3xl font-black font-sans text-zinc-655 line-through">
                   {matchResult.matchScore}%
                 </span>
-                <span className="text-xl font-bold font-mono text-zinc-500">→</span>
-                <span className="text-4xl font-black font-mono text-white tracking-tight drop-shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                <span className="text-xl font-bold font-sans text-[#666666]">→</span>
+                <span className="text-4xl font-black font-sans text-[#1E1E1E] tracking-tight drop-shadow-[0_0_15px_rgba(34,197,94,0.2)]">
                   {matchResult.scoreImprovement}% Match
                 </span>
               </div>
 
-              <p className="text-[10px] text-zinc-400 leading-relaxed font-semibold">
+              <p className="text-[10px] text-[#666666] leading-relaxed font-semibold">
                 Extracted semantic alignment keywords. The optimization injected missing high-yield B.Tech placements technical tags into experience bullets and skills.
               </p>
 
               {/* Tailor state controller buttons */}
-              <div className="flex items-center space-x-3 pt-3 border-t border-zinc-900">
+              <div className="flex items-center space-x-3 pt-3 border-t border-stone-200">
                 <button
                   onClick={handleUndoTailoring}
-                  className="flex-1 py-2 px-3 rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900/20 text-zinc-400 hover:text-white font-extrabold text-[10px] transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                  className="flex-1 py-2 px-3 rounded-lg border border-stone-200 hover:border-stone-200 bg-stone-50 text-[#666666] hover:text-[#1E1E1E] font-extrabold text-[10px] transition-all flex items-center justify-center space-x-1 cursor-pointer"
                 >
                   <RotateCcw className="h-3 w-3" />
                   <span>Undo Changes</span>
                 </button>
                 <button
                   onClick={handleConfirmTailoring}
-                  className="flex-1 py-2 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-extrabold text-[10px] transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                  className="flex-1 py-2 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-[10px] transition-all flex items-center justify-center space-x-1 cursor-pointer"
                 >
-                  <Check className="h-3 w-3 text-zinc-955 stroke-[2.5]" />
+                  <Check className="h-3 w-3 text-white stroke-[2.5]" />
                   <span>Apply Optimization</span>
                 </button>
               </div>
             </div>
 
             {/* Skills Gap Analysis */}
-            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5 text-left">
-                <ListChecks className="h-4 w-4 text-cyan-400" />
+            <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5 text-left">
+                <ListChecks className="h-4 w-4 text-[#006039]" />
                 <span>Job Fit Gap Audit</span>
               </h4>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Matching Skills */}
                 <div className="p-4 rounded-xl bg-emerald-950/5 border border-emerald-900/20 space-y-2.5 text-left">
-                  <span className="text-[9px] font-black text-emerald-450 font-mono uppercase tracking-widest block">MATCHING CONTAINS</span>
+                  <span className="text-[9px] font-black text-emerald-450 font-sans uppercase tracking-widest block">MATCHING CONTAINS</span>
                   <div className="flex flex-wrap gap-1.5">
                     {matchResult.gapAnalysis?.matchingSkills.map((sk, idx) => (
-                      <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-mono font-bold text-emerald-400 flex items-center space-x-1">
+                      <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-sans font-bold text-emerald-400 flex items-center space-x-1">
                         <span>✓</span>
                         <span>{sk}</span>
                       </span>
                     ))}
                     {matchResult.gapAnalysis?.matchingTechnologies.map((tech, idx) => (
-                      <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-mono font-bold text-emerald-400 flex items-center space-x-1">
+                      <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-sans font-bold text-emerald-400 flex items-center space-x-1">
                         <span>✓</span>
                         <span>{tech}</span>
                       </span>
                     ))}
                     {([...(matchResult.gapAnalysis?.matchingSkills || []), ...(matchResult.gapAnalysis?.matchingTechnologies || [])].length === 0) && (
-                      <span className="text-[8px] text-zinc-650 font-semibold italic">0 matching items found.</span>
+                      <span className="text-[8px] text-[#666666] font-semibold italic">0 matching items found.</span>
                     )}
                   </div>
                 </div>
 
                 {/* Missing Gaps */}
                 <div className="p-4 rounded-xl bg-amber-950/5 border border-amber-950/20 space-y-2.5 text-left">
-                  <span className="text-[9px] font-black text-amber-400 font-mono uppercase tracking-widest block">MISSING CORE GAPS</span>
+                  <span className="text-[9px] font-black text-amber-400 font-sans uppercase tracking-widest block">MISSING CORE GAPS</span>
                   <div className="flex flex-wrap gap-1.5">
                     {matchResult.gapAnalysis?.missingSkills.map((sk, idx) => (
-                      <span key={idx} className="px-2 py-0.5 rounded bg-amber-950/25 border border-amber-900/40 text-[9px] font-mono font-bold text-amber-450 flex items-center space-x-1">
+                      <span key={idx} className="px-2 py-0.5 rounded bg-amber-950/25 border border-amber-900/40 text-[9px] font-sans font-bold text-amber-450 flex items-center space-x-1">
                         <span>✗</span>
                         <span>{sk}</span>
                       </span>
                     ))}
                     {matchResult.gapAnalysis?.missingTechnologies.map((tech, idx) => (
-                      <span key={idx} className="px-2 py-0.5 rounded bg-amber-950/25 border border-amber-900/40 text-[9px] font-mono font-bold text-amber-450 flex items-center space-x-1">
+                      <span key={idx} className="px-2 py-0.5 rounded bg-amber-950/25 border border-amber-900/40 text-[9px] font-sans font-bold text-amber-450 flex items-center space-x-1">
                         <span>✗</span>
                         <span>{tech}</span>
                       </span>
                     ))}
                     {matchResult.gapAnalysis?.missingCertifications?.map((cert, idx) => (
-                      <span key={idx} className="px-2 py-0.5 rounded bg-red-950/25 border border-red-900/40 text-[9px] font-mono font-bold text-red-400 flex items-center space-x-1">
+                      <span key={idx} className="px-2 py-0.5 rounded bg-red-950/25 border border-red-900/40 text-[9px] font-sans font-bold text-red-400 flex items-center space-x-1">
                         <span>✗</span>
                         <span>{cert}</span>
                       </span>
                     ))}
                     {([...(matchResult.gapAnalysis?.missingSkills || []), ...(matchResult.gapAnalysis?.missingTechnologies || []), ...(matchResult.gapAnalysis?.missingCertifications || [])].length === 0) && (
-                      <span className="text-[8px] text-zinc-500 font-semibold italic">Perfect match! No gaps found.</span>
+                      <span className="text-[8px] text-[#666666] font-semibold italic">Perfect match! No gaps found.</span>
                     )}
                   </div>
                 </div>
@@ -1375,9 +1375,9 @@ export default function DashboardPage() {
             </div>
 
             {/* Keyword Frequency Report */}
-            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5 text-left">
-                <BarChart3 className="h-4 w-4 text-cyan-400" />
+            <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5 text-left">
+                <BarChart3 className="h-4 w-4 text-[#006039]" />
                 <span>Keyword Frequency Coverage</span>
               </h4>
               
@@ -1385,9 +1385,9 @@ export default function DashboardPage() {
                 {matchResult.keywordFrequency?.map((item, idx) => (
                   <div 
                     key={idx} 
-                    className="flex items-center space-x-2 px-2.5 py-1 rounded bg-zinc-900 border border-zinc-850 hover:border-zinc-800 transition-colors"
+                    className="flex items-center space-x-2 px-2.5 py-1 rounded bg-stone-50 border border-stone-200 hover:border-stone-200 transition-colors"
                   >
-                    <span className="text-[10px] font-mono font-black text-slate-200">{item.keyword}</span>
+                    <span className="text-[10px] font-sans font-black text-[#1E1E1E]">{item.keyword}</span>
                     <span className={`text-[8px] font-mono font-black px-1.5 py-0.25 rounded ${
                       item.count > 0 
                         ? "bg-emerald-950/40 text-emerald-400 border border-emerald-900/50" 
@@ -1408,9 +1408,9 @@ export default function DashboardPage() {
             </div>
 
             {/* Prioritised Optimization Checklist */}
-            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5 text-left">
-                <ListChecks className="h-4 w-4 text-cyan-400" />
+            <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5 text-left">
+                <ListChecks className="h-4 w-4 text-[#006039]" />
                 <span>Placements Sprints Priority Action Checklist</span>
               </h4>
 
@@ -1431,8 +1431,8 @@ export default function DashboardPage() {
                         !
                       </span>
                       <div className="space-y-0.5">
-                        <p className="text-[10px] font-bold text-slate-200">{item.task}</p>
-                        <p className="text-[8px] font-mono text-zinc-500">Priority: {item.priority.toUpperCase()} impact • Projected {item.impact}</p>
+                        <p className="text-[10px] font-bold text-[#1E1E1E]">{item.task}</p>
+                        <p className="text-[8px] font-sans text-[#666666]">Priority: {item.priority.toUpperCase()} impact • Projected {item.impact}</p>
                       </div>
                     </div>
                     <span className={`text-[9px] font-bold font-mono px-2 py-0.5 rounded bg-zinc-900 border text-white ${
@@ -1446,28 +1446,28 @@ export default function DashboardPage() {
             </div>
 
             {/* Before vs After Bullet Comparisons */}
-            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center justify-between">
+            <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center justify-between">
                 <span>🔄 AI Bullet Optimization Pipeline</span>
-                <span className="text-[9px] font-bold font-mono text-zinc-500 lowercase">Compare improvements</span>
+                <span className="text-[9px] font-bold font-sans text-[#666666] lowercase">Compare improvements</span>
               </h4>
 
               <div className="space-y-4 max-h-80 overflow-y-auto pr-1">
                 {matchResult.beforeAfterComparison.map((comp, idx) => (
-                  <div key={idx} className="space-y-2 border-b border-zinc-900 pb-4 last:border-0 last:pb-0">
+                  <div key={idx} className="space-y-2 border-b border-stone-200 pb-4 last:border-0 last:pb-0">
                     
                     {/* Original Bullet */}
                     <div className="p-3 rounded-lg bg-red-950/10 border border-red-950/30 text-left relative overflow-hidden">
-                      <span className="absolute top-1 right-2 text-[8px] font-black font-mono text-red-500 uppercase opacity-60">Original Draft</span>
-                      <p className="text-[10px] text-zinc-500 font-medium font-sans leading-normal pr-12">
+                      <span className="absolute top-1 right-2 text-[8px] font-black font-sans text-red-500 uppercase opacity-60">Original Draft</span>
+                      <p className="text-[10px] text-[#666666] font-medium font-sans leading-normal pr-12">
                         {comp.original}
                       </p>
                     </div>
 
                     {/* Optimized Bullet */}
                     <div className="p-3 rounded-lg bg-emerald-950/10 border border-emerald-900/20 text-left relative overflow-hidden">
-                      <span className="absolute top-1 right-2 text-[8px] font-black font-mono text-emerald-400 uppercase opacity-80">Tailored Optimization</span>
-                      <p className="text-[10px] text-zinc-200 font-bold font-sans leading-normal pr-12">
+                      <span className="absolute top-1 right-2 text-[8px] font-black font-sans text-emerald-400 uppercase opacity-80">Tailored Optimization</span>
+                      <p className="text-[10px] text-[#1E1E1E] font-bold font-sans leading-normal pr-12">
                         {comp.optimized}
                       </p>
                     </div>
@@ -1490,10 +1490,10 @@ export default function DashboardPage() {
         
         {/* Company Selection History Logs */}
         {companyHistory.length > 0 && (
-          <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-3 relative overflow-hidden text-left">
-            <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
-              <span className="text-[10px] font-black text-white font-mono uppercase tracking-wider flex items-center space-x-1.5">
-                <History className="h-3.5 w-3.5 text-cyan-400" />
+          <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-3 relative overflow-hidden text-left">
+            <div className="flex items-center justify-between border-b border-stone-200 pb-2.5">
+              <span className="text-[10px] font-black text-[#1E1E1E] font-sans uppercase tracking-wider flex items-center space-x-1.5">
+                <History className="h-3.5 w-3.5 text-[#006039]" />
                 <span>Company Suitability History Logs ({companyHistory.length})</span>
               </span>
               <button
@@ -1501,7 +1501,7 @@ export default function DashboardPage() {
                   setCompanyHistory([]);
                   if (user) saveResume(user.uid, resumeId, resumeData, atsScore, tailorApplied, parsedReport, analysisHistory, []);
                 }}
-                className="text-[9px] font-bold text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
+                className="text-[9px] font-bold text-[#666666] hover:text-red-400 transition-colors cursor-pointer"
               >
                 Clear History
               </button>
@@ -1522,11 +1522,11 @@ export default function DashboardPage() {
                   }`}
                 >
                   <div className="space-y-0.5 max-w-[70%]">
-                    <div className="text-[10px] font-bold font-mono truncate">{hist.companyName}</div>
-                    <div className="text-[8px] font-mono text-zinc-500">{hist.roleName} • {hist.timestamp}</div>
+                    <div className="text-[10px] font-bold font-sans truncate">{hist.companyName}</div>
+                    <div className="text-[8px] font-sans text-[#666666]">{hist.roleName} • {hist.timestamp}</div>
                   </div>
                   <div className="text-right flex items-center space-x-2">
-                    <span className="text-xs font-black font-mono bg-zinc-950 border border-zinc-800/80 px-2 py-0.5 rounded text-cyan-400">
+                    <span className="text-xs font-black font-sans bg-white border border-stone-200 px-2 py-0.5 rounded text-[#006039]">
                       {hist.matchScore}% Fit
                     </span>
                   </div>
@@ -1537,13 +1537,13 @@ export default function DashboardPage() {
         )}
 
         {/* Company Selector Form Card */}
-        <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4 text-left">
-          <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
+        <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4 text-left">
+          <div className="flex items-center justify-between border-b border-stone-200 pb-3">
             <div className="flex items-center space-x-2">
-              <div className="h-7 w-7 rounded bg-cyan-950 border border-cyan-800/35 flex items-center justify-center">
-                <Building2 className="h-4 w-4 text-cyan-400" />
+              <div className="h-7 w-7 rounded bg-stone-50 border border-stone-200 flex items-center justify-center">
+                <Building2 className="h-4 w-4 text-[#006039]" />
               </div>
-              <span className="text-xs font-black text-white font-mono uppercase tracking-wider">
+              <span className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider">
                 Target Company & Role Optimization
               </span>
             </div>
@@ -1552,11 +1552,11 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Company Select */}
             <div className="space-y-1.5 text-left">
-              <label className="text-[9px] font-black text-zinc-400 font-mono uppercase tracking-wider">Select Company</label>
+              <label className="text-[9px] font-black text-[#666666] font-sans uppercase tracking-wider">Select Company</label>
               <select
                 value={companySelection}
                 onChange={(e) => setCompanySelection(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-850 hover:border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 rounded-xl p-3 text-xs leading-relaxed outline-none transition-all font-mono"
+                className="w-full bg-stone-50 border border-stone-200 hover:border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] rounded-xl p-3 text-xs leading-relaxed outline-none transition-all font-sans"
               >
                 <option value="Google">Google</option>
                 <option value="Microsoft">Microsoft</option>
@@ -1576,13 +1576,13 @@ export default function DashboardPage() {
 
             {/* Target Role input */}
             <div className="space-y-1.5 text-left">
-              <label className="text-[9px] font-black text-zinc-400 font-mono uppercase tracking-wider">Target Job Role</label>
+              <label className="text-[9px] font-black text-[#666666] font-sans uppercase tracking-wider">Target Job Role</label>
               <input
                 type="text"
                 value={roleSelection}
                 onChange={(e) => setRoleSelection(e.target.value)}
                 placeholder="e.g. Software Engineer Intern, Specialist Programmer"
-                className="w-full bg-zinc-900 border border-zinc-850 hover:border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 rounded-xl p-3 text-xs leading-relaxed outline-none transition-all font-sans font-semibold"
+                className="w-full bg-stone-50 border border-stone-200 hover:border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] rounded-xl p-3 text-xs leading-relaxed outline-none transition-all font-sans font-semibold"
               />
             </div>
           </div>
@@ -1590,16 +1590,16 @@ export default function DashboardPage() {
           <button
             onClick={handleCompanyAnalysis}
             disabled={isAnalyzingCompany || !roleSelection.trim()}
-            className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-zinc-950 font-black text-xs shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2 cursor-pointer"
+            className="w-full py-3.5 px-4 rounded-xl hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-white font-black text-xs shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2 cursor-pointer"
           >
             {isAnalyzingCompany ? (
               <>
-                <div className="h-4 w-4 border-2 border-zinc-955 border-t-transparent rounded-full animate-spin" />
+                <div className="h-4 w-4 border-2 border-stone-200 border-t-transparent rounded-full animate-spin" />
                 <span>Running Company Suitability Audits...</span>
               </>
             ) : (
               <>
-                <Building2 className="h-4 w-4 text-zinc-955" />
+                <Building2 className="h-4 w-4 text-white" />
                 <span>Analyze Placements Suitability</span>
               </>
             )}
@@ -1613,120 +1613,120 @@ export default function DashboardPage() {
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 text-left">
             
             {/* Overall Company Match Gauge */}
-            <div className="glass-panel border border-cyan-500/25 bg-gradient-to-tr from-cyan-950/20 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)]">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 pointer-events-none rounded-full blur-2xl" />
+            <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)]">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#006039]/5 pointer-events-none rounded-full blur-2xl" />
               
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black font-mono text-cyan-400 tracking-wider uppercase">
+                <span className="text-[10px] font-black font-sans text-[#006039] tracking-wider uppercase">
                   🏢 Target Company Match score
                 </span>
-                <span className="text-[9px] font-black font-mono text-zinc-400">
+                <span className="text-[9px] font-black font-sans text-[#666666]">
                   {companySelection.toUpperCase()} • {roleSelection.toUpperCase()}
                 </span>
               </div>
 
               <div className="flex items-baseline space-x-2.5 pt-1.5 justify-start">
-                <span className="text-4xl font-black font-mono text-white tracking-tight drop-shadow-[0_0_15px_rgba(6,182,212,0.35)]">
+                <span className="text-4xl font-black font-sans text-[#1E1E1E] tracking-tight drop-shadow-[0_0_15px_rgba(6,182,212,0.35)]">
                   {companyMatchResult.matchScore}%
                 </span>
-                <span className="text-xs font-bold font-mono text-cyan-400">Suitability Match</span>
+                <span className="text-xs font-bold font-sans text-[#006039]">Suitability Match</span>
               </div>
 
-              <p className="text-[10px] text-zinc-400 leading-relaxed font-semibold">
+              <p className="text-[10px] text-[#666666] leading-relaxed font-semibold">
                 This represents how ready your resume is for {companySelection}'s screening filters, based on preferred skills, project depth guidelines, and certification expectations.
               </p>
             </div>
 
             {/* Multi-Dimensional Fit Score Progress Bars */}
-            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-                <BarChart3 className="h-4 w-4 text-cyan-400" />
+            <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
+                <BarChart3 className="h-4 w-4 text-[#006039]" />
                 <span>Multi-Dimensional Suitability Matrix</span>
               </h4>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                 {/* Technical Match */}
                 <div className="space-y-1.5">
-                  <div className="flex justify-between text-[10px] font-bold font-mono">
-                    <span className="text-zinc-400">Technical Match</span>
-                    <span className="text-cyan-400">{companyMatchResult.technicalMatch}%</span>
+                  <div className="flex justify-between text-[10px] font-bold font-sans">
+                    <span className="text-[#666666]">Technical Match</span>
+                    <span className="text-[#006039]">{companyMatchResult.technicalMatch}%</span>
                   </div>
-                  <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                    <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.technicalMatch}%` }} />
+                  <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
+                    <div className="h-full transition-all duration-500" style={{ width: `${companyMatchResult.technicalMatch}%` }} />
                   </div>
                 </div>
 
                 {/* Experience Match */}
                 <div className="space-y-1.5">
-                  <div className="flex justify-between text-[10px] font-bold font-mono">
-                    <span className="text-zinc-400">Experience Match</span>
+                  <div className="flex justify-between text-[10px] font-bold font-sans">
+                    <span className="text-[#666666]">Experience Match</span>
                     <span className="text-purple-400">{companyMatchResult.experienceMatch}%</span>
                   </div>
-                  <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                    <div className="bg-gradient-to-r from-purple-500 to-purple-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.experienceMatch}%` }} />
+                  <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
+                    <div className="from-purple-500 to-purple-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.experienceMatch}%` }} />
                   </div>
                 </div>
 
                 {/* Skills Match */}
                 <div className="space-y-1.5">
-                  <div className="flex justify-between text-[10px] font-bold font-mono">
-                    <span className="text-zinc-400">Keyword Density (Skills)</span>
+                  <div className="flex justify-between text-[10px] font-bold font-sans">
+                    <span className="text-[#666666]">Keyword Density (Skills)</span>
                     <span className="text-emerald-450">{companyMatchResult.skillsMatch}%</span>
                   </div>
-                  <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                    <div className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.skillsMatch}%` }} />
+                  <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
+                    <div className="from-emerald-500 to-emerald-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.skillsMatch}%` }} />
                   </div>
                 </div>
 
                 {/* Project Match */}
                 <div className="space-y-1.5">
-                  <div className="flex justify-between text-[10px] font-bold font-mono">
-                    <span className="text-zinc-400">Project Depth Match</span>
+                  <div className="flex justify-between text-[10px] font-bold font-sans">
+                    <span className="text-[#666666]">Project Depth Match</span>
                     <span className="text-indigo-400">{companyMatchResult.projectMatch}%</span>
                   </div>
-                  <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                    <div className="bg-gradient-to-r from-indigo-500 to-indigo-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.projectMatch}%` }} />
+                  <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
+                    <div className="from-indigo-500 to-indigo-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.projectMatch}%` }} />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Recruiter Gap Analysis table */}
-            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-                <ListChecks className="h-4 w-4 text-cyan-400" />
+            <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
+                <ListChecks className="h-4 w-4 text-[#006039]" />
                 <span>{companySelection}-Specific Skills Gap Audit</span>
               </h4>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Matching Skills */}
                 <div className="p-4 rounded-xl bg-emerald-950/5 border border-emerald-950/20 space-y-2.5 text-left">
-                  <span className="text-[9px] font-black text-emerald-450 font-mono uppercase tracking-widest block">MATCHING CONTAINS</span>
+                  <span className="text-[9px] font-black text-emerald-450 font-sans uppercase tracking-widest block">MATCHING CONTAINS</span>
                   <div className="flex flex-wrap gap-1.5">
                     {companyMatchResult.gapAnalysis?.contains?.map((sk: string, idx: number) => (
-                      <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-mono font-bold text-emerald-400 flex items-center space-x-1">
+                      <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-sans font-bold text-emerald-400 flex items-center space-x-1">
                         <span>✓</span>
                         <span>{sk}</span>
                       </span>
                     ))}
                     {(companyMatchResult.gapAnalysis?.contains?.length === 0) && (
-                      <span className="text-[8px] text-zinc-650 font-semibold italic">0 matching items found.</span>
+                      <span className="text-[8px] text-[#666666] font-semibold italic">0 matching items found.</span>
                     )}
                   </div>
                 </div>
 
                 {/* Missing Gaps */}
                 <div className="p-4 rounded-xl bg-amber-955/5 border border-amber-955/20 space-y-2.5 text-left">
-                  <span className="text-[9px] font-black text-amber-400 font-mono uppercase tracking-widest block">MISSING EXPECTATIONS</span>
+                  <span className="text-[9px] font-black text-amber-400 font-sans uppercase tracking-widest block">MISSING EXPECTATIONS</span>
                   <div className="flex flex-wrap gap-1.5">
                     {companyMatchResult.gapAnalysis?.missing?.map((sk: string, idx: number) => (
-                      <span key={idx} className="px-2 py-0.5 rounded bg-amber-955/25 border border-amber-900/40 text-[9px] font-mono font-bold text-amber-450 flex items-center space-x-1">
+                      <span key={idx} className="px-2 py-0.5 rounded bg-amber-955/25 border border-amber-900/40 text-[9px] font-sans font-bold text-amber-450 flex items-center space-x-1">
                         <span>✗</span>
                         <span>{sk}</span>
                       </span>
                     ))}
                     {(companyMatchResult.gapAnalysis?.missing?.length === 0) && (
-                      <span className="text-[8px] text-zinc-500 font-semibold italic">Perfect match! No gaps found.</span>
+                      <span className="text-[8px] text-[#666666] font-semibold italic">Perfect match! No gaps found.</span>
                     )}
                   </div>
                 </div>
@@ -1734,72 +1734,72 @@ export default function DashboardPage() {
             </div>
 
             {/* Section sequencing guidance: Focus Mode */}
-            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-                <Zap className="h-4 w-4 text-cyan-400" />
+            <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
+                <Zap className="h-4 w-4 text-[#006039]" />
                 <span>Resume Focus Mode: Section Sequencing Guidance</span>
               </h4>
-              <div className="p-4 rounded-xl bg-zinc-900/30 border border-zinc-850 flex items-start space-x-3 text-left">
-                <div className="h-6 w-6 rounded bg-cyan-950/40 border border-cyan-800/40 text-[10px] font-bold text-cyan-400 flex items-center justify-center flex-shrink-0 mt-0.5">ℹ</div>
+              <div className="p-4 rounded-xl bg-stone-50 border border-stone-200 flex items-start space-x-3 text-left">
+                <div className="h-6 w-6 rounded bg-stone-50 border border-stone-200 text-[10px] font-bold text-[#006039] flex items-center justify-center flex-shrink-0 mt-0.5">ℹ</div>
                 <div className="space-y-1">
-                  <span className="text-[9px] font-black text-cyan-400 font-mono uppercase tracking-wider block">RECOMMENDED ORDER FOR {companySelection}</span>
-                  <p className="text-[10px] font-bold text-slate-200 leading-normal">{companyMatchResult.focusMode}</p>
+                  <span className="text-[9px] font-black text-[#006039] font-sans uppercase tracking-wider block">RECOMMENDED ORDER FOR {companySelection}</span>
+                  <p className="text-[10px] font-bold text-[#1E1E1E] leading-normal">{companyMatchResult.focusMode}</p>
                 </div>
               </div>
             </div>
 
             {/* Recruiter Perspective Feed */}
-            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-                <Sparkles className="h-4 w-4 text-cyan-400" strokeWidth={2.5} />
+            <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
+                <Sparkles className="h-4 w-4 text-[#006039]" strokeWidth={2.5} />
                 <span>Recruiter Perspective Feed</span>
               </h4>
 
               <div className="space-y-3.5 pr-1">
                 {/* Strengths */}
                 <div className="space-y-1.5">
-                  <span className="text-[9px] font-black text-emerald-450 font-mono tracking-widest uppercase block">✓ KEY STRENGTHS RECRUITER NOTICED</span>
+                  <span className="text-[9px] font-black text-emerald-450 font-sans tracking-widest uppercase block">✓ KEY STRENGTHS RECRUITER NOTICED</span>
                   <div className="space-y-1">
                     {companyMatchResult.recruiterPerspective?.strengths?.map((str: string, idx: number) => (
-                      <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-350 font-semibold leading-relaxed">
+                      <div key={idx} className="flex items-start space-x-2 text-[10px] text-[#666666] font-semibold leading-relaxed">
                         <span className="text-emerald-500 font-bold">•</span>
                         <span>{str}</span>
                       </div>
                     ))}
                     {(companyMatchResult.recruiterPerspective?.strengths?.length === 0) && (
-                      <p className="text-[9px] text-zinc-500 italic">No particular highlights found.</p>
+                      <p className="text-[9px] text-[#666666] italic">No particular highlights found.</p>
                     )}
                   </div>
                 </div>
 
                 {/* Weaknesses */}
-                <div className="space-y-1.5 pt-2 border-t border-zinc-900">
-                  <span className="text-[9px] font-black text-red-400 font-mono tracking-widest uppercase block">✗ WEAKNESSES & GAP WARNINGS</span>
+                <div className="space-y-1.5 pt-2 border-t border-stone-200">
+                  <span className="text-[9px] font-black text-red-400 font-sans tracking-widest uppercase block">✗ WEAKNESSES & GAP WARNINGS</span>
                   <div className="space-y-1">
                     {companyMatchResult.recruiterPerspective?.weaknesses?.map((weak: string, idx: number) => (
-                      <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-350 font-semibold leading-relaxed">
+                      <div key={idx} className="flex items-start space-x-2 text-[10px] text-[#666666] font-semibold leading-relaxed">
                         <span className="text-red-500 font-bold">•</span>
                         <span>{weak}</span>
                       </div>
                     ))}
                     {(companyMatchResult.recruiterPerspective?.weaknesses?.length === 0) && (
-                      <p className="text-[9px] text-zinc-500 italic">No major warnings found.</p>
+                      <p className="text-[9px] text-[#666666] italic">No major warnings found.</p>
                     )}
                   </div>
                 </div>
 
                 {/* Opportunities */}
-                <div className="space-y-1.5 pt-2 border-t border-zinc-900">
-                  <span className="text-[9px] font-black text-amber-500 font-mono tracking-widest uppercase block">⚡ PLACEMENT IMPROVEMENT OPPORTUNITIES</span>
+                <div className="space-y-1.5 pt-2 border-t border-stone-200">
+                  <span className="text-[9px] font-black text-amber-500 font-sans tracking-widest uppercase block">⚡ PLACEMENT IMPROVEMENT OPPORTUNITIES</span>
                   <div className="space-y-1">
                     {companyMatchResult.recruiterPerspective?.opportunities?.map((opp: string, idx: number) => (
-                      <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-350 font-semibold leading-relaxed">
+                      <div key={idx} className="flex items-start space-x-2 text-[10px] text-[#666666] font-semibold leading-relaxed">
                         <span className="text-amber-500 font-bold">•</span>
                         <span>{opp}</span>
                       </div>
                     ))}
                     {(companyMatchResult.recruiterPerspective?.opportunities?.length === 0) && (
-                      <p className="text-[9px] text-zinc-500 italic">No distinct opportunities noted.</p>
+                      <p className="text-[9px] text-[#666666] italic">No distinct opportunities noted.</p>
                     )}
                   </div>
                 </div>
@@ -1807,20 +1807,20 @@ export default function DashboardPage() {
             </div>
 
             {/* Company Suggestions */}
-            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-                <Award className="h-4 w-4 text-cyan-400" />
+            <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
+                <Award className="h-4 w-4 text-[#006039]" />
                 <span>Actionable Placement Recommendations</span>
               </h4>
               <div className="space-y-2.5">
                 {companyMatchResult.suggestions?.map((sug: string, idx: number) => (
-                  <div key={idx} className="p-3 rounded-xl bg-zinc-900/50 border border-zinc-850 text-[10px] font-bold text-slate-200 leading-normal flex items-start space-x-2 hover:border-zinc-800 transition-all">
-                    <span className="text-cyan-400 font-mono font-black mt-0.5">#{idx + 1}</span>
+                  <div key={idx} className="p-3 rounded-xl bg-stone-50 border border-stone-200 text-[10px] font-bold text-[#1E1E1E] leading-normal flex items-start space-x-2 hover:border-stone-200 transition-all">
+                    <span className="text-[#006039] font-sans font-black mt-0.5">#{idx + 1}</span>
                     <span>{sug}</span>
                   </div>
                 ))}
                 {(companyMatchResult.suggestions?.length === 0) && (
-                  <p className="text-[9px] text-zinc-500 italic">No recommendations available.</p>
+                  <p className="text-[9px] text-[#666666] italic">No recommendations available.</p>
                 )}
               </div>
             </div>
@@ -1844,10 +1844,10 @@ export default function DashboardPage() {
       <div className="space-y-6 text-left animate-in fade-in duration-300">
         {/* Job description scans */}
         {hasJdHistory && (
-          <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
-            <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center justify-between">
+          <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
+            <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center justify-between">
               <span className="flex items-center space-x-1.5">
-                <Briefcase className="h-4 w-4 text-cyan-400" />
+                <Briefcase className="h-4 w-4 text-[#006039]" />
                 <span>Job Description Matches ({analysisHistory.length})</span>
               </span>
               <button
@@ -1855,7 +1855,7 @@ export default function DashboardPage() {
                   setAnalysisHistory([]);
                   if (user) saveResume(user.uid, resumeId, resumeData, atsScore, tailorApplied, parsedReport, [], companyHistory);
                 }}
-                className="text-[9px] font-bold text-zinc-550 hover:text-red-400 transition-colors"
+                className="text-[9px] font-bold text-[#666666] hover:text-red-400 transition-colors"
               >
                 Clear JD History
               </button>
@@ -1865,14 +1865,14 @@ export default function DashboardPage() {
               {analysisHistory.map((hist) => (
                 <div 
                   key={hist.id} 
-                  className="p-4 rounded-2xl bg-zinc-900/20 border border-zinc-900/60 flex flex-col justify-between hover:border-zinc-800 transition-all hover:bg-zinc-900/30"
+                  className="p-4 rounded-2xl bg-stone-50 border border-stone-200 flex flex-col justify-between hover:border-stone-200 transition-all hover:bg-stone-50"
                 >
                   <div className="space-y-1.5">
-                    <p className="text-xs font-bold text-slate-200 font-mono truncate">{hist.jobTitle}</p>
-                    <p className="text-[9px] text-zinc-500 font-mono font-semibold uppercase tracking-wider">{hist.companyName} • {hist.timestamp}</p>
+                    <p className="text-xs font-bold text-[#1E1E1E] font-sans truncate">{hist.jobTitle}</p>
+                    <p className="text-[9px] text-[#666666] font-sans font-semibold uppercase tracking-wider">{hist.companyName} • {hist.timestamp}</p>
                   </div>
-                  <div className="flex justify-between items-center mt-4 pt-2 border-t border-zinc-900">
-                    <span className="text-[10px] font-black font-mono text-cyan-400 bg-cyan-955/20 border border-cyan-900/30 px-2 py-0.5 rounded">
+                  <div className="flex justify-between items-center mt-4 pt-2 border-t border-stone-200">
+                    <span className="text-[10px] font-black font-sans text-[#006039] bg-stone-50 border border-stone-200 px-2 py-0.5 rounded">
                       {hist.matchScore}% Match
                     </span>
                     <button
@@ -1883,7 +1883,7 @@ export default function DashboardPage() {
                         setTailorApplied(true);
                         setActiveTab("matcher");
                       }}
-                      className="text-[9px] font-bold text-cyan-400 hover:text-cyan-300 cursor-pointer"
+                      className="text-[9px] font-bold text-[#006039] hover:text-[#006039] cursor-pointer"
                     >
                       Reload Draft →
                     </button>
@@ -1896,10 +1896,10 @@ export default function DashboardPage() {
 
         {/* Company Suitability scans */}
         {hasCompHistory && (
-          <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
-            <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center justify-between">
+          <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
+            <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center justify-between">
               <span className="flex items-center space-x-1.5">
-                <Building2 className="h-4 w-4 text-cyan-400" />
+                <Building2 className="h-4 w-4 text-[#006039]" />
                 <span>Company Optimization Suitability ({companyHistory.length})</span>
               </span>
               <button
@@ -1907,7 +1907,7 @@ export default function DashboardPage() {
                   setCompanyHistory([]);
                   if (user) saveResume(user.uid, resumeId, resumeData, atsScore, tailorApplied, parsedReport, analysisHistory, []);
                 }}
-                className="text-[9px] font-bold text-zinc-550 hover:text-red-400 transition-colors"
+                className="text-[9px] font-bold text-[#666666] hover:text-red-400 transition-colors"
               >
                 Clear Company History
               </button>
@@ -1917,14 +1917,14 @@ export default function DashboardPage() {
               {companyHistory.map((hist) => (
                 <div 
                   key={hist.id} 
-                  className="p-4 rounded-2xl bg-zinc-900/20 border border-zinc-900/60 flex flex-col justify-between hover:border-zinc-800 transition-all hover:bg-zinc-900/30"
+                  className="p-4 rounded-2xl bg-stone-50 border border-stone-200 flex flex-col justify-between hover:border-stone-200 transition-all hover:bg-stone-50"
                 >
                   <div className="space-y-1.5">
-                    <p className="text-xs font-bold text-slate-200 font-mono truncate">{hist.companyName}</p>
-                    <p className="text-[9px] text-zinc-500 font-mono font-semibold uppercase tracking-wider">{hist.roleName} • {hist.timestamp}</p>
+                    <p className="text-xs font-bold text-[#1E1E1E] font-sans truncate">{hist.companyName}</p>
+                    <p className="text-[9px] text-[#666666] font-sans font-semibold uppercase tracking-wider">{hist.roleName} • {hist.timestamp}</p>
                   </div>
-                  <div className="flex justify-between items-center mt-4 pt-2 border-t border-zinc-900">
-                    <span className="text-[10px] font-black font-mono text-cyan-400 bg-cyan-955/20 border border-cyan-900/30 px-2 py-0.5 rounded">
+                  <div className="flex justify-between items-center mt-4 pt-2 border-t border-stone-200">
+                    <span className="text-[10px] font-black font-sans text-[#006039] bg-stone-50 border border-stone-200 px-2 py-0.5 rounded">
                       {hist.matchScore}% Suitability
                     </span>
                     <button
@@ -1934,7 +1934,7 @@ export default function DashboardPage() {
                         setCompanyMatchResult(hist);
                         setActiveTab("company");
                       }}
-                      className="text-[9px] font-bold text-cyan-400 hover:text-cyan-300 cursor-pointer"
+                      className="text-[9px] font-bold text-[#006039] hover:text-[#006039] cursor-pointer"
                     >
                       Open Report →
                     </button>
@@ -1953,68 +1953,68 @@ export default function DashboardPage() {
       <div className="space-y-6 text-left animate-in fade-in duration-300">
         
         {/* Premium Profile Status Card */}
-        <div className="glass-panel border border-zinc-900 rounded-3xl p-6 relative overflow-hidden text-left hover-card-premium">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 pointer-events-none rounded-full blur-3xl" />
+        <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 relative overflow-hidden text-left hover-card-premium">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#006039]/5 pointer-events-none rounded-full blur-3xl" />
           
           <div className="flex items-center space-x-4">
-            <div className="h-14 w-14 rounded-2xl bg-gradient-to-tr from-cyan-955 to-zinc-900 border border-cyan-800/30 flex items-center justify-center font-mono font-black text-lg text-cyan-400 shadow-inner">
+            <div className="h-14 w-14 rounded-2xl to-zinc-900 border border-stone-200 flex items-center justify-center font-sans font-black text-lg text-[#006039] shadow-inner">
               {user.email?.charAt(0).toUpperCase()}
             </div>
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
-                <span className="text-[9px] font-mono font-black text-cyan-400 tracking-widest uppercase leading-none">BOOSTCV SUITE</span>
+                <span className="text-[9px] font-sans font-black text-[#006039] tracking-widest uppercase leading-none">BOOSTCV SUITE</span>
                 <span className={`text-[8px] font-mono font-bold px-2 py-0.5 rounded uppercase ${isPaid ? "bg-emerald-955/20 border border-emerald-900/50 text-emerald-400" : "bg-zinc-900/80 border border-zinc-800 text-zinc-400"}`}>
                   {isPaid ? "Pro Developer License" : "Free Preview Mode"}
                 </span>
               </div>
-              <h3 className="text-base font-black text-white font-mono">{user.email}</h3>
+              <h3 className="text-base font-black text-[#1E1E1E] font-sans">{user.email}</h3>
             </div>
           </div>
         </div>
 
         {/* Security & Anti-Exploit explanations */}
-        <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
-          <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-            <Lock className="h-4 w-4 text-cyan-400" />
+        <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
+          <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
+            <Lock className="h-4 w-4 text-[#006039]" />
             <span>Premium Security & Session Lock Gating</span>
           </h4>
-          <p className="text-xs text-zinc-400 leading-relaxed font-semibold">
+          <p className="text-xs text-[#666666] leading-relaxed font-semibold">
             BOOSTCV implements a transaction-aware, highly secure 10-minute temporary checkout session system. Unlocked premium access allows unlimited live previews and PDF downloads but invalidates itself upon successful download compile to protect the SaaS micro-payment structures.
           </p>
           
           {/* Quick specs */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[10px] font-bold font-mono">
-            <div className="p-3 bg-zinc-900/30 border border-zinc-900 rounded-xl space-y-0.5">
-              <span className="text-zinc-500 uppercase tracking-wider block">PREVIEW STATUS:</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[10px] font-bold font-sans">
+            <div className="p-3 bg-stone-50 border border-stone-200 rounded-xl space-y-0.5">
+              <span className="text-[#666666] uppercase tracking-wider block">PREVIEW STATUS:</span>
               <span className={isPaid ? "text-emerald-450" : "text-amber-400"}>
                 {isPaid ? "🔓 UNLOCKED (Export Session Active)" : "🔒 LOCKED (Partially blurred & faded)"}
               </span>
             </div>
-            <div className="p-3 bg-zinc-900/30 border border-zinc-900 rounded-xl space-y-0.5">
-              <span className="text-zinc-500 uppercase tracking-wider block">EXPORT CHARGES:</span>
-              <span className="text-slate-200">₹80.00 / resume download session</span>
+            <div className="p-3 bg-stone-50 border border-stone-200 rounded-xl space-y-0.5">
+              <span className="text-[#666666] uppercase tracking-wider block">EXPORT CHARGES:</span>
+              <span className="text-[#1E1E1E]">₹80.00 / resume download session</span>
             </div>
           </div>
         </div>
 
         {/* Referral Scheme details */}
-        <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
-          <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-            <Award className="h-4 w-4 text-cyan-400" />
+        <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
+          <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
+            <Award className="h-4 w-4 text-[#006039]" />
             <span>Classmates Referral Scheme (Get Free Downloads)</span>
           </h4>
-          <p className="text-xs text-zinc-450 leading-relaxed font-semibold">
+          <p className="text-xs text-[#666666] leading-relaxed font-semibold">
             Invite your peers and classmates to optimize their resumes! Once **3 of your friends** sign up via your unique link, your account instantly unlocks a lifetime Pro Developer License for free.
           </p>
 
-          <div className="p-4 bg-zinc-900/20 border border-zinc-900 rounded-2xl space-y-3">
-            <div className="flex justify-between items-center text-[10px] font-mono font-bold">
-              <span className="text-zinc-400">Classmates Referral Counter</span>
-              <span className="text-cyan-400 font-extrabold">{referralCount} / 3 Peers Joined</span>
+          <div className="p-4 bg-stone-50 border border-stone-200 rounded-2xl space-y-3">
+            <div className="flex justify-between items-center text-[10px] font-sans font-bold">
+              <span className="text-[#666666]">Classmates Referral Counter</span>
+              <span className="text-[#006039] font-extrabold">{referralCount} / 3 Peers Joined</span>
             </div>
-            <div className="w-full bg-zinc-950 h-2 rounded-full overflow-hidden">
+            <div className="w-full bg-white h-2 rounded-full overflow-hidden">
               <div 
-                className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" 
+                className="h-full transition-all duration-500" 
                 style={{ width: `${(referralCount / 3) * 100}%` }}
               />
             </div>
@@ -2024,11 +2024,11 @@ export default function DashboardPage() {
                 type="text"
                 readOnly
                 value={referralLink}
-                className="bg-zinc-950 border border-zinc-900 text-[10px] p-2.5 rounded-lg flex-1 text-zinc-500 outline-none select-all font-mono"
+                className="bg-white border border-stone-200 text-[10px] p-2.5 rounded-lg flex-1 text-[#666666] outline-none select-all font-sans"
               />
               <button
                 onClick={copyReferral}
-                className="px-4 py-2.5 rounded-lg bg-cyan-955 border border-cyan-800 text-cyan-400 hover:bg-cyan-900 transition-colors font-bold font-mono text-[10px]"
+                className="px-4 py-2.5 rounded-lg bg-stone-50 border border-stone-200 text-[#006039] hover:bg-[#004d2e] transition-colors font-bold font-sans text-[10px]"
               >
                 {copied ? "Copied!" : "Copy Link"}
               </button>
@@ -2047,10 +2047,10 @@ export default function DashboardPage() {
   const renderAtsInsightsContainer = () => {
     if (!parsedReport) {
       return (
-        <div className="py-12 text-center text-zinc-500 text-xs font-mono font-semibold space-y-2">
-          <AlertCircle className="h-8 w-8 text-zinc-600 mx-auto" />
+        <div className="py-12 text-center text-[#666666] text-xs font-sans font-semibold space-y-2">
+          <AlertCircle className="h-8 w-8 text-[#666666] mx-auto" />
           <p>No diagnostics calculated yet.</p>
-          <p className="text-[10px] text-zinc-650 max-w-xs mx-auto">Fill in the fields or trigger a deep parsing update to see warnings.</p>
+          <p className="text-[10px] text-[#666666] max-w-xs mx-auto">Fill in the fields or trigger a deep parsing update to see warnings.</p>
         </div>
       );
     }
@@ -2067,63 +2067,63 @@ export default function DashboardPage() {
       <div className="space-y-5 text-left animate-in fade-in duration-300">
         
         {/* Compact gauge */}
-        <div className="flex items-center space-x-4 bg-zinc-900/30 p-4 rounded-2xl border border-zinc-900">
+        <div className="flex items-center space-x-4 bg-stone-50 p-4 rounded-2xl border border-stone-200">
           <AtsScoreGauge score={atsScore} size={85} />
           <div className="space-y-1">
-            <span className="text-[9px] font-black font-mono text-cyan-400 uppercase tracking-wider block">SHORTLISTING READINESS SCORE</span>
-            <p className="text-[10px] text-zinc-400 font-semibold font-sans leading-relaxed">
+            <span className="text-[9px] font-black font-sans text-[#006039] uppercase tracking-wider block">SHORTLISTING READINESS SCORE</span>
+            <p className="text-[10px] text-[#666666] font-semibold font-sans leading-relaxed">
               Your resume layout matches {atsScore}% of corporate standards. Switch tabs below to optimize warnings.
             </p>
           </div>
         </div>
 
         {/* Small breakdowns */}
-        <div className="grid grid-cols-2 gap-3 text-[9px] font-bold font-mono">
+        <div className="grid grid-cols-2 gap-3 text-[9px] font-bold font-sans">
           <div className="space-y-1">
-            <div className="flex justify-between text-zinc-500">
+            <div className="flex justify-between text-[#666666]">
               <span>Structure completeness</span>
-              <span className="text-cyan-400">{structureVal}%</span>
+              <span className="text-[#006039]">{structureVal}%</span>
             </div>
-            <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
-              <div className="bg-cyan-500 h-full transition-all duration-300" style={{ width: `${structureVal}%` }} />
+            <div className="w-full bg-stone-50 h-1 rounded-full overflow-hidden">
+              <div className="bg-[#006039] h-full transition-all duration-300" style={{ width: `${structureVal}%` }} />
             </div>
           </div>
           <div className="space-y-1">
-            <div className="flex justify-between text-zinc-500">
+            <div className="flex justify-between text-[#666666]">
               <span>Formatting & symbols</span>
-              <span className="text-cyan-400">{formattingVal}%</span>
+              <span className="text-[#006039]">{formattingVal}%</span>
             </div>
-            <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
-              <div className="bg-cyan-500 h-full transition-all duration-300" style={{ width: `${formattingVal}%` }} />
+            <div className="w-full bg-stone-50 h-1 rounded-full overflow-hidden">
+              <div className="bg-[#006039] h-full transition-all duration-300" style={{ width: `${formattingVal}%` }} />
             </div>
           </div>
           <div className="space-y-1">
-            <div className="flex justify-between text-zinc-500">
+            <div className="flex justify-between text-[#666666]">
               <span>Readability indexes</span>
-              <span className="text-cyan-400">{readabilityVal}%</span>
+              <span className="text-[#006039]">{readabilityVal}%</span>
             </div>
-            <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
-              <div className="bg-cyan-500 h-full transition-all duration-300" style={{ width: `${readabilityVal}%` }} />
+            <div className="w-full bg-stone-50 h-1 rounded-full overflow-hidden">
+              <div className="bg-[#006039] h-full transition-all duration-300" style={{ width: `${readabilityVal}%` }} />
             </div>
           </div>
           <div className="space-y-1">
-            <div className="flex justify-between text-zinc-500">
+            <div className="flex justify-between text-[#666666]">
               <span>Keywords matches</span>
-              <span className="text-cyan-400">{keywordsVal}%</span>
+              <span className="text-[#006039]">{keywordsVal}%</span>
             </div>
-            <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
-              <div className="bg-cyan-500 h-full transition-all duration-300" style={{ width: `${keywordsVal}%` }} />
+            <div className="w-full bg-stone-50 h-1 rounded-full overflow-hidden">
+              <div className="bg-[#006039] h-full transition-all duration-300" style={{ width: `${keywordsVal}%` }} />
             </div>
           </div>
         </div>
 
         {/* Top Warnings list */}
         {parsedReport.warnings && parsedReport.warnings.length > 0 && (
-          <div className="space-y-2 pt-2 border-t border-zinc-900">
-            <span className="text-[9px] font-black font-mono text-zinc-400 uppercase tracking-widest block">RECRUITER STRENGTH NOTES</span>
+          <div className="space-y-2 pt-2 border-t border-stone-200">
+            <span className="text-[9px] font-black font-sans text-[#666666] uppercase tracking-widest block">RECRUITER STRENGTH NOTES</span>
             <div className="space-y-1">
               {parsedReport.warnings.slice(0, 3).map((warn: string, idx: number) => (
-                <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-400 font-semibold leading-relaxed">
+                <div key={idx} className="flex items-start space-x-2 text-[10px] text-[#666666] font-semibold leading-relaxed">
                   <span className="text-emerald-500 font-extrabold">•</span>
                   <span>{warn}</span>
                 </div>
@@ -2133,11 +2133,11 @@ export default function DashboardPage() {
         )}
 
         {parsedReport.keywordGaps && parsedReport.keywordGaps.length > 0 && (
-          <div className="space-y-2 pt-2 border-t border-zinc-900">
-            <span className="text-[9px] font-black font-mono text-zinc-400 uppercase tracking-widest block">IDENTIFIED GAPS WARNINGS</span>
+          <div className="space-y-2 pt-2 border-t border-stone-200">
+            <span className="text-[9px] font-black font-sans text-[#666666] uppercase tracking-widest block">IDENTIFIED GAPS WARNINGS</span>
             <div className="space-y-1">
               {parsedReport.keywordGaps.slice(0, 3).map((gap: string, idx: number) => (
-                <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-400 font-semibold leading-relaxed">
+                <div key={idx} className="flex items-start space-x-2 text-[10px] text-[#666666] font-semibold leading-relaxed">
                   <span className="text-red-500 font-extrabold">•</span>
                   <span>{gap}</span>
                 </div>
@@ -2192,11 +2192,11 @@ export default function DashboardPage() {
               : "justify-center"
           }`}>
             {resumeData.personal.phone && <span>{resumeData.personal.phone}</span>}
-            {resumeData.personal.phone && resumeData.personal.email && <span className="text-zinc-400">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+            {resumeData.personal.phone && resumeData.personal.email && <span className="text-[#666666]">{selectedTemplate === "technical" ? "|" : "•"}</span>}
             {resumeData.personal.email && <span>{resumeData.personal.email}</span>}
-            {resumeData.personal.email && resumeData.personal.linkedin && <span className="text-zinc-400">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+            {resumeData.personal.email && resumeData.personal.linkedin && <span className="text-[#666666]">{selectedTemplate === "technical" ? "|" : "•"}</span>}
             {resumeData.personal.linkedin && <span>{resumeData.personal.linkedin}</span>}
-            {resumeData.personal.linkedin && resumeData.personal.github && <span className="text-zinc-400">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+            {resumeData.personal.linkedin && resumeData.personal.github && <span className="text-[#666666]">{selectedTemplate === "technical" ? "|" : "•"}</span>}
             {resumeData.personal.github && <span>{resumeData.personal.github}</span>}
           </div>
         </div>
@@ -2217,7 +2217,7 @@ export default function DashboardPage() {
                   <span>{edu.institution || "Institution Name"}</span>
                   <span>{edu.year || "2022 - 2026"}</span>
                 </div>
-                <div className="flex justify-between text-zinc-600 italic">
+                <div className="flex justify-between text-[#666666] italic">
                   <span>{edu.degree || "B.Tech"}</span>
                   <span>{edu.gpa || "9.0 CGPA"}</span>
                 </div>
@@ -2303,7 +2303,7 @@ export default function DashboardPage() {
                   <div key={idx} className={selectedTemplate === "technical" ? "mb-2" : "mb-3"}>
                     <div className="flex justify-between font-bold text-black">
                       <span>{exp.company || "Company Name"}</span>
-                      <span className="text-zinc-650 font-normal text-[8px]">{exp.duration || "Duration"}</span>
+                      <span className="text-[#666666] font-normal text-[8px]">{exp.duration || "Duration"}</span>
                     </div>
                     <div className={`italic text-zinc-650 mb-1 ${selectedTemplate === "technical" ? "font-bold text-black" : ""}`}>{exp.role || "Role"}</div>
                     
@@ -2339,7 +2339,7 @@ export default function DashboardPage() {
                   <div key={idx} className={selectedTemplate === "technical" ? "mb-1.5" : "mb-2"}>
                     <div className="flex justify-between font-bold text-black">
                       <span>{proj.title || "Project Title"}</span>
-                      <span className="text-zinc-550 text-[8px] font-normal">Tech: {proj.techStack || "Tech Stack"}</span>
+                      <span className="text-[#666666] text-[8px] font-normal">Tech: {proj.techStack || "Tech Stack"}</span>
                     </div>
                     
                     <ul className={`list-disc pl-4 text-zinc-800 mt-1 ${
@@ -2367,48 +2367,48 @@ export default function DashboardPage() {
         {!isPaid && (
           <>
             {/* Premium Dark Gradient Fade blending the white page into dark dashboard background */}
-            <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-zinc-950 via-zinc-950/85 to-transparent pointer-events-none z-20" />
+            <div className="absolute bottom-0 left-0 right-0 h-64 pointer-events-none z-20" />
 
             {/* Floating premium Glassmorphism Checkout CTA */}
             <div className="absolute bottom-4 left-4 right-4 z-30 flex flex-col items-center">
-              <div className="w-full max-w-md p-5 rounded-xl border border-cyan-500/25 bg-zinc-950/90 backdrop-blur-md shadow-[0_0_30px_rgba(6,182,212,0.15)] space-y-4 animate-neon-pulse">
+              <div className="w-full max-w-md p-5 rounded-xl border border-stone-200 bg-white backdrop-blur-md shadow-[0_0_30px_rgba(6,182,212,0.15)] space-y-4 animate-neon-pulse">
                 
                 {/* Header cyber lock emblem */}
                 <div className="flex items-center justify-center space-x-2">
-                  <div className="h-6 w-6 rounded-full bg-cyan-950 border border-cyan-500/35 flex items-center justify-center shadow-sm">
-                    <Lock className="h-3 w-3 text-cyan-400 animate-pulse" />
+                  <div className="h-6 w-6 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center shadow-sm">
+                    <Lock className="h-3 w-3 text-[#006039] animate-pulse" />
                   </div>
-                  <span className="text-[10px] font-black font-mono tracking-widest text-cyan-400 uppercase">
+                  <span className="text-[10px] font-black font-sans tracking-widest text-[#006039] uppercase">
                     PREMIUM PRO FORMAT LOCKED
                   </span>
                 </div>
 
                 {/* Sales Copy */}
                 <div className="text-center space-y-1">
-                  <h4 className="text-xs font-extrabold text-white leading-tight">
+                  <h4 className="text-xs font-extrabold text-[#1E1E1E] leading-tight">
                     Unlock Final Recruiter-Ready PDF
                   </h4>
-                  <p className="text-[9px] text-zinc-400 font-semibold leading-normal">
+                  <p className="text-[9px] text-[#666666] font-semibold leading-normal">
                     Secure your 100% clean selectable-text PDF. Fully verified against placements scanner guidelines.
                   </p>
                 </div>
 
                 {/* Quick Trust Checks */}
-                <div className="grid grid-cols-2 gap-2 border-y border-zinc-900 py-2.5 text-[8.5px] text-zinc-300 font-bold font-mono">
+                <div className="grid grid-cols-2 gap-2 border-y border-stone-200 py-2.5 text-[8.5px] text-[#666666] font-bold font-sans">
                   <div className="flex items-center space-x-1.5">
-                    <span className="text-cyan-400">✓</span>
+                    <span className="text-[#006039]">✓</span>
                     <span>98%+ Shortlist Guaranteed</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
-                    <span className="text-cyan-400">✓</span>
+                    <span className="text-[#006039]">✓</span>
                     <span>Standard Single-Column</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
-                    <span className="text-cyan-400">✓</span>
+                    <span className="text-[#006039]">✓</span>
                     <span>100% Editable Selection Text</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
-                    <span className="text-cyan-400">✓</span>
+                    <span className="text-[#006039]">✓</span>
                     <span>Lifetime Free AI Re-tuner</span>
                   </div>
                 </div>
@@ -2416,21 +2416,21 @@ export default function DashboardPage() {
                 {/* Razorpay Standard Instant Unlock Button */}
                 <button
                   onClick={triggerRazorpayCheckout}
-                  className="w-full py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-zinc-950 font-black text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
+                  className="w-full py-2.5 rounded-lg hover: hover: text-white font-black text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
                 >
-                  <Zap className="h-4 w-4 text-zinc-950 fill-zinc-955 stroke-[2.5]" />
+                  <Zap className="h-4 w-4 text-white fill-zinc-955 stroke-[2.5]" />
                   <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 80}</span>
                 </button>
 
                 {/* Classmate referral share widget for free access */}
-                <div className="border-t border-zinc-900 pt-3 space-y-2">
+                <div className="border-t border-stone-200 pt-3 space-y-2">
                   <div className="flex justify-between items-center text-[9px] font-bold">
-                    <span className="text-zinc-400">B.Tech Referral Scheme (Unlock Free)</span>
-                    <span className="text-cyan-400 font-mono">{referralCount} / 3 Classmates Joined</span>
+                    <span className="text-[#666666]">B.Tech Referral Scheme (Unlock Free)</span>
+                    <span className="text-[#006039] font-sans">{referralCount} / 3 Classmates Joined</span>
                   </div>
-                  <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
                     <div 
-                      className="bg-cyan-500 h-full transition-all duration-500" 
+                      className="bg-[#006039] h-full transition-all duration-500" 
                       style={{ width: `${(referralCount / 3) * 100}%` }}
                     />
                   </div>
@@ -2440,11 +2440,11 @@ export default function DashboardPage() {
                       type="text"
                       readOnly
                       value={referralLink}
-                      className="bg-zinc-900/60 border border-zinc-900 text-[8.5px] p-2 rounded flex-1 text-zinc-500 outline-none select-all font-mono"
+                      className="bg-stone-50 border border-stone-200 text-[8.5px] p-2 rounded flex-1 text-[#666666] outline-none select-all font-sans"
                     />
                     <button
                       onClick={copyReferral}
-                      className="px-3 py-2 rounded bg-cyan-950 border border-cyan-800 text-cyan-400 hover:bg-cyan-900 transition-colors font-bold text-[8.5px] cursor-pointer"
+                      className="px-3 py-2 rounded bg-stone-50 border border-stone-200 text-[#006039] hover:bg-[#004d2e] transition-colors font-bold text-[8.5px] cursor-pointer"
                     >
                       {copied ? "Copied!" : "Copy Link"}
                     </button>
@@ -2460,22 +2460,22 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex flex-row h-screen w-screen overflow-hidden bg-zinc-950 font-sans antialiased text-slate-200">
+    <div className="flex flex-row h-screen w-screen overflow-hidden bg-[#FAF8F3] font-sans antialiased text-[#1E1E1E]">
       
       {/* Dynamic script tags for Razorpay SDK */}
       <script src="https://checkout.razorpay.com/v1/checkout.js" async />
 
       {/* 1. Left Vertical Navigation Rail */}
-      <aside className="hidden md:flex flex-col w-60 border-r border-zinc-900 bg-zinc-950/70 p-5 space-y-6 flex-shrink-0 relative">
+      <aside className="hidden md:flex flex-col w-60 border-r border-stone-200 bg-white p-5 space-y-6 flex-shrink-0 relative">
         
         {/* Brand header */}
-        <div className="flex items-center space-x-2.5 px-3 py-1.5 bg-zinc-900/35 border border-zinc-850 rounded-2xl shadow-sm">
-          <div className="h-7 w-7 rounded-lg bg-gradient-to-tr from-cyan-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/10">
-            <Zap className="h-4 w-4 text-zinc-950 stroke-[2.5]" />
+        <div className="flex items-center space-x-2.5 px-3 py-1.5 bg-stone-50 border border-stone-150 rounded-2xl shadow-sm">
+          <div className="h-7 w-7 rounded-lg bg-[#006039] flex items-center justify-center shadow-sm">
+            <Zap className="h-4 w-4 text-[#1E1E1E] stroke-[2.5]" />
           </div>
           <div className="flex flex-col text-left">
-            <span className="text-xs font-black text-white font-mono tracking-wider uppercase leading-none">BOOSTCV</span>
-            <span className="text-[7.5px] font-bold text-cyan-400 font-mono tracking-widest leading-none mt-1 uppercase">SaaS Optimization</span>
+            <span className="text-xs font-black text-[#1E1E1E] font-sans tracking-wide uppercase leading-none">BOOSTCV</span>
+            <span className="text-[7.5px] font-black text-[#006039] font-sans tracking-wider leading-none mt-1.5 uppercase">SaaS Career Platform</span>
           </div>
         </div>
 
@@ -2483,7 +2483,7 @@ export default function DashboardPage() {
         <nav className="flex-1 flex flex-col space-y-1.5 text-left">
           <button
             onClick={() => setActiveTab("edit")}
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 ${activeTab === "edit" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 ${activeTab === "edit" ? "bg-[#006039] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
           >
             <FileText className="h-4 w-4" />
             <span>Resume Builder</span>
@@ -2491,29 +2491,29 @@ export default function DashboardPage() {
           
           <button
             onClick={() => setActiveTab("ats")}
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 relative ${activeTab === "ats" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 relative ${activeTab === "ats" ? "bg-[#006039] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
           >
             <BarChart3 className="h-4 w-4" />
             <span>Shortlisting Scan</span>
             {atsScore > 0 && (
-              <span className="absolute right-3 text-[8.5px] font-black bg-zinc-900 border border-zinc-800 px-1.5 py-0.25 rounded text-cyan-400">{atsScore}%</span>
+              <span className={`absolute right-3 text-[8.5px] font-black px-1.5 py-0.25 rounded ${activeTab === "ats" ? "bg-[#004f2f] text-white" : "bg-stone-100 border border-stone-250 text-[#006039]"}`}>{atsScore}%</span>
             )}
           </button>
 
           <button
             onClick={() => setActiveTab("matcher")}
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 relative ${activeTab === "matcher" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 relative ${activeTab === "matcher" ? "bg-[#006039] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
           >
             <Sparkles className="h-4 w-4" />
             <span>AI Job Matcher</span>
             {tailorApplied && (
-              <span className="absolute right-3 h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
+              <span className="absolute right-3 h-2 w-2 rounded-full bg-[#006039] animate-ping" />
             )}
           </button>
 
           <button
             onClick={() => setActiveTab("company")}
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 ${activeTab === "company" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 ${activeTab === "company" ? "bg-[#006039] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
           >
             <Building2 className="h-4 w-4" />
             <span>Company Intelligence</span>
@@ -2521,18 +2521,18 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setActiveTab("history")}
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 relative ${activeTab === "history" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 relative ${activeTab === "history" ? "bg-[#006039] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
           >
             <History className="h-4 w-4" />
             <span>Resume History</span>
             {(analysisHistory.length + companyHistory.length) > 0 && (
-              <span className="absolute right-3 text-[8.5px] bg-zinc-900 border border-zinc-800 px-1.5 py-0.25 rounded text-zinc-450">{analysisHistory.length + companyHistory.length}</span>
+              <span className={`absolute right-3 text-[8.5px] font-black px-1.5 py-0.25 rounded ${activeTab === "history" ? "bg-[#004f2f] text-white" : "bg-stone-100 border border-stone-250 text-[#666666]"}`}>{analysisHistory.length + companyHistory.length}</span>
             )}
           </button>
 
           <button
             onClick={() => setActiveTab("account")}
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 ${activeTab === "account" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 ${activeTab === "account" ? "bg-[#006039] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
           >
             <User className="h-4 w-4" />
             <span>Account & Billing</span>
@@ -2541,15 +2541,15 @@ export default function DashboardPage() {
 
         {/* Profile Card Bottom */}
         {user && (
-          <div className="mt-auto border-t border-zinc-900 pt-4 flex items-center space-x-3 text-left">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-cyan-955 to-zinc-900 border border-cyan-800/30 flex items-center justify-center font-mono font-black text-[10px] text-cyan-400">
+          <div className="mt-auto border-t border-stone-200 pt-4 flex items-center space-x-3 text-left">
+            <div className="h-8 w-8 rounded-xl bg-[#006039] flex items-center justify-center font-sans font-black text-[10px] text-[#1E1E1E]">
               {user.email?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold text-slate-200 truncate leading-none">{user.email}</p>
-              <div className="flex items-center space-x-1.5 mt-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                <span className="text-[7.5px] font-bold font-mono text-zinc-500 uppercase tracking-widest leading-none">
+              <p className="text-[10px] font-bold text-[#1E1E1E] truncate leading-none">{user.email}</p>
+              <div className="flex items-center space-x-1.5 mt-1.5">
+                <span className={`h-1.5 w-1.5 rounded-full ${isPaid ? "bg-[#C6A769]" : "bg-stone-400"} animate-pulse`} />
+                <span className={`text-[7.5px] font-black uppercase tracking-wider leading-none ${isPaid ? "text-[#C6A769]" : "text-[#666666]"}`}>
                   {isPaid ? "Pro Unlocked" : "Free Preview"}
                 </span>
               </div>
@@ -2559,12 +2559,12 @@ export default function DashboardPage() {
       </aside>
 
       {/* 2. Main Work Panel View Area */}
-      <div className="flex-grow flex flex-col h-full overflow-hidden bg-zinc-950/20">
+      <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#FAF8F3]/30">
         
         {/* Contextual top workspace header */}
-        <header className="h-14 border-b border-zinc-900 px-6 flex items-center justify-between bg-zinc-950/85 z-10 flex-shrink-0">
+        <header className="h-14 border-b border-stone-200 px-6 flex items-center justify-between bg-white z-10 flex-shrink-0">
           <div className="flex items-center space-x-3">
-            <span className="text-xs font-black font-mono text-white tracking-widest uppercase">
+            <span className="text-xs font-extrabold text-[#1E1E1E] tracking-wider uppercase font-sans">
               {activeTab === "edit" && "Resume Builder Workspace"}
               {activeTab === "ats" && "Shortlisting Diagnostics Scan"}
               {activeTab === "matcher" && "AI Job Matcher Dashboard"}
@@ -2576,13 +2576,13 @@ export default function DashboardPage() {
 
           <div className="flex items-center space-x-4">
             {isPaid && (
-              <span className="text-[9px] font-black font-mono text-emerald-450 bg-emerald-950/20 border border-emerald-900/50 px-2 py-0.5 rounded uppercase tracking-wider animate-pulse hidden sm:inline">
+              <span className="text-[9px] font-black bg-[#C6A769] border border-[#b29358] px-2 py-0.5 rounded text-[#1E1E1E] uppercase tracking-wider hidden sm:inline shadow-sm">
                 🔓 Active Premium Session
               </span>
             )}
             <button 
               onClick={signOut}
-              className="text-[10px] text-zinc-550 hover:text-zinc-300 font-bold font-mono transition-colors cursor-pointer"
+              className="text-[10px] text-[#666666] hover:text-[#1E1E1E] font-bold font-sans transition-colors cursor-pointer"
             >
               Logout
             </button>
@@ -2617,16 +2617,16 @@ export default function DashboardPage() {
 
           {/* Right Contextual Insights Panel (Toggle subtabs Preview vs ATS diagnostics on builder tab) */}
           {activeTab === "edit" && (
-        <div className="w-full lg:w-1/2 p-4 md:p-6 overflow-y-auto bg-zinc-950/80 h-full flex flex-col space-y-6">
+        <div className="w-full lg:w-1/2 p-4 md:p-6 overflow-y-auto bg-white h-full flex flex-col space-y-6">
           
           {/* Diagnostic Stats Header */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center glass-panel border border-zinc-900 rounded-2xl p-4 md:p-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-4 md:p-6">
             <div className="md:col-span-4 flex justify-center">
               <AtsScoreGauge score={atsScore} size={130} />
             </div>
             
             <div className="md:col-span-8 space-y-3 text-left">
-              <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-mono">
+              <h3 className="text-sm font-extrabold text-[#1E1E1E] uppercase tracking-wider font-sans">
                 Shortlisting Readiness Report
               </h3>
               
@@ -2643,64 +2643,64 @@ export default function DashboardPage() {
                     const achievementsVal = bd.achievements !== undefined ? bd.achievements : 60;
 
                     return (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[9px] font-bold font-mono border-b border-zinc-900 pb-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[9px] font-bold font-sans border-b border-stone-200 pb-3">
                         <div className="space-y-1">
-                          <div className="flex justify-between text-zinc-400">
+                          <div className="flex justify-between text-[#666666]">
                             <span>Structure completeness:</span>
-                            <span className="text-cyan-400">{structureVal}%</span>
+                            <span className="text-[#006039]">{structureVal}%</span>
                           </div>
-                          <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${structureVal}%` }} />
+                          <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-[#006039] h-full transition-all duration-500" style={{ width: `${structureVal}%` }} />
                           </div>
                         </div>
 
                         <div className="space-y-1">
-                          <div className="flex justify-between text-zinc-400">
+                          <div className="flex justify-between text-[#666666]">
                             <span>Formatting & symbols:</span>
-                            <span className="text-cyan-400">{formattingVal}%</span>
+                            <span className="text-[#006039]">{formattingVal}%</span>
                           </div>
-                          <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${formattingVal}%` }} />
+                          <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-[#006039] h-full transition-all duration-500" style={{ width: `${formattingVal}%` }} />
                           </div>
                         </div>
 
                         <div className="space-y-1">
-                          <div className="flex justify-between text-zinc-400">
+                          <div className="flex justify-between text-[#666666]">
                             <span>Recruiter readability:</span>
-                            <span className="text-cyan-400">{readabilityVal}%</span>
+                            <span className="text-[#006039]">{readabilityVal}%</span>
                           </div>
-                          <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${readabilityVal}%` }} />
+                          <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-[#006039] h-full transition-all duration-500" style={{ width: `${readabilityVal}%` }} />
                           </div>
                         </div>
 
                         <div className="space-y-1">
-                          <div className="flex justify-between text-zinc-400">
+                          <div className="flex justify-between text-[#666666]">
                             <span>Target keywords:</span>
-                            <span className="text-cyan-400">{keywordsVal}%</span>
+                            <span className="text-[#006039]">{keywordsVal}%</span>
                           </div>
-                          <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${keywordsVal}%` }} />
+                          <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-[#006039] h-full transition-all duration-500" style={{ width: `${keywordsVal}%` }} />
                           </div>
                         </div>
 
                         <div className="space-y-1">
-                          <div className="flex justify-between text-zinc-400">
+                          <div className="flex justify-between text-[#666666]">
                             <span>Project depth:</span>
-                            <span className="text-cyan-400">{projectsVal}%</span>
+                            <span className="text-[#006039]">{projectsVal}%</span>
                           </div>
-                          <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${projectsVal}%` }} />
+                          <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-[#006039] h-full transition-all duration-500" style={{ width: `${projectsVal}%` }} />
                           </div>
                         </div>
 
                         <div className="space-y-1">
-                          <div className="flex justify-between text-zinc-400">
+                          <div className="flex justify-between text-[#666666]">
                             <span>Achievements quality:</span>
-                            <span className="text-cyan-400">{achievementsVal}%</span>
+                            <span className="text-[#006039]">{achievementsVal}%</span>
                           </div>
-                          <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${achievementsVal}%` }} />
+                          <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-[#006039] h-full transition-all duration-500" style={{ width: `${achievementsVal}%` }} />
                           </div>
                         </div>
                       </div>
@@ -2709,12 +2709,12 @@ export default function DashboardPage() {
 
                   {/* Format & Checklist diagnostics */}
                   <div className="space-y-2">
-                    <span className="text-[10px] font-black text-white uppercase tracking-widest font-mono block">
+                    <span className="text-[10px] font-black text-[#1E1E1E] uppercase tracking-widest font-sans block">
                       Formatting Violations ({parsedReport.warnings.length})
                     </span>
-                    <ul className="space-y-1.5 text-[9px] font-bold font-mono max-h-24 overflow-y-auto pr-1">
+                    <ul className="space-y-1.5 text-[9px] font-bold font-sans max-h-24 overflow-y-auto pr-1">
                       {parsedReport.warnings.map((warn, idx) => (
-                        <li key={idx} className="flex items-start space-x-1.5 text-zinc-400">
+                        <li key={idx} className="flex items-start space-x-1.5 text-[#666666]">
                           <span className="h-3 w-3 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center font-bold text-[7px] mt-0.5 flex-shrink-0">!</span>
                           <span>{warn}</span>
                         </li>
@@ -2724,15 +2724,15 @@ export default function DashboardPage() {
 
                   {/* Missing keyword chip Cloud highlights */}
                   {parsedReport.keywordGaps.length > 0 && (
-                    <div className="space-y-2 border-t border-zinc-900 pt-2.5">
-                      <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest font-mono block">
+                    <div className="space-y-2 border-t border-stone-200 pt-2.5">
+                      <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest font-sans block">
                         Target Keyword Gaps ({parsedReport.keywordGaps.length})
                       </span>
                       <div className="flex flex-wrap gap-1.5 pt-0.5">
                         {parsedReport.keywordGaps.map((word, idx) => (
                           <span 
                             key={idx}
-                            className="px-2 py-0.5 rounded bg-amber-950/20 border border-amber-900/30 text-[8px] font-mono text-amber-400 font-bold"
+                            className="px-2 py-0.5 rounded bg-amber-950/20 border border-amber-900/30 text-[8px] font-sans text-amber-400 font-bold"
                           >
                             + {word}
                           </span>
@@ -2743,13 +2743,13 @@ export default function DashboardPage() {
 
                 </div>
               ) : (
-                <ul className="text-xs space-y-2 text-zinc-400">
+                <ul className="text-xs space-y-2 text-[#666666]">
                   <li className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-cyan-400 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-[#006039] mt-0.5 flex-shrink-0" />
                     <span><strong>Format check:</strong> Clean single-column layout detected (Pass).</span>
                   </li>
                   <li className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-cyan-400 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-[#006039] mt-0.5 flex-shrink-0" />
                     <span><strong>Fonts standard:</strong> Helvetica / Arial parsed cleanly.</span>
                   </li>
                   {atsScore < 85 ? (
@@ -2758,8 +2758,8 @@ export default function DashboardPage() {
                       <span><strong>Quantify suggestion:</strong> Add metrics to experience for 98%+ score.</span>
                     </li>
                   ) : (
-                    <li className="flex items-start space-x-2 text-cyan-400">
-                      <CheckCircle2 className="h-4 w-4 text-cyan-400 mt-0.5 flex-shrink-0" />
+                    <li className="flex items-start space-x-2 text-[#006039]">
+                      <CheckCircle2 className="h-4 w-4 text-[#006039] mt-0.5 flex-shrink-0" />
                       <span><strong>Quantified bullets:</strong> Standard XYZ numbers detected!</span>
                     </li>
                   )}
@@ -2769,7 +2769,7 @@ export default function DashboardPage() {
               {/* Paywall Action / Download Trigger */}
               <div className="pt-2">
                 {paymentError && (
-                  <div className="p-3 rounded-xl bg-red-950/30 border border-red-800/40 text-red-400 text-xs font-bold font-mono tracking-wide flex items-center space-x-2 mb-3">
+                  <div className="p-3 rounded-xl bg-red-950/30 border border-red-800/40 text-red-400 text-xs font-bold font-sans tracking-wide flex items-center space-x-2 mb-3">
                     <span className="h-2 w-2 rounded-full bg-red-500 animate-ping flex-shrink-0" />
                     <span>{paymentError}</span>
                   </div>
@@ -2799,9 +2799,9 @@ export default function DashboardPage() {
                  ) : (
                   <button
                     onClick={triggerRazorpayCheckout}
-                    className="px-6 py-3 text-xs font-black rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-600 text-zinc-950 hover:brightness-110 active:scale-98 transition-all shadow-[0_0_15px_rgba(6,182,212,0.35)] flex items-center space-x-2 cursor-pointer"
+                    className="px-6 py-3 text-xs font-black rounded-lg text-white hover:brightness-110 active:scale-98 transition-all shadow-[0_0_15px_rgba(6,182,212,0.35)] flex items-center space-x-2 cursor-pointer"
                   >
-                    <Download className="h-4 w-4 text-zinc-950" />
+                    <Download className="h-4 w-4 text-white" />
                     <span>Unlock Selection PDF (₹{tailorApplied ? 149 : 80})</span>
                   </button>
                 )}
@@ -2810,21 +2810,21 @@ export default function DashboardPage() {
           </div>
 
           {/* Dynamic HTML Document Live Preview Panel */}
-          <div className="flex-1 bg-zinc-950 rounded-xl border border-zinc-900 overflow-hidden relative min-h-[450px] shadow-lg flex flex-col">
+          <div className="flex-1 bg-white rounded-xl border border-stone-200 overflow-hidden relative min-h-[450px] shadow-lg flex flex-col">
             
             {/* Template Selector Bar */}
-            <div className="bg-zinc-900 border-b border-zinc-800 px-4 py-2.5 flex items-center justify-between flex-shrink-0">
-              <span className="text-[10px] font-black font-mono tracking-wider text-zinc-400 uppercase">
+            <div className="bg-stone-50 border-b border-stone-200 px-4 py-2.5 flex items-center justify-between flex-shrink-0">
+              <span className="text-[10px] font-black font-sans tracking-wider text-[#666666] uppercase">
                 Placement Template Compiler
               </span>
-              <div className="flex items-center space-x-1.5 p-0.5 bg-zinc-950 border border-zinc-850 rounded-lg">
+              <div className="flex items-center space-x-1.5 p-0.5 bg-white border border-stone-200 rounded-lg">
                 {(["classic", "minimal", "technical"] as const).map((temp) => (
                   <button
                     key={temp}
                     onClick={() => setSelectedTemplate(temp)}
                     className={`px-2.5 py-1 text-[9px] font-bold font-mono tracking-wide rounded-md transition-all uppercase cursor-pointer ${
                       selectedTemplate === temp
-                        ? "bg-cyan-500 text-zinc-950 shadow-sm font-black"
+                        ? "bg-cyan-500 text-white shadow-sm font-black"
                         : "text-zinc-400 hover:text-zinc-200"
                     }`}
                   >
@@ -2875,11 +2875,11 @@ export default function DashboardPage() {
                     : "justify-center"
                 }`}>
                   {resumeData.personal.phone && <span>{resumeData.personal.phone}</span>}
-                  {resumeData.personal.phone && resumeData.personal.email && <span className="text-zinc-400">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+                  {resumeData.personal.phone && resumeData.personal.email && <span className="text-[#666666]">{selectedTemplate === "technical" ? "|" : "•"}</span>}
                   {resumeData.personal.email && <span>{resumeData.personal.email}</span>}
-                  {resumeData.personal.email && resumeData.personal.linkedin && <span className="text-zinc-400">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+                  {resumeData.personal.email && resumeData.personal.linkedin && <span className="text-[#666666]">{selectedTemplate === "technical" ? "|" : "•"}</span>}
                   {resumeData.personal.linkedin && <span>{resumeData.personal.linkedin}</span>}
-                  {resumeData.personal.linkedin && resumeData.personal.github && <span className="text-zinc-400">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+                  {resumeData.personal.linkedin && resumeData.personal.github && <span className="text-[#666666]">{selectedTemplate === "technical" ? "|" : "•"}</span>}
                   {resumeData.personal.github && <span>{resumeData.personal.github}</span>}
                 </div>
               </div>
@@ -2900,7 +2900,7 @@ export default function DashboardPage() {
                         <span>{edu.institution || "Institution Name"}</span>
                         <span>{edu.year || "2022 - 2026"}</span>
                       </div>
-                      <div className="flex justify-between text-zinc-600 italic">
+                      <div className="flex justify-between text-[#666666] italic">
                         <span>{edu.degree || "B.Tech"}</span>
                         <span>{edu.gpa || "9.0 CGPA"}</span>
                       </div>
@@ -2986,7 +2986,7 @@ export default function DashboardPage() {
                          <div key={idx} className={selectedTemplate === "technical" ? "mb-2" : "mb-3"}>
                            <div className="flex justify-between font-bold text-black">
                              <span>{exp.company || "Company Name"}</span>
-                             <span className="text-zinc-600 font-normal">{exp.duration || "Duration"}</span>
+                             <span className="text-[#666666] font-normal">{exp.duration || "Duration"}</span>
                            </div>
                            <div className={`italic text-zinc-600 mb-1 ${selectedTemplate === "technical" ? "font-bold text-black" : ""}`}>{exp.role || "Role"}</div>
                            
@@ -3022,7 +3022,7 @@ export default function DashboardPage() {
                          <div key={idx} className={selectedTemplate === "technical" ? "mb-1.5" : "mb-2"}>
                            <div className="flex justify-between font-bold text-black">
                              <span>{proj.title || "Project Title"}</span>
-                             <span className="text-zinc-500 text-[8px] font-normal">Tech: {proj.techStack || "Tech Stack"}</span>
+                             <span className="text-[#666666] text-[8px] font-normal">Tech: {proj.techStack || "Tech Stack"}</span>
                            </div>
                            
                            <ul className={`list-disc pl-4 text-zinc-800 mt-1 ${
@@ -3052,48 +3052,48 @@ export default function DashboardPage() {
             {!isPaid && (
               <>
                 {/* Premium Dark Gradient Fade blending the white page into dark dashboard background */}
-                <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-zinc-950 via-zinc-950/85 to-transparent pointer-events-none z-20" />
+                <div className="absolute bottom-0 left-0 right-0 h-64 pointer-events-none z-20" />
 
                 {/* Floating premium Glassmorphism Checkout CTA */}
                 <div className="absolute bottom-4 left-4 right-4 z-30 flex flex-col items-center">
-                  <div className="w-full max-w-md p-5 rounded-xl border border-cyan-500/25 bg-zinc-950/90 backdrop-blur-md shadow-[0_0_30px_rgba(6,182,212,0.15)] space-y-4 animate-neon-pulse">
+                  <div className="w-full max-w-md p-5 rounded-xl border border-stone-200 bg-white backdrop-blur-md shadow-[0_0_30px_rgba(6,182,212,0.15)] space-y-4 animate-neon-pulse">
                     
                     {/* Header cyber lock emblem */}
                     <div className="flex items-center justify-center space-x-2">
-                      <div className="h-6 w-6 rounded-full bg-cyan-950 border border-cyan-500/35 flex items-center justify-center shadow-sm">
-                        <Lock className="h-3 w-3 text-cyan-400 animate-pulse" />
+                      <div className="h-6 w-6 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center shadow-sm">
+                        <Lock className="h-3 w-3 text-[#006039] animate-pulse" />
                       </div>
-                      <span className="text-[10px] font-black font-mono tracking-widest text-cyan-400 uppercase">
+                      <span className="text-[10px] font-black font-sans tracking-widest text-[#006039] uppercase">
                         PREMIUM PRO FORMAT LOCKED
                       </span>
                     </div>
 
                     {/* Sales Copy */}
                     <div className="text-center space-y-1">
-                      <h4 className="text-sm font-extrabold text-white leading-tight">
+                      <h4 className="text-sm font-extrabold text-[#1E1E1E] leading-tight">
                         Unlock Final Recruiter-Ready PDF
                       </h4>
-                      <p className="text-[10px] text-zinc-400 font-medium">
+                      <p className="text-[10px] text-[#666666] font-medium">
                         Secure your 100% clean selectable-text PDF. Fully verified against placements scanner guidelines.
                       </p>
                     </div>
 
                     {/* Quick Trust Checks */}
-                    <div className="grid grid-cols-2 gap-2 border-y border-zinc-900 py-2.5 text-[9px] text-zinc-300 font-bold font-mono">
+                    <div className="grid grid-cols-2 gap-2 border-y border-stone-200 py-2.5 text-[9px] text-[#666666] font-bold font-sans">
                       <div className="flex items-center space-x-1.5">
-                        <span className="text-cyan-400">✓</span>
+                        <span className="text-[#006039]">✓</span>
                         <span>98%+ Shortlist Guaranteed</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
-                        <span className="text-cyan-400">✓</span>
+                        <span className="text-[#006039]">✓</span>
                         <span>Standard Single-Column</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
-                        <span className="text-cyan-400">✓</span>
+                        <span className="text-[#006039]">✓</span>
                         <span>100% Editable Selection Text</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
-                        <span className="text-cyan-400">✓</span>
+                        <span className="text-[#006039]">✓</span>
                         <span>Lifetime Free AI Re-tuner</span>
                       </div>
                     </div>
@@ -3101,21 +3101,21 @@ export default function DashboardPage() {
                     {/* Razorpay Standard Instant Unlock Button */}
                     <button
                       onClick={triggerRazorpayCheckout}
-                      className="w-full py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-zinc-950 font-black text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all transform active:scale-98 flex items-center justify-center space-x-1.5"
+                      className="w-full py-2.5 rounded-lg hover: hover: text-white font-black text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all transform active:scale-98 flex items-center justify-center space-x-1.5"
                     >
-                      <Zap className="h-4 w-4 text-zinc-950 fill-zinc-950 stroke-[2.5]" />
+                      <Zap className="h-4 w-4 text-white fill-zinc-950 stroke-[2.5]" />
                       <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 80}</span>
                     </button>
 
                     {/* Classmate referral share widget for free access */}
-                    <div className="border-t border-zinc-900 pt-3 space-y-2">
+                    <div className="border-t border-stone-200 pt-3 space-y-2">
                       <div className="flex justify-between items-center text-[10px] font-bold">
-                        <span className="text-zinc-400">B.Tech Referral Scheme (Unlock Free)</span>
-                        <span className="text-cyan-400 font-mono">{referralCount} / 3 Classmates Joined</span>
+                        <span className="text-[#666666]">B.Tech Referral Scheme (Unlock Free)</span>
+                        <span className="text-[#006039] font-sans">{referralCount} / 3 Classmates Joined</span>
                       </div>
-                      <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                      <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
                         <div 
-                          className="bg-cyan-500 h-full transition-all duration-500" 
+                          className="bg-[#006039] h-full transition-all duration-500" 
                           style={{ width: `${(referralCount / 3) * 100}%` }}
                         />
                       </div>
@@ -3125,11 +3125,11 @@ export default function DashboardPage() {
                           type="text"
                           readOnly
                           value={referralLink}
-                          className="bg-zinc-900/60 border border-zinc-900 text-[9px] p-2 rounded flex-1 text-zinc-500 outline-none select-all font-mono"
+                          className="bg-stone-50 border border-stone-200 text-[9px] p-2 rounded flex-1 text-[#666666] outline-none select-all font-sans"
                         />
                         <button
                           onClick={copyReferral}
-                          className="px-3 py-2 rounded bg-cyan-950 border border-cyan-800 text-cyan-400 hover:bg-cyan-900 transition-colors font-bold text-[9px]"
+                          className="px-3 py-2 rounded bg-stone-50 border border-stone-200 text-[#006039] hover:bg-[#004d2e] transition-colors font-bold text-[9px]"
                         >
                           {copied ? "Copied!" : "Copy Link"}
                         </button>
@@ -3150,50 +3150,50 @@ export default function DashboardPage() {
       {/* Simulated Payment Sandbox Modal Overlay */}
       {showMockModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md border border-cyan-500/30 rounded-2xl bg-zinc-950/95 backdrop-blur-md p-6 space-y-6 shadow-[0_0_50px_rgba(6,182,212,0.25)] animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-md border border-stone-200 rounded-2xl bg-white backdrop-blur-md p-6 space-y-6 shadow-[0_0_50px_rgba(6,182,212,0.25)] animate-in fade-in zoom-in-95 duration-200">
             
             {/* Header branding */}
-            <div className="flex items-center space-x-3 border-b border-zinc-900 pb-4">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-electric-blue flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-                <Zap className="h-5.5 w-5.5 text-zinc-950 stroke-[2.5]" />
+            <div className="flex items-center space-x-3 border-b border-stone-200 pb-4">
+              <div className="h-10 w-10 rounded-xl to-electric-blue flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                <Zap className="h-5.5 w-5.5 text-white stroke-[2.5]" />
               </div>
               <div className="text-left">
-                <h3 className="text-sm font-black text-white font-mono tracking-wide uppercase">
+                <h3 className="text-sm font-black text-[#1E1E1E] font-sans tracking-wide uppercase">
                   Razorpay Sandbox Gateway
                 </h3>
-                <p className="text-[10px] text-cyan-400 font-bold font-mono tracking-widest uppercase">
+                <p className="text-[10px] text-[#006039] font-bold font-sans tracking-widest uppercase">
                   Offline Development Mode
                 </p>
               </div>
             </div>
 
             {/* Simulated Payment details */}
-            <div className="bg-zinc-900/40 border border-zinc-900 rounded-xl p-4 space-y-3 text-xs font-mono">
+            <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 space-y-3 text-xs font-sans">
               <div className="flex justify-between">
-                <span className="text-zinc-500">Merchandiser:</span>
-                <span className="text-slate-200 font-bold">BOOSTCV Professional</span>
+                <span className="text-[#666666]">Merchandiser:</span>
+                <span className="text-[#1E1E1E] font-bold">BOOSTCV Professional</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-500">Simulated Order:</span>
-                <span className="text-cyan-400 font-bold select-all">{mockOrderId}</span>
+                <span className="text-[#666666]">Simulated Order:</span>
+                <span className="text-[#006039] font-bold select-all">{mockOrderId}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-500">Amount Due:</span>
+                <span className="text-[#666666]">Amount Due:</span>
                 <span className="text-emerald-400 font-extrabold text-sm">₹{(mockAmount / 100).toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-500">Currency:</span>
-                <span className="text-slate-200">INR (Indian Rupee)</span>
+                <span className="text-[#666666]">Currency:</span>
+                <span className="text-[#1E1E1E]">INR (Indian Rupee)</span>
               </div>
-              <div className="flex justify-between border-t border-zinc-900 pt-2.5 mt-1">
-                <span className="text-zinc-500">Simulation Method:</span>
+              <div className="flex justify-between border-t border-stone-200 pt-2.5 mt-1">
+                <span className="text-[#666666]">Simulation Method:</span>
                 <span className="text-amber-400 font-bold">Mock Signature Verification</span>
               </div>
             </div>
 
             {/* Information Callout */}
-            <div className="p-3.5 rounded-xl bg-cyan-950/20 border border-cyan-800/20 text-zinc-400 text-[10px] leading-relaxed space-y-1 text-left">
-              <div className="flex items-center space-x-1 text-cyan-400 font-black">
+            <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200 text-[#666666] text-[10px] leading-relaxed space-y-1 text-left">
+              <div className="flex items-center space-x-1 text-[#006039] font-black">
                 <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-ping mr-1" />
                 <span>DEVELOPER INFO</span>
               </div>
@@ -3207,16 +3207,16 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
                 onClick={handleMockPaymentFailure}
-                className="py-3 px-4 rounded-xl border border-zinc-800 hover:border-zinc-700 bg-zinc-900/20 hover:bg-zinc-900/50 text-zinc-400 hover:text-white font-extrabold text-xs transition-all transform active:scale-98"
+                className="py-3 px-4 rounded-xl border border-stone-200 hover:border-stone-200 bg-stone-50 hover:bg-stone-50 text-[#666666] hover:text-[#1E1E1E] font-extrabold text-xs transition-all transform active:scale-98"
               >
                 Decline & Cancel
               </button>
               
               <button
                 onClick={handleMockPaymentSuccess}
-                className="py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 hover:brightness-110 text-zinc-950 font-black text-xs transition-all transform active:scale-98 shadow-[0_0_15px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-1.5"
+                className="py-3 px-4 rounded-xl hover:brightness-110 text-white font-black text-xs transition-all transform active:scale-98 shadow-[0_0_15px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-1.5"
               >
-                <CheckCircle2 className="h-4 w-4 text-zinc-950" />
+                <CheckCircle2 className="h-4 w-4 text-white" />
                 <span>Simulate Pay</span>
               </button>
             </div>
