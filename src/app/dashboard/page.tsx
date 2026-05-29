@@ -30,7 +30,11 @@ import {
   AlertCircle,
   Trash2,
   Briefcase,
-  RotateCcw
+  RotateCcw,
+  History,
+  ShieldAlert,
+  BarChart3,
+  ListChecks
 } from "lucide-react";
 import Link from "next/link";
 
@@ -64,14 +68,40 @@ export default function DashboardPage() {
   const [jobDescription, setJobDescription] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [matchResult, setMatchResult] = useState<{
+    id?: string;
     matchScore: number;
+    scoreImprovement: number;
     extractedKeywords: string[];
     missingKeywords: string[];
     suggestions: string[];
-    scoreImprovement: number;
     beforeAfterComparison: Array<{ original: string; optimized: string }>;
     tailoredResume: typeof defaultResumeData;
+    extractedJd: {
+      requiredSkills: string[];
+      preferredSkills: string[];
+      technologies: string[];
+      frameworks: string[];
+      certifications: string[];
+      experienceRequired: string;
+      softSkills: string[];
+    };
+    gapAnalysis: {
+      matchingSkills: string[];
+      missingSkills: string[];
+      matchingTechnologies: string[];
+      missingTechnologies: string[];
+      matchingCertifications: string[];
+      missingCertifications: string[];
+    };
+    keywordFrequency: Array<{ keyword: string; count: number; importance: "high" | "medium" | "low" }>;
+    breakdown: {
+      keywordCoverage: number;
+      skillsCoverage: number;
+      atsCompatibility: number;
+    };
+    improvementPriority: Array<{ task: string; priority: "critical" | "high" | "medium"; impact: string }>;
   } | null>(null);
+  const [analysisHistory, setAnalysisHistory] = useState<any[]>([]);
   const [tailorApplied, setTailorApplied] = useState(false);
   const [originalResumeDraft, setOriginalResumeDraft] = useState<typeof defaultResumeData | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<"classic" | "minimal" | "technical">("classic");
@@ -127,9 +157,35 @@ export default function DashboardPage() {
       setAtsScore(data.scoreImprovement);
       setTailorApplied(true);
 
+      // Append new job description analysis to history list
+      const cleanTitle = jobDescription.split("\n")[0].replace(/[#*_\-[\]()]/g, "").trim().slice(0, 35) || "Full Stack Developer";
+      const cleanCompany = jobDescription.match(/(?:at|company|employer|hiring):?\s*([A-Za-z0-9\s]+)/i)?.[1]?.trim().slice(0, 20) || "Target Company";
+      
+      const newHistoryItem = {
+        id: `job_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        timestamp: new Date().toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }),
+        jobTitle: cleanTitle,
+        companyName: cleanCompany,
+        matchScore: data.matchScore,
+        scoreImprovement: data.scoreImprovement,
+        extractedKeywords: data.extractedKeywords,
+        missingKeywords: data.missingKeywords,
+        extractedJd: data.extractedJd,
+        gapAnalysis: data.gapAnalysis,
+        keywordFrequency: data.keywordFrequency,
+        breakdown: data.breakdown,
+        improvementPriority: data.improvementPriority,
+        suggestions: data.suggestions,
+        beforeAfterComparison: data.beforeAfterComparison,
+        tailoredResume: data.tailoredResume
+      };
+
+      const updatedHistory = [newHistoryItem, ...analysisHistory].slice(0, 10);
+      setAnalysisHistory(updatedHistory);
+
       // Save to cache securely
       if (user) {
-        saveResume(user.uid, resumeId, data.tailoredResume, data.scoreImprovement, true, parsedReport);
+        saveResume(user.uid, resumeId, data.tailoredResume, data.scoreImprovement, true, parsedReport, updatedHistory);
       }
     } catch (err: any) {
       console.error("Tailoring action failed:", err);
@@ -154,7 +210,7 @@ export default function DashboardPage() {
       };
       setParsedReport(updatedReport);
       if (user) {
-        saveResume(user.uid, resumeId, originalResumeDraft, prevScore, false, updatedReport);
+        saveResume(user.uid, resumeId, originalResumeDraft, prevScore, false, updatedReport, analysisHistory);
       }
     }
   };
@@ -346,6 +402,9 @@ export default function DashboardPage() {
           }
           if (res.parsedReport) {
             setParsedReport(res.parsedReport);
+          }
+          if (res.analysisHistory) {
+            setAnalysisHistory(res.analysisHistory);
           }
         }
         if (user.email === "admin@cvboost.co") {
@@ -545,7 +604,7 @@ export default function DashboardPage() {
 
     // Persistent cache
     if (user) {
-      saveResume(user.uid, resumeId, newData, newScore, tailorApplied, updatedReport);
+      saveResume(user.uid, resumeId, newData, newScore, tailorApplied, updatedReport, analysisHistory);
     }
   };
 
@@ -825,6 +884,55 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-6 flex-grow flex flex-col">
               
+              {/* Job Analysis History Logs */}
+              {analysisHistory.length > 0 && (
+                <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-3 relative overflow-hidden">
+                  <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
+                    <span className="text-[10px] font-black text-white font-mono uppercase tracking-wider flex items-center space-x-1.5">
+                      <History className="h-3.5 w-3.5 text-cyan-400" />
+                      <span>JD Scan History Logs ({analysisHistory.length})</span>
+                    </span>
+                    <button
+                      onClick={() => {
+                        setAnalysisHistory([]);
+                        if (user) saveResume(user.uid, resumeId, resumeData, atsScore, tailorApplied, parsedReport, []);
+                      }}
+                      className="text-[9px] font-bold text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
+                    >
+                      Clear History
+                    </button>
+                  </div>
+                  <div className="flex flex-col space-y-2 max-h-40 overflow-y-auto pr-1">
+                    {analysisHistory.map((hist) => (
+                      <button
+                        key={hist.id}
+                        onClick={() => {
+                          setMatchResult(hist);
+                          setResumeData(hist.tailoredResume);
+                          setAtsScore(hist.scoreImprovement);
+                          setTailorApplied(true);
+                        }}
+                        className={`p-2.5 rounded-lg border text-left flex justify-between items-center transition-all cursor-pointer ${
+                          matchResult?.id === hist.id
+                            ? "bg-cyan-950/20 border-cyan-800/40 text-cyan-400"
+                            : "bg-zinc-900/10 border-zinc-900/60 hover:bg-zinc-900/30 text-zinc-450 hover:text-zinc-300"
+                        }`}
+                      >
+                        <div className="space-y-0.5 max-w-[70%]">
+                          <div className="text-[10px] font-bold font-mono truncate">{hist.jobTitle}</div>
+                          <div className="text-[8px] font-mono text-zinc-500">{hist.companyName} • {hist.timestamp}</div>
+                        </div>
+                        <div className="text-right flex items-center space-x-2">
+                          <span className="text-xs font-black font-mono bg-zinc-950 border border-zinc-800/80 px-2 py-0.5 rounded text-slate-100">
+                            {hist.matchScore}%
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Job Description Input Card */}
               <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
                 <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
@@ -854,7 +962,7 @@ export default function DashboardPage() {
                     {jobDescription && (
                       <button
                         onClick={() => setJobDescription("")}
-                        className="text-zinc-500 hover:text-red-400 flex items-center space-x-1 transition-colors"
+                        className="text-zinc-500 hover:text-red-400 flex items-center space-x-1 transition-colors cursor-pointer"
                       >
                         <Trash2 className="h-3 w-3" />
                         <span>Clear</span>
@@ -871,12 +979,12 @@ export default function DashboardPage() {
                   {isAnalyzing ? (
                     <>
                       <div className="h-4 w-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
-                      <span>Extracting Keywords & Tailoring Score...</span>
+                      <span>Extracting Keywords & Gap Analysis...</span>
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-4 w-4 text-zinc-950 fill-zinc-950 stroke-[2.5]" />
-                      <span>Optimize for Job Description</span>
+                      <span>Scan & Match for Job Description</span>
                     </>
                   )}
                 </button>
@@ -887,7 +995,7 @@ export default function DashboardPage() {
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
                   
                   {/* ATS Compatibility Improvement Indicator */}
-                  <div className="glass-panel border border-cyan-500/25 bg-gradient-to-tr from-cyan-950/20 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)]">
+                  <div className="glass-panel border border-cyan-500/25 bg-gradient-to-tr from-cyan-950/20 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)] text-left">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none" />
                     
                     <div className="flex items-center justify-between">
@@ -900,16 +1008,16 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="flex items-baseline space-x-2.5 pt-1.5 justify-start">
-                      <span className="text-3xl font-black font-mono text-zinc-600 line-through">
+                      <span className="text-3xl font-black font-mono text-zinc-650 line-through">
                         {matchResult.matchScore}%
                       </span>
-                      <span className="text-xl font-bold font-mono text-zinc-400">→</span>
+                      <span className="text-xl font-bold font-mono text-zinc-500">→</span>
                       <span className="text-4xl font-black font-mono text-white tracking-tight drop-shadow-[0_0_15px_rgba(34,197,94,0.2)]">
                         {matchResult.scoreImprovement}% Match
                       </span>
                     </div>
 
-                    <p className="text-[10px] text-zinc-400 leading-relaxed font-semibold text-left">
+                    <p className="text-[10px] text-zinc-400 leading-relaxed font-semibold">
                       Extracted semantic alignment keywords. The optimization injected missing high-yield B.Tech placements technical tags into experience bullets and skills.
                     </p>
 
@@ -932,47 +1040,198 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* Extracted & Missing Keywords Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Neon Stats Grid Dashboard */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="glass-panel border border-zinc-900 rounded-2xl p-4 flex flex-col justify-between items-center relative overflow-hidden shadow-[0_0_12px_rgba(6,182,212,0.05)] text-center">
+                      <span className="text-[8px] font-bold font-mono text-zinc-500 uppercase tracking-widest block">MATCH SCORE</span>
+                      <div className="py-2.5 relative flex items-center justify-center">
+                        <span className="text-3xl font-black font-mono text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.3)]">{matchResult.matchScore}%</span>
+                      </div>
+                      <span className="text-[8px] font-mono text-zinc-400">JD vs Resume overlap</span>
+                    </div>
+
+                    <div className="glass-panel border border-zinc-900 rounded-2xl p-4 flex flex-col justify-between items-center relative overflow-hidden shadow-[0_0_12px_rgba(6,182,212,0.05)] text-center space-y-2">
+                      <span className="text-[8px] font-bold font-mono text-zinc-500 uppercase tracking-widest block">KEYWORD COVERAGE</span>
+                      <div className="py-1 relative flex items-center justify-center">
+                        <span className="text-3xl font-black font-mono text-white">{matchResult.breakdown?.keywordCoverage || 0}%</span>
+                      </div>
+                      <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
+                        <div className="bg-cyan-500 h-full" style={{ width: `${matchResult.breakdown?.keywordCoverage || 0}%` }} />
+                      </div>
+                    </div>
+
+                    <div className="glass-panel border border-zinc-900 rounded-2xl p-4 flex flex-col justify-between items-center relative overflow-hidden shadow-[0_0_12px_rgba(6,182,212,0.05)] text-center space-y-2">
+                      <span className="text-[8px] font-bold font-mono text-zinc-500 uppercase tracking-widest block">SKILLS COVERAGE</span>
+                      <div className="py-1 relative flex items-center justify-center">
+                        <span className="text-3xl font-black font-mono text-white">{matchResult.breakdown?.skillsCoverage || 0}%</span>
+                      </div>
+                      <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
+                        <div className="bg-cyan-500 h-full" style={{ width: `${matchResult.breakdown?.skillsCoverage || 0}%` }} />
+                      </div>
+                    </div>
+
+                    <div className="glass-panel border border-zinc-900 rounded-2xl p-4 flex flex-col justify-between items-center relative overflow-hidden shadow-[0_0_12px_rgba(6,182,212,0.05)] text-center space-y-2">
+                      <span className="text-[8px] font-bold font-mono text-zinc-500 uppercase tracking-widest block">ATS COMPATIBILITY</span>
+                      <div className="py-1 relative flex items-center justify-center">
+                        <span className="text-3xl font-black font-mono text-white">{matchResult.breakdown?.atsCompatibility || 0}%</span>
+                      </div>
+                      <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
+                        <div className="bg-cyan-500 h-full" style={{ width: `${matchResult.breakdown?.atsCompatibility || 0}%` }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Skills Gap Analysis Grid */}
+                  <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+                    <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5 text-left">
+                      <ShieldAlert className="h-4 w-4 text-cyan-400" />
+                      <span>Recruiter Skills Gap Audit</span>
+                    </h4>
                     
-                    {/* Extracted JD Keywords */}
-                    <div className="glass-panel border border-zinc-900 rounded-2xl p-4 space-y-3">
-                      <h4 className="text-[10px] font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-2 text-left">
-                        🎯 Extracted Keywords ({matchResult.extractedKeywords.length})
-                      </h4>
-                      <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto pt-1 justify-start">
-                        {matchResult.extractedKeywords.map((kw, idx) => (
-                          <span 
-                            key={idx} 
-                            className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-850 text-zinc-300 font-mono text-[9px] font-bold"
-                          >
-                            {kw}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Missing Keywords (Amber Chips) */}
-                    <div className="glass-panel border border-zinc-900 rounded-2xl p-4 space-y-3">
-                      <h4 className="text-[10px] font-black text-amber-400 font-mono uppercase tracking-wider border-b border-zinc-900 pb-2 text-left">
-                        ⚠️ Missing Keywords ({matchResult.missingKeywords.length})
-                      </h4>
-                      <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto pt-1 justify-start">
-                        {matchResult.missingKeywords.length === 0 ? (
-                          <span className="text-[9px] font-semibold text-zinc-500 italic">No missing keywords found! Excellent match!</span>
-                        ) : (
-                          matchResult.missingKeywords.map((kw, idx) => (
-                            <span 
-                              key={idx} 
-                              className="px-2 py-0.5 rounded bg-amber-950/20 border border-amber-900/40 text-amber-400 font-mono text-[9px] font-bold"
-                            >
-                              {kw}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Job Requires */}
+                      <div className="p-4 rounded-xl bg-zinc-900/10 border border-zinc-900/60 space-y-2.5 text-left">
+                        <span className="text-[9px] font-black text-zinc-400 font-mono uppercase tracking-widest block">JOB REQUIRES</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {matchResult.extractedJd?.requiredSkills.map((sk, idx) => (
+                            <span key={idx} className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[9px] font-mono font-bold text-zinc-300">
+                              {sk}
                             </span>
-                          ))
-                        )}
+                          ))}
+                          {matchResult.extractedJd?.preferredSkills.map((tech, idx) => (
+                            <span key={idx} className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[9px] font-mono font-bold text-zinc-400">
+                              {tech}
+                            </span>
+                          ))}
+                          {matchResult.extractedJd?.softSkills?.slice(0, 3).map((soft, idx) => (
+                            <span key={idx} className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800/50 text-[9px] font-mono font-bold text-zinc-500">
+                              {soft}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Resume Contains */}
+                      <div className="p-4 rounded-xl bg-emerald-950/5 border border-emerald-900/20 space-y-2.5 text-left">
+                        <span className="text-[9px] font-black text-emerald-400 font-mono uppercase tracking-widest block">RESUME CONTAINS</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {matchResult.gapAnalysis?.matchingSkills.map((sk, idx) => (
+                            <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-mono font-bold text-emerald-400 flex items-center space-x-1">
+                              <span>✓</span>
+                              <span>{sk}</span>
+                            </span>
+                          ))}
+                          {matchResult.gapAnalysis?.matchingTechnologies.map((tech, idx) => (
+                            <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-mono font-bold text-emerald-400 flex items-center space-x-1">
+                              <span>✓</span>
+                              <span>{tech}</span>
+                            </span>
+                          ))}
+                          {([...(matchResult.gapAnalysis?.matchingSkills || []), ...(matchResult.gapAnalysis?.matchingTechnologies || [])].length === 0) && (
+                            <span className="text-[8px] text-zinc-650 font-semibold italic">0 matching items found.</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Missing Gaps */}
+                      <div className="p-4 rounded-xl bg-amber-950/5 border border-amber-950/20 space-y-2.5 text-left">
+                        <span className="text-[9px] font-black text-amber-400 font-mono uppercase tracking-widest block">MISSING CORE GAPS</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {matchResult.gapAnalysis?.missingSkills.map((sk, idx) => (
+                            <span key={idx} className="px-2 py-0.5 rounded bg-amber-950/25 border border-amber-900/40 text-[9px] font-mono font-bold text-amber-450 flex items-center space-x-1">
+                              <span>✗</span>
+                              <span>{sk}</span>
+                            </span>
+                          ))}
+                          {matchResult.gapAnalysis?.missingTechnologies.map((tech, idx) => (
+                            <span key={idx} className="px-2 py-0.5 rounded bg-amber-950/25 border border-amber-900/40 text-[9px] font-mono font-bold text-amber-450 flex items-center space-x-1">
+                              <span>✗</span>
+                              <span>{tech}</span>
+                            </span>
+                          ))}
+                          {matchResult.gapAnalysis?.missingCertifications.map((cert, idx) => (
+                            <span key={idx} className="px-2 py-0.5 rounded bg-red-950/25 border border-red-900/40 text-[9px] font-mono font-bold text-red-400 flex items-center space-x-1">
+                              <span>✗</span>
+                              <span>{cert}</span>
+                            </span>
+                          ))}
+                          {([...(matchResult.gapAnalysis?.missingSkills || []), ...(matchResult.gapAnalysis?.missingTechnologies || []), ...(matchResult.gapAnalysis?.missingCertifications || [])].length === 0) && (
+                            <span className="text-[8px] text-zinc-500 font-semibold italic">Perfect match! No gaps found.</span>
+                          )}
+                        </div>
                       </div>
                     </div>
+                  </div>
 
+                  {/* Keyword Frequency Report */}
+                  <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+                    <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5 text-left">
+                      <BarChart3 className="h-4 w-4 text-cyan-400" />
+                      <span>Keyword Frequency Coverage</span>
+                    </h4>
+                    
+                    <div className="flex flex-wrap gap-2.5 pt-1 justify-start">
+                      {matchResult.keywordFrequency?.map((item, idx) => (
+                        <div 
+                          key={idx} 
+                          className="flex items-center space-x-2 px-2.5 py-1 rounded bg-zinc-900 border border-zinc-850 hover:border-zinc-800 transition-colors"
+                        >
+                          <span className="text-[10px] font-mono font-black text-slate-200">{item.keyword}</span>
+                          <span className={`text-[8px] font-mono font-black px-1.5 py-0.25 rounded ${
+                            item.count > 0 
+                              ? "bg-emerald-950/40 text-emerald-400 border border-emerald-900/50" 
+                              : "bg-red-950/40 text-red-400 border border-red-900/50"
+                          }`}>
+                            {item.count}x
+                          </span>
+                          <span className={`text-[7px] font-mono font-extrabold uppercase px-1 rounded ${
+                            item.importance === "high" 
+                              ? "bg-red-950/30 text-red-500" 
+                              : (item.importance === "medium" ? "bg-amber-950/30 text-amber-500" : "bg-cyan-950/30 text-cyan-500")
+                          }`}>
+                            {item.importance}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Prioritised Optimization Checklist */}
+                  <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+                    <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5 text-left">
+                      <ListChecks className="h-4 w-4 text-cyan-400" />
+                      <span>Placements Sprints Priority Action Checklist</span>
+                    </h4>
+
+                    <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                      {matchResult.improvementPriority?.map((item, idx) => (
+                        <div 
+                          key={idx} 
+                          className={`p-3.5 rounded-xl border flex justify-between items-center transition-all hover:bg-zinc-900/10 text-left ${
+                            item.priority === "critical" 
+                              ? "bg-red-950/5 border-red-900/20 text-red-400" 
+                              : (item.priority === "high" ? "bg-amber-950/5 border-amber-900/20 text-amber-400" : "bg-cyan-950/5 border-cyan-900/20 text-cyan-400")
+                          }`}
+                        >
+                          <div className="flex items-start space-x-2.5">
+                            <span className={`h-4 w-4 rounded-full border text-[9px] font-mono font-black flex items-center justify-center mt-0.5 flex-shrink-0 ${
+                              item.priority === "critical" ? "border-red-500 text-red-500 animate-pulse" : (item.priority === "high" ? "border-amber-500 text-amber-500" : "border-cyan-500 text-cyan-500")
+                            }`}>
+                              !
+                            </span>
+                            <div className="space-y-0.5">
+                              <p className="text-[10px] font-bold text-slate-200">{item.task}</p>
+                              <p className="text-[8px] font-mono text-zinc-500">Priority: {item.priority.toUpperCase()} impact • Projected {item.impact}</p>
+                            </div>
+                          </div>
+                          <span className={`text-[9px] font-bold font-mono px-2 py-0.5 rounded bg-zinc-900 border text-white ${
+                            item.priority === "critical" ? "border-red-900/50" : (item.priority === "high" ? "border-amber-900/50" : "border-cyan-900/50")
+                          }`}>
+                            {item.impact}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Before vs After Bullet Comparisons */}
@@ -989,7 +1248,7 @@ export default function DashboardPage() {
                           {/* Original Bullet */}
                           <div className="p-3 rounded-lg bg-red-950/10 border border-red-950/30 text-left relative overflow-hidden">
                             <span className="absolute top-1 right-2 text-[8px] font-black font-mono text-red-500 uppercase opacity-60">Original Draft</span>
-                            <p className="text-[10px] text-zinc-500 font-medium font-sans leading-normal leading-relaxed pr-12">
+                            <p className="text-[10px] text-zinc-500 font-medium font-sans leading-normal pr-12">
                               {comp.original}
                             </p>
                           </div>
@@ -997,7 +1256,7 @@ export default function DashboardPage() {
                           {/* Optimized Bullet */}
                           <div className="p-3 rounded-lg bg-emerald-950/10 border border-emerald-900/20 text-left relative overflow-hidden">
                             <span className="absolute top-1 right-2 text-[8px] font-black font-mono text-emerald-400 uppercase opacity-80">Tailored Optimization</span>
-                            <p className="text-[10px] text-zinc-200 font-bold font-sans leading-normal leading-relaxed pr-12">
+                            <p className="text-[10px] text-zinc-200 font-bold font-sans leading-normal pr-12">
                               {comp.optimized}
                             </p>
                           </div>
@@ -1005,21 +1264,6 @@ export default function DashboardPage() {
                         </div>
                       ))}
                     </div>
-                  </div>
-
-                  {/* Heuristic Improvement suggestions list */}
-                  <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-3">
-                    <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-2 text-left">
-                      💡 Placement Strategy Recommendations
-                    </h4>
-                    <ul className="space-y-2 text-[10px] font-medium leading-relaxed text-zinc-400 pl-1 text-left">
-                      {matchResult.suggestions.map((sug, idx) => (
-                        <li key={idx} className="flex items-start space-x-2">
-                          <span className="text-cyan-400 font-black font-mono">•</span>
-                          <span>{sug}</span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
 
                 </div>

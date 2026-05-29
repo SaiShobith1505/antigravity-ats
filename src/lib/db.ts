@@ -55,7 +55,8 @@ export async function saveResume(
   data: ResumeData,
   atsScore: number,
   usedAITailor?: boolean,
-  parsedReport?: any
+  parsedReport?: any,
+  analysisHistory?: any
 ): Promise<void> {
   try {
     const resumeRef = doc(db, "resumes", resumeId);
@@ -73,12 +74,16 @@ export async function saveResume(
     if (parsedReport !== undefined) {
       payload.parsedReport = parsedReport;
     }
+    if (analysisHistory !== undefined) {
+      payload.analysisHistory = analysisHistory;
+    }
     await setDoc(resumeRef, payload, { merge: true });
   } catch (error) {
     console.warn("Firestore saveResume failed, falling back to localStorage:", error);
     let paymentStatus = "unpaid";
     let isTailored = false;
     let existingReport = null;
+    let existingHistory: any[] = [];
     const existing = localStorage.getItem(`cv_boost_resume_${resumeId}`);
     if (existing) {
       try {
@@ -86,6 +91,7 @@ export async function saveResume(
         paymentStatus = parsed.paymentStatus || "unpaid";
         isTailored = parsed.usedAITailor || false;
         existingReport = parsed.parsedReport || null;
+        existingHistory = parsed.analysisHistory || [];
       } catch (_) {}
     }
     localStorage.setItem(
@@ -98,6 +104,7 @@ export async function saveResume(
         paymentStatus,
         usedAITailor: usedAITailor !== undefined ? usedAITailor : isTailored,
         parsedReport: parsedReport !== undefined ? parsedReport : existingReport,
+        analysisHistory: analysisHistory !== undefined ? analysisHistory : existingHistory,
         updatedAt: new Date().toISOString(),
       })
     );
