@@ -1025,17 +1025,6 @@ export default function DashboardPage() {
     navigator.clipboard.writeText(referralLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-
-    // Simulate viral sign-ups inside local sandbox to allow quick free unlock testing!
-    const nextCount = Math.min(3, referralCount + 1);
-    setReferralCount(nextCount);
-    if (user) {
-      localStorage.setItem(`cv_boost_refs_${user.uid}`, nextCount.toString());
-      if (nextCount >= 3) {
-        setIsPaid(true);
-        setPaymentStatusPaid(resumeId);
-      }
-    }
   };
 
   if (loading) {
