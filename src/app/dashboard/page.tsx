@@ -3021,7 +3021,7 @@ export default function DashboardPage() {
                 {/* Razorpay Standard Instant Unlock Button */}
                 <button
                   onClick={triggerRazorpayCheckout}
-                  className="w-full py-2.5 rounded-lg hover: hover: text-white font-black text-xs shadow-sm transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
+                  className="w-full py-2.5 rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white font-black text-xs shadow-sm transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
                 >
                   <Zap className="h-4 w-4 text-white fill-white stroke-[2.5]" />
                   <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 99}</span>
@@ -3530,9 +3530,9 @@ export default function DashboardPage() {
                     {/* Razorpay Standard Instant Unlock Button */}
                     <button
                       onClick={triggerRazorpayCheckout}
-                      className="w-full py-2.5 rounded-lg hover: hover: text-white font-black text-xs shadow-sm transition-all transform active:scale-98 flex items-center justify-center space-x-1.5"
+                      className="w-full py-2.5 rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white font-black text-xs shadow-sm transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
-                      <Zap className="h-4 w-4 text-white fill-zinc-950 stroke-[2.5]" />
+                      <Zap className="h-4 w-4 text-white fill-white stroke-[2.5]" />
                       <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 99}</span>
                     </button>
 
@@ -3756,7 +3756,7 @@ export default function DashboardPage() {
                  ) : (
                   <button
                     onClick={triggerRazorpayCheckout}
-                    className="px-6 py-3 text-xs font-black rounded-lg text-white hover:brightness-110 active:scale-98 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
+                    className="px-6 py-3 text-xs font-black rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white active:scale-98 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
                   >
                     <Download className="h-4 w-4 text-white" />
                     <span>Unlock Selection PDF (₹{tailorApplied ? 149 : 99})</span>
