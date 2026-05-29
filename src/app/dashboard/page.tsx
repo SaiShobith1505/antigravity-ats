@@ -35,7 +35,8 @@ import {
   ShieldAlert,
   BarChart3,
   ListChecks,
-  Building2
+  Building2,
+  User
 } from "lucide-react";
 import Link from "next/link";
 
@@ -65,7 +66,8 @@ export default function DashboardPage() {
   const [mockAmount, setMockAmount] = useState(8000);
 
   // AI JD Matcher & Optimizer states
-  const [activeTab, setActiveTab] = useState<"edit" | "matcher" | "company">("edit");
+  const [activeTab, setActiveTab] = useState<"edit" | "ats" | "matcher" | "company" | "history" | "account">("edit");
+  const [previewTab, setPreviewTab] = useState<"preview" | "insights">("preview");
   
   // Company Intelligence Engine States
   const [companySelection, setCompanySelection] = useState<string>("Google");
@@ -888,623 +890,1733 @@ export default function DashboardPage() {
     );
   }
 
-  return (
-    <div className="flex-1 flex flex-col h-screen overflow-hidden bg-zinc-950">
-      
-      {/* Dynamic script tags for Razorpay SDK */}
-      <script src="https://checkout.razorpay.com/v1/checkout.js" async />
+  // Premium Onboarding & Workspace Helpers
+  const renderEmptyState = (type: "ats" | "matcher" | "company" | "history") => {
+    return (
+      <div className="glass-panel border border-zinc-900 rounded-3xl p-10 flex flex-col items-center justify-center text-center space-y-4 max-w-md mx-auto mt-12 animate-in fade-in duration-300">
+        <div className="h-14 w-14 rounded-2xl bg-zinc-900 border border-zinc-850 flex items-center justify-center shadow-md">
+          {type === "ats" && <BarChart3 className="h-6 w-6 text-cyan-400" />}
+          {type === "matcher" && <Sparkles className="h-6 w-6 text-cyan-400" />}
+          {type === "company" && <Building2 className="h-6 w-6 text-cyan-400" />}
+          {type === "history" && <History className="h-6 w-6 text-cyan-400" />}
+        </div>
+        <div className="space-y-1">
+          <h3 className="text-xs font-black text-white uppercase tracking-wider font-mono">
+            {type === "ats" && "No Analysis Audits Found"}
+            {type === "matcher" && "No Job Matches Computed"}
+            {type === "company" && "No Company Fit Calculations"}
+            {type === "history" && "No Scan History Recorded"}
+          </h3>
+          <p className="text-[10px] text-zinc-550 leading-relaxed font-semibold max-w-xs">
+            {type === "ats" && "Upload a resume PDF/DOCX or fill out the details inside our Resume Builder tab to trigger a real-time deep diagnostics report."}
+            {type === "matcher" && "Paste a target job description inside our Job Matcher tab to see a side-by-side gap audit and keyword cloud."}
+            {type === "company" && "Select a target corporation and job role to calculate structural sequencing guidelines and recruiter observations."}
+            {type === "history" && "Your previously conducted jobs tailored and company suitability analyses will appear here for instant loading."}
+          </p>
+        </div>
+        <button
+          onClick={() => {
+            if (type === "ats" || type === "history") setActiveTab("edit");
+            else if (type === "matcher") setActiveTab("matcher");
+            else if (type === "company") setActiveTab("company");
+          }}
+          className="py-2 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-[10px] font-bold text-slate-200 transition-all cursor-pointer"
+        >
+          {type === "ats" || type === "history" ? "Open Resume Builder" : "Start New Scan"}
+        </button>
+      </div>
+    );
+  };
 
-      {/* Dashboard Top bar */}
-      <nav className="h-16 border-b border-zinc-900 bg-zinc-950/80 px-4 md:px-8 flex items-center justify-between z-10 flex-shrink-0">
-        <div className="flex items-center space-x-4">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded bg-gradient-to-tr from-cyan-500 to-electric-blue flex items-center justify-center">
-              <Zap className="h-4.5 w-4.5 text-zinc-950 stroke-[2.5]" />
+  const renderOnboardingStepper = () => {
+    const isStep1Done = resumeData && resumeData.personal && resumeData.personal.fullName !== "Amit Sharma";
+    const isStep2Done = atsScore > 40;
+    const isStep3Done = matchResult !== null;
+    const isStep4Done = companyMatchResult !== null;
+    const isStep5Done = isPaid;
+
+    return (
+      <div className="grid grid-cols-5 gap-2 p-3 bg-zinc-900/30 border border-zinc-900/80 rounded-2xl flex-shrink-0 text-center items-center">
+        <button 
+          onClick={() => setActiveTab("edit")}
+          className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
+        >
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep1Done ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : activeTab === "edit" ? "bg-cyan-400 animate-pulse" : "bg-zinc-800"}`} />
+          <span className={`text-[8px] font-mono font-black uppercase tracking-wider ${activeTab === "edit" ? "text-cyan-400" : isStep1Done ? "text-zinc-400" : "text-zinc-650"}`}>1. Upload</span>
+        </button>
+        <button 
+          onClick={() => setActiveTab("ats")}
+          className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
+        >
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep2Done ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : activeTab === "ats" ? "bg-cyan-400 animate-pulse" : "bg-zinc-800"}`} />
+          <span className={`text-[8px] font-mono font-black uppercase tracking-wider ${activeTab === "ats" ? "text-cyan-400" : isStep2Done ? "text-zinc-400" : "text-zinc-655"}`}>2. ATS Scan</span>
+        </button>
+        <button 
+          onClick={() => setActiveTab("matcher")}
+          className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
+        >
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep3Done ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : activeTab === "matcher" ? "bg-cyan-400 animate-pulse" : "bg-zinc-800"}`} />
+          <span className={`text-[8px] font-mono font-black uppercase tracking-wider ${activeTab === "matcher" ? "text-cyan-400" : isStep3Done ? "text-zinc-400" : "text-zinc-655"}`}>3. Match JD</span>
+        </button>
+        <button 
+          onClick={() => setActiveTab("company")}
+          className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
+        >
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep4Done ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : activeTab === "company" ? "bg-cyan-400 animate-pulse" : "bg-zinc-800"}`} />
+          <span className={`text-[8px] font-mono font-black uppercase tracking-wider ${activeTab === "company" ? "text-cyan-400" : isStep4Done ? "text-zinc-400" : "text-zinc-655"}`}>4. Company Fit</span>
+        </button>
+        <button 
+          onClick={() => setActiveTab("account")}
+          className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
+        >
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep5Done ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : activeTab === "account" ? "bg-cyan-400 animate-pulse" : "bg-zinc-800"}`} />
+          <span className={`text-[8px] font-mono font-black uppercase tracking-wider ${activeTab === "account" ? "text-cyan-400" : isStep5Done ? "text-zinc-400" : "text-zinc-655"}`}>5. Export</span>
+        </button>
+      </div>
+    );
+  };
+
+  const renderAtsDeepScanWorkspace = () => {
+    if (!parsedReport) {
+      return renderEmptyState("ats");
+    }
+
+    const bd = parsedReport.breakdown || {};
+    const structureVal = bd.structure !== undefined ? bd.structure : 80;
+    const formattingVal = bd.formatting !== undefined ? bd.formatting : 95;
+    const readabilityVal = bd.readability !== undefined ? bd.readability : 85;
+    const keywordsVal = bd.keywords !== undefined ? bd.keywords : 70;
+    const projectsVal = bd.projects !== undefined ? bd.projects : 75;
+    const achievementsVal = bd.achievements !== undefined ? bd.achievements : 60;
+
+    return (
+      <div className="space-y-6 text-left animate-in fade-in duration-300">
+        {/* Header card with ring score */}
+        <div className="flex flex-col md:flex-row gap-6 items-center justify-between bg-zinc-900/10 border border-zinc-900 rounded-3xl p-6 text-left hover-card-premium">
+          <div className="flex flex-col justify-center items-center flex-shrink-0">
+            <AtsScoreGauge score={atsScore} size={140} />
+            <span className="text-[9px] font-black font-mono text-zinc-500 uppercase tracking-widest mt-2.5">ATS Suitability</span>
+          </div>
+          <div className="flex-grow space-y-2">
+            <div className="flex items-center space-x-2">
+              <span className="text-[9px] font-mono font-black text-cyan-400 uppercase tracking-wider">⚡ COMPATIBILITY REPORT</span>
+              <span className="text-[8px] font-mono font-bold text-emerald-455 bg-emerald-955/20 border border-emerald-900/50 px-2 py-0.5 rounded uppercase">Verified ATS Compatibility</span>
             </div>
-             <span className="text-base font-black tracking-tight text-white font-mono hidden sm:inline">
-              BOOSTCV
-             </span>
-          </Link>
+            <h3 className="text-base font-black text-white leading-tight uppercase font-mono">Dynamic Content-Quality Assessment</h3>
+            <p className="text-xs text-zinc-450 leading-relaxed font-medium">
+              Your overall score of {atsScore}% is derived from structure completeness, typography layout formatting, parser readability scores, keyword density checks, project complexity, and action verbs achievement quality metrics.
+            </p>
+          </div>
         </div>
 
-        {/* Action Tickers */}
-        <div className="flex items-center space-x-4">
-          <span className="text-xs font-mono text-zinc-400 font-medium hidden md:inline">
-            Logged as: <strong className="text-cyan-400">{user.email}</strong>
-          </span>
-          <button 
-            onClick={signOut}
-            className="text-xs text-zinc-500 hover:text-zinc-300 font-bold font-mono"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
+        {/* Score Breakdown Progress Bars */}
+        <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
+          <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+            <BarChart3 className="h-4 w-4 text-cyan-400" />
+            <span>Category Optimization Matrix</span>
+          </h4>
 
-      {/* Split Work Panels */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        
-        {/* Left Input Fields Panel (Form & AI Job Description Matcher) */}
-        <div className="w-full lg:w-1/2 p-4 md:p-6 overflow-y-auto border-r border-zinc-900 h-full flex flex-col space-y-6 text-left">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[10px] font-bold font-mono">
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-zinc-455">
+                <span>Structure Completeness</span>
+                <span className="text-cyan-455">{structureVal}%</span>
+              </div>
+              <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+                <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${structureVal}%` }} />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-zinc-455">
+                <span>Formatting & Emojis</span>
+                <span className="text-cyan-455">{formattingVal}%</span>
+              </div>
+              <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+                <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${formattingVal}%` }} />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-zinc-455">
+                <span>Recruiter Readability</span>
+                <span className="text-cyan-455">{readabilityVal}%</span>
+              </div>
+              <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+                <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${readabilityVal}%` }} />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-zinc-455">
+                <span>Keywords Density</span>
+                <span className="text-cyan-455">{keywordsVal}%</span>
+              </div>
+              <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+                <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${keywordsVal}%` }} />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-zinc-455">
+                <span>Projects Depth</span>
+                <span className="text-cyan-455">{projectsVal}%</span>
+              </div>
+              <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+                <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${projectsVal}%` }} />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-zinc-455">
+                <span>Achievements Quality</span>
+                <span className="text-cyan-455">{achievementsVal}%</span>
+              </div>
+              <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+                <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${achievementsVal}%` }} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Summary Details Grid (Strengths, Weaknesses) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
-          {/* Tabs Selector Bar */}
-          <div className="grid grid-cols-3 gap-2 p-1 bg-zinc-900/50 border border-zinc-850 rounded-xl flex-shrink-0">
-            <button
-              onClick={() => setActiveTab("edit")}
-              className={`py-2.5 px-3 rounded-lg font-bold font-mono text-xs transition-all flex items-center justify-center space-x-2 ${
-                activeTab === "edit"
-                  ? "bg-zinc-800 text-cyan-400 shadow-sm border border-zinc-700/50"
-                  : "text-zinc-400 hover:text-zinc-200"
-              }`}
-            >
-              <FileText className="h-4 w-4" />
-              <span>Edit Resume Draft</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("matcher")}
-              className={`py-2.5 px-3 rounded-lg font-bold font-mono text-xs transition-all flex items-center justify-center space-x-2 relative ${
-                activeTab === "matcher"
-                  ? "bg-zinc-800 text-cyan-400 shadow-sm border border-zinc-700/50"
-                  : "text-zinc-400 hover:text-zinc-200"
-              }`}
-            >
-              <Sparkles className="h-4 w-4" />
-              <span>AI Job Matcher</span>
-              {tailorApplied && (
-                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
+          {/* Key Strengths */}
+          <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
+            <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+              <CheckCircle2 className="h-4 w-4 text-emerald-450" />
+              <span>Recruiter Strengths Detected</span>
+            </h4>
+            <div className="space-y-2.5">
+              {parsedReport.warnings?.slice(0, 4).map((str: string, idx: number) => (
+                <div key={idx} className="flex items-start space-x-2.5 text-xs text-zinc-350 font-semibold leading-relaxed">
+                  <span className="text-emerald-500 font-extrabold mt-0.5">•</span>
+                  <span>{str}</span>
+                </div>
+              ))}
+              {(!parsedReport.warnings || parsedReport.warnings.length === 0) && (
+                <p className="text-[10px] text-zinc-550 italic font-semibold">No particular highlights found.</p>
               )}
-            </button>
-            <button
-              onClick={() => setActiveTab("company")}
-              className={`py-2.5 px-3 rounded-lg font-bold font-mono text-xs transition-all flex items-center justify-center space-x-2 relative ${
-                activeTab === "company"
-                  ? "bg-zinc-800 text-cyan-400 shadow-sm border border-zinc-700/50"
-                  : "text-zinc-400 hover:text-zinc-200"
-              }`}
-            >
-              <Building2 className="h-4 w-4" />
-              <span>Company Intelligence</span>
-            </button>
+            </div>
           </div>
 
-          {/* Conditional Content Panel */}
-          {activeTab === "edit" && (
-            <ResumeForm data={resumeData} onChange={handleFormChange} />
-          )}
-
-          {activeTab === "matcher" && (
-            <div className="space-y-6 flex-grow flex flex-col">
-              
-              {/* Job Analysis History Logs */}
-              {analysisHistory.length > 0 && (
-                <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-3 relative overflow-hidden">
-                  <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
-                    <span className="text-[10px] font-black text-white font-mono uppercase tracking-wider flex items-center space-x-1.5">
-                      <History className="h-3.5 w-3.5 text-cyan-400" />
-                      <span>JD Scan History Logs ({analysisHistory.length})</span>
-                    </span>
-                    <button
-                      onClick={() => {
-                        setAnalysisHistory([]);
-                        if (user) saveResume(user.uid, resumeId, resumeData, atsScore, tailorApplied, parsedReport, [], companyHistory);
-                      }}
-                      className="text-[9px] font-bold text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
-                    >
-                      Clear History
-                    </button>
-                  </div>
-                  <div className="flex flex-col space-y-2 max-h-40 overflow-y-auto pr-1">
-                    {analysisHistory.map((hist) => (
-                      <button
-                        key={hist.id}
-                        onClick={() => {
-                          setMatchResult(hist);
-                          setResumeData(hist.tailoredResume);
-                          setAtsScore(hist.scoreImprovement);
-                          setTailorApplied(true);
-                        }}
-                        className={`p-2.5 rounded-lg border text-left flex justify-between items-center transition-all cursor-pointer ${
-                          matchResult?.id === hist.id
-                            ? "bg-cyan-950/20 border-cyan-800/40 text-cyan-400"
-                            : "bg-zinc-900/10 border-zinc-900/60 hover:bg-zinc-900/30 text-zinc-450 hover:text-zinc-300"
-                        }`}
-                      >
-                        <div className="space-y-0.5 max-w-[70%]">
-                          <div className="text-[10px] font-bold font-mono truncate">{hist.jobTitle}</div>
-                          <div className="text-[8px] font-mono text-zinc-500">{hist.companyName} • {hist.timestamp}</div>
-                        </div>
-                        <div className="text-right flex items-center space-x-2">
-                          <span className="text-xs font-black font-mono bg-zinc-950 border border-zinc-800/80 px-2 py-0.5 rounded text-slate-100">
-                            {hist.matchScore}%
-                          </span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
+          {/* Warnings / Weaknesses */}
+          <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
+            <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+              <AlertCircle className="h-4 w-4 text-red-400" />
+              <span>Warnings & Format Gaps</span>
+            </h4>
+            <div className="space-y-2.5">
+              {parsedReport.keywordGaps?.slice(0, 4).map((warn: string, idx: number) => (
+                <div key={idx} className="flex items-start space-x-2.5 text-xs text-zinc-350 font-semibold leading-relaxed">
+                  <span className="text-red-500 font-extrabold mt-0.5">•</span>
+                  <span>{warn}</span>
                 </div>
+              ))}
+              {(!parsedReport.keywordGaps || parsedReport.keywordGaps.length === 0) && (
+                <p className="text-[10px] text-zinc-550 italic font-semibold">No format warnings or keyword gaps noted.</p>
               )}
+            </div>
+          </div>
 
-              {/* Job Description Input Card */}
-              <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-                <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
-                  <div className="flex items-center space-x-2">
-                    <div className="h-7 w-7 rounded bg-cyan-950 border border-cyan-800/35 flex items-center justify-center">
-                      <Briefcase className="h-4 w-4 text-cyan-400" />
-                    </div>
-                    <span className="text-xs font-black text-white font-mono uppercase tracking-wider">
-                      Target Job Description
+        </div>
+
+        {/* Action checklist items */}
+        <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
+          <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+            <ListChecks className="h-4 w-4 text-cyan-400" />
+            <span>Placement Preparation Sprints Checklist</span>
+          </h4>
+          <div className="space-y-3">
+            {parsedReport.metricEnhancements?.map((item: string, idx: number) => (
+              <div 
+                key={idx} 
+                className="p-3.5 rounded-2xl bg-zinc-900/40 border border-zinc-900/60 text-xs text-zinc-250 font-semibold leading-relaxed flex items-start space-x-3 hover:border-zinc-800 transition-all text-left"
+              >
+                <div className="h-5 w-5 rounded-full border border-cyan-500/30 text-cyan-400 font-mono text-[9px] font-black flex items-center justify-center flex-shrink-0 mt-0.5">
+                  !
+                </div>
+                <div className="space-y-0.5">
+                  <p className="font-bold text-slate-200">{item}</p>
+                  <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider">Priority: Placements optimization milestone</p>
+                </div>
+              </div>
+            ))}
+            {(!parsedReport.metricEnhancements || parsedReport.metricEnhancements.length === 0) && (
+              <p className="text-[10px] text-zinc-550 italic font-semibold">Perfect! No urgent improvements required.</p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderJobMatcherWorkspace = () => {
+    return (
+      <div className="space-y-6 text-left animate-in fade-in duration-300">
+        
+        {/* Job Analysis History Logs */}
+        {analysisHistory.length > 0 && (
+          <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-3 relative overflow-hidden">
+            <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
+              <span className="text-[10px] font-black text-white font-mono uppercase tracking-wider flex items-center space-x-1.5">
+                <History className="h-3.5 w-3.5 text-cyan-400" />
+                <span>JD Scan History Logs ({analysisHistory.length})</span>
+              </span>
+              <button
+                onClick={() => {
+                  setAnalysisHistory([]);
+                  if (user) saveResume(user.uid, resumeId, resumeData, atsScore, tailorApplied, parsedReport, [], companyHistory);
+                }}
+                className="text-[9px] font-bold text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
+              >
+                Clear History
+              </button>
+            </div>
+            <div className="flex flex-col space-y-2 max-h-40 overflow-y-auto pr-1">
+              {analysisHistory.map((hist) => (
+                <button
+                  key={hist.id}
+                  onClick={() => {
+                    setMatchResult(hist);
+                    setResumeData(hist.tailoredResume);
+                    setAtsScore(hist.scoreImprovement);
+                    setTailorApplied(true);
+                  }}
+                  className={`p-2.5 rounded-lg border text-left flex justify-between items-center transition-all cursor-pointer ${
+                    matchResult?.id === hist.id
+                      ? "bg-cyan-950/20 border-cyan-800/40 text-cyan-400"
+                      : "bg-zinc-900/10 border-zinc-900/60 hover:bg-zinc-900/30 text-zinc-450 hover:text-zinc-300"
+                  }`}
+                >
+                  <div className="space-y-0.5 max-w-[70%]">
+                    <div className="text-[10px] font-bold font-mono truncate">{hist.jobTitle}</div>
+                    <div className="text-[8px] font-mono text-zinc-500">{hist.companyName} • {hist.timestamp}</div>
+                  </div>
+                  <div className="text-right flex items-center space-x-2">
+                    <span className="text-xs font-black font-mono bg-zinc-950 border border-zinc-800/80 px-2 py-0.5 rounded text-slate-100">
+                      {hist.matchScore}%
                     </span>
                   </div>
-                  <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase">
-                    Max 3,000 chars
-                  </span>
-                </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
-                <div className="space-y-2 relative text-left">
-                  <textarea
-                    rows={6}
-                    value={jobDescription}
-                    onChange={(e) => setJobDescription(e.target.value.slice(0, 3000))}
-                    placeholder="Paste the target company job description here (e.g. required frameworks, technologies, roles, verbs)..."
-                    className="bg-zinc-900/30 border border-zinc-900 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 placeholder-zinc-600 rounded-xl p-4 w-full text-xs leading-relaxed outline-none transition-all font-sans resize-none"
-                  />
-                  <div className="flex justify-between items-center text-[10px] font-mono font-bold text-zinc-500 px-1">
-                    <span>{jobDescription.length} / 3000 characters</span>
-                    {jobDescription && (
-                      <button
-                        onClick={() => setJobDescription("")}
-                        className="text-zinc-500 hover:text-red-400 flex items-center space-x-1 transition-colors cursor-pointer"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                        <span>Clear</span>
-                      </button>
+        {/* Job Description Input Card */}
+        <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
+            <div className="flex items-center space-x-2">
+              <div className="h-7 w-7 rounded bg-cyan-950 border border-cyan-800/35 flex items-center justify-center">
+                <Briefcase className="h-4 w-4 text-cyan-400" />
+              </div>
+              <span className="text-xs font-black text-white font-mono uppercase tracking-wider">
+                Target Job Description
+              </span>
+            </div>
+            <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase">
+              Max 3,000 chars
+            </span>
+          </div>
+
+          <div className="space-y-2 relative text-left">
+            <textarea
+              rows={6}
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value.slice(0, 3000))}
+              placeholder="Paste the target company job description here (e.g. required frameworks, technologies, roles, verbs)..."
+              className="bg-zinc-900/30 border border-zinc-900 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 placeholder-zinc-650 rounded-xl p-4 w-full text-xs leading-relaxed outline-none transition-all font-sans resize-none"
+            />
+            <div className="flex justify-between items-center text-[10px] font-mono font-bold text-zinc-500 px-1">
+              <span>{jobDescription.length} / 3000 characters</span>
+              {jobDescription && (
+                <button
+                  onClick={() => setJobDescription("")}
+                  className="text-zinc-500 hover:text-red-400 flex items-center space-x-1 transition-colors cursor-pointer"
+                >
+                  <Trash2 className="h-3 w-3" />
+                  <span>Clear</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          <button
+            onClick={handleOptimizeResume}
+            disabled={isAnalyzing || !jobDescription.trim()}
+            className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-zinc-950 font-black text-xs shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2 cursor-pointer"
+          >
+            {isAnalyzing ? (
+              <>
+                <div className="h-4 w-4 border-2 border-zinc-955 border-t-transparent rounded-full animate-spin" />
+                <span>Extracting Keywords & Gap Analysis...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4 text-zinc-955 fill-zinc-955 stroke-[2.5]" />
+                <span>Scan & Match for Job Description</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* AI Analysis Staging Overlay */}
+        {!matchResult ? (
+          renderEmptyState("matcher")
+        ) : (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+            
+            {/* ATS Compatibility Improvement Indicator */}
+            <div className="glass-panel border border-cyan-500/25 bg-gradient-to-tr from-cyan-950/20 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)] text-left">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none" />
+              
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black font-mono text-cyan-400 tracking-wider uppercase">
+                  ⚡ ATS Match Compatibility Optimized
+                </span>
+                <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded">
+                  +{matchResult.scoreImprovement - matchResult.matchScore}% Boost
+                </span>
+              </div>
+
+              <div className="flex items-baseline space-x-2.5 pt-1.5 justify-start">
+                <span className="text-3xl font-black font-mono text-zinc-655 line-through">
+                  {matchResult.matchScore}%
+                </span>
+                <span className="text-xl font-bold font-mono text-zinc-500">→</span>
+                <span className="text-4xl font-black font-mono text-white tracking-tight drop-shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                  {matchResult.scoreImprovement}% Match
+                </span>
+              </div>
+
+              <p className="text-[10px] text-zinc-400 leading-relaxed font-semibold">
+                Extracted semantic alignment keywords. The optimization injected missing high-yield B.Tech placements technical tags into experience bullets and skills.
+              </p>
+
+              {/* Tailor state controller buttons */}
+              <div className="flex items-center space-x-3 pt-3 border-t border-zinc-900">
+                <button
+                  onClick={handleUndoTailoring}
+                  className="flex-1 py-2 px-3 rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900/20 text-zinc-400 hover:text-white font-extrabold text-[10px] transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>Undo Changes</span>
+                </button>
+                <button
+                  onClick={handleConfirmTailoring}
+                  className="flex-1 py-2 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-extrabold text-[10px] transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                >
+                  <Check className="h-3 w-3 text-zinc-955 stroke-[2.5]" />
+                  <span>Apply Optimization</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Skills Gap Analysis */}
+            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5 text-left">
+                <ListChecks className="h-4 w-4 text-cyan-400" />
+                <span>Job Fit Gap Audit</span>
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Matching Skills */}
+                <div className="p-4 rounded-xl bg-emerald-950/5 border border-emerald-900/20 space-y-2.5 text-left">
+                  <span className="text-[9px] font-black text-emerald-450 font-mono uppercase tracking-widest block">MATCHING CONTAINS</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {matchResult.gapAnalysis?.matchingSkills.map((sk, idx) => (
+                      <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-mono font-bold text-emerald-400 flex items-center space-x-1">
+                        <span>✓</span>
+                        <span>{sk}</span>
+                      </span>
+                    ))}
+                    {matchResult.gapAnalysis?.matchingTechnologies.map((tech, idx) => (
+                      <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-mono font-bold text-emerald-400 flex items-center space-x-1">
+                        <span>✓</span>
+                        <span>{tech}</span>
+                      </span>
+                    ))}
+                    {([...(matchResult.gapAnalysis?.matchingSkills || []), ...(matchResult.gapAnalysis?.matchingTechnologies || [])].length === 0) && (
+                      <span className="text-[8px] text-zinc-650 font-semibold italic">0 matching items found.</span>
                     )}
                   </div>
                 </div>
 
-                <button
-                  onClick={handleOptimizeResume}
-                  disabled={isAnalyzing || !jobDescription.trim()}
-                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-zinc-950 font-black text-xs shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2 cursor-pointer"
-                >
-                  {isAnalyzing ? (
-                    <>
-                      <div className="h-4 w-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
-                      <span>Extracting Keywords & Gap Analysis...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-4 w-4 text-zinc-950 fill-zinc-950 stroke-[2.5]" />
-                      <span>Scan & Match for Job Description</span>
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* AI Analysis Staging Overlay */}
-              {matchResult && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                  
-                  {/* ATS Compatibility Improvement Indicator */}
-                  <div className="glass-panel border border-cyan-500/25 bg-gradient-to-tr from-cyan-950/20 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)] text-left">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none" />
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black font-mono text-cyan-400 tracking-wider uppercase">
-                        ⚡ ATS Match Compatibility Optimized
+                {/* Missing Gaps */}
+                <div className="p-4 rounded-xl bg-amber-950/5 border border-amber-950/20 space-y-2.5 text-left">
+                  <span className="text-[9px] font-black text-amber-400 font-mono uppercase tracking-widest block">MISSING CORE GAPS</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {matchResult.gapAnalysis?.missingSkills.map((sk, idx) => (
+                      <span key={idx} className="px-2 py-0.5 rounded bg-amber-950/25 border border-amber-900/40 text-[9px] font-mono font-bold text-amber-450 flex items-center space-x-1">
+                        <span>✗</span>
+                        <span>{sk}</span>
                       </span>
-                      <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded">
-                        +{matchResult.scoreImprovement - matchResult.matchScore}% Boost
+                    ))}
+                    {matchResult.gapAnalysis?.missingTechnologies.map((tech, idx) => (
+                      <span key={idx} className="px-2 py-0.5 rounded bg-amber-950/25 border border-amber-900/40 text-[9px] font-mono font-bold text-amber-450 flex items-center space-x-1">
+                        <span>✗</span>
+                        <span>{tech}</span>
                       </span>
-                    </div>
-
-                    <div className="flex items-baseline space-x-2.5 pt-1.5 justify-start">
-                      <span className="text-3xl font-black font-mono text-zinc-655 line-through">
-                        {matchResult.matchScore}%
+                    ))}
+                    {matchResult.gapAnalysis?.missingCertifications?.map((cert, idx) => (
+                      <span key={idx} className="px-2 py-0.5 rounded bg-red-950/25 border border-red-900/40 text-[9px] font-mono font-bold text-red-400 flex items-center space-x-1">
+                        <span>✗</span>
+                        <span>{cert}</span>
                       </span>
-                      <span className="text-xl font-bold font-mono text-zinc-500">→</span>
-                      <span className="text-4xl font-black font-mono text-white tracking-tight drop-shadow-[0_0_15px_rgba(34,197,94,0.2)]">
-                        {matchResult.scoreImprovement}% Match
-                      </span>
-                    </div>
-
-                    <p className="text-[10px] text-zinc-400 leading-relaxed font-semibold">
-                      Extracted semantic alignment keywords. The optimization injected missing high-yield B.Tech placements technical tags into experience bullets and skills.
-                    </p>
-
-                    {/* Tailor state controller buttons */}
-                    <div className="flex items-center space-x-3 pt-3 border-t border-zinc-900">
-                      <button
-                        onClick={handleUndoTailoring}
-                        className="flex-1 py-2 px-3 rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900/20 text-zinc-400 hover:text-white font-extrabold text-[10px] transition-all flex items-center justify-center space-x-1 cursor-pointer"
-                      >
-                        <RotateCcw className="h-3 w-3" />
-                        <span>Undo Changes</span>
-                      </button>
-                      <button
-                        onClick={handleConfirmTailoring}
-                        className="flex-1 py-2 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-extrabold text-[10px] transition-all flex items-center justify-center space-x-1 cursor-pointer"
-                      >
-                        <Check className="h-3 w-3 text-zinc-950 stroke-[2.5]" />
-                        <span>Apply Optimization</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Skills Gap Analysis */}
-                  <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-                    <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5 text-left">
-                      <ListChecks className="h-4 w-4 text-cyan-400" />
-                      <span>Job Fit Gap Audit</span>
-                    </h4>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Matching Skills */}
-                      <div className="p-4 rounded-xl bg-emerald-950/5 border border-emerald-950/20 space-y-2.5 text-left">
-                        <span className="text-[9px] font-black text-emerald-450 font-mono uppercase tracking-widest block">MATCHING CONTAINS</span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {matchResult.gapAnalysis?.matchingSkills.map((sk, idx) => (
-                            <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-mono font-bold text-emerald-400 flex items-center space-x-1">
-                              <span>✓</span>
-                              <span>{sk}</span>
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                    ))}
+                    {([...(matchResult.gapAnalysis?.missingSkills || []), ...(matchResult.gapAnalysis?.missingTechnologies || []), ...(matchResult.gapAnalysis?.missingCertifications || [])].length === 0) && (
+                      <span className="text-[8px] text-zinc-500 font-semibold italic">Perfect match! No gaps found.</span>
+                    )}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
-          )}
 
-          {activeTab === "company" && (
-            <div className="space-y-6 flex-grow flex flex-col">
+            {/* Keyword Frequency Report */}
+            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5 text-left">
+                <BarChart3 className="h-4 w-4 text-cyan-400" />
+                <span>Keyword Frequency Coverage</span>
+              </h4>
               
-              {/* Company Selection History Logs */}
-              {companyHistory.length > 0 && (
-                <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-3 relative overflow-hidden text-left">
-                  <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
-                    <span className="text-[10px] font-black text-white font-mono uppercase tracking-wider flex items-center space-x-1.5">
-                      <History className="h-3.5 w-3.5 text-cyan-400" />
-                      <span>Company Suitability History Logs ({companyHistory.length})</span>
+              <div className="flex flex-wrap gap-2.5 pt-1 justify-start">
+                {matchResult.keywordFrequency?.map((item, idx) => (
+                  <div 
+                    key={idx} 
+                    className="flex items-center space-x-2 px-2.5 py-1 rounded bg-zinc-900 border border-zinc-850 hover:border-zinc-800 transition-colors"
+                  >
+                    <span className="text-[10px] font-mono font-black text-slate-200">{item.keyword}</span>
+                    <span className={`text-[8px] font-mono font-black px-1.5 py-0.25 rounded ${
+                      item.count > 0 
+                        ? "bg-emerald-950/40 text-emerald-400 border border-emerald-900/50" 
+                        : "bg-red-950/40 text-red-400 border border-red-900/50"
+                    }`}>
+                      {item.count}x
+                    </span>
+                    <span className={`text-[7px] font-mono font-extrabold uppercase px-1 rounded ${
+                      item.importance === "high" 
+                        ? "bg-red-950/30 text-red-500" 
+                        : (item.importance === "medium" ? "bg-amber-950/30 text-amber-500" : "bg-cyan-950/30 text-cyan-500")
+                    }`}>
+                      {item.importance}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Prioritised Optimization Checklist */}
+            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5 text-left">
+                <ListChecks className="h-4 w-4 text-cyan-400" />
+                <span>Placements Sprints Priority Action Checklist</span>
+              </h4>
+
+              <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                {matchResult.improvementPriority?.map((item, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`p-3.5 rounded-xl border flex justify-between items-center transition-all hover:bg-zinc-900/10 text-left ${
+                      item.priority === "critical" 
+                        ? "bg-red-950/5 border-red-900/20 text-red-400" 
+                        : (item.priority === "high" ? "bg-amber-950/5 border-amber-900/20 text-amber-400" : "bg-cyan-950/5 border-cyan-900/20 text-cyan-400")
+                    }`}
+                  >
+                    <div className="flex items-start space-x-2.5">
+                      <span className={`h-4 w-4 rounded-full border text-[9px] font-mono font-black flex items-center justify-center mt-0.5 flex-shrink-0 ${
+                        item.priority === "critical" ? "border-red-500 text-red-500 animate-pulse" : (item.priority === "high" ? "border-amber-500 text-amber-500" : "border-cyan-500 text-cyan-500")
+                      }`}>
+                        !
+                      </span>
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] font-bold text-slate-200">{item.task}</p>
+                        <p className="text-[8px] font-mono text-zinc-500">Priority: {item.priority.toUpperCase()} impact • Projected {item.impact}</p>
+                      </div>
+                    </div>
+                    <span className={`text-[9px] font-bold font-mono px-2 py-0.5 rounded bg-zinc-900 border text-white ${
+                      item.priority === "critical" ? "border-red-900/50" : (item.priority === "high" ? "border-amber-900/50" : "border-cyan-900/50")
+                    }`}>
+                      {item.impact}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Before vs After Bullet Comparisons */}
+            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center justify-between">
+                <span>🔄 AI Bullet Optimization Pipeline</span>
+                <span className="text-[9px] font-bold font-mono text-zinc-500 lowercase">Compare improvements</span>
+              </h4>
+
+              <div className="space-y-4 max-h-80 overflow-y-auto pr-1">
+                {matchResult.beforeAfterComparison.map((comp, idx) => (
+                  <div key={idx} className="space-y-2 border-b border-zinc-900 pb-4 last:border-0 last:pb-0">
+                    
+                    {/* Original Bullet */}
+                    <div className="p-3 rounded-lg bg-red-950/10 border border-red-950/30 text-left relative overflow-hidden">
+                      <span className="absolute top-1 right-2 text-[8px] font-black font-mono text-red-500 uppercase opacity-60">Original Draft</span>
+                      <p className="text-[10px] text-zinc-500 font-medium font-sans leading-normal pr-12">
+                        {comp.original}
+                      </p>
+                    </div>
+
+                    {/* Optimized Bullet */}
+                    <div className="p-3 rounded-lg bg-emerald-950/10 border border-emerald-900/20 text-left relative overflow-hidden">
+                      <span className="absolute top-1 right-2 text-[8px] font-black font-mono text-emerald-400 uppercase opacity-80">Tailored Optimization</span>
+                      <p className="text-[10px] text-zinc-200 font-bold font-sans leading-normal pr-12">
+                        {comp.optimized}
+                      </p>
+                    </div>
+
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        )}
+
+      </div>
+    );
+  };
+
+  const renderCompanyIntelligenceWorkspace = () => {
+    return (
+      <div className="space-y-6 text-left animate-in fade-in duration-300">
+        
+        {/* Company Selection History Logs */}
+        {companyHistory.length > 0 && (
+          <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-3 relative overflow-hidden text-left">
+            <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
+              <span className="text-[10px] font-black text-white font-mono uppercase tracking-wider flex items-center space-x-1.5">
+                <History className="h-3.5 w-3.5 text-cyan-400" />
+                <span>Company Suitability History Logs ({companyHistory.length})</span>
+              </span>
+              <button
+                onClick={() => {
+                  setCompanyHistory([]);
+                  if (user) saveResume(user.uid, resumeId, resumeData, atsScore, tailorApplied, parsedReport, analysisHistory, []);
+                }}
+                className="text-[9px] font-bold text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
+              >
+                Clear History
+              </button>
+            </div>
+            <div className="flex flex-col space-y-2 max-h-40 overflow-y-auto pr-1">
+              {companyHistory.map((hist) => (
+                <button
+                  key={hist.id}
+                  onClick={() => {
+                    setCompanySelection(hist.companyName);
+                    setRoleSelection(hist.roleName);
+                    setCompanyMatchResult(hist);
+                  }}
+                  className={`p-2.5 rounded-lg border text-left flex justify-between items-center transition-all cursor-pointer ${
+                    companyMatchResult?.id === hist.id
+                      ? "bg-cyan-950/20 border-cyan-800/40 text-cyan-400"
+                      : "bg-zinc-900/10 border-zinc-900/60 hover:bg-zinc-900/30 text-zinc-450 hover:text-zinc-300"
+                  }`}
+                >
+                  <div className="space-y-0.5 max-w-[70%]">
+                    <div className="text-[10px] font-bold font-mono truncate">{hist.companyName}</div>
+                    <div className="text-[8px] font-mono text-zinc-500">{hist.roleName} • {hist.timestamp}</div>
+                  </div>
+                  <div className="text-right flex items-center space-x-2">
+                    <span className="text-xs font-black font-mono bg-zinc-950 border border-zinc-800/80 px-2 py-0.5 rounded text-cyan-400">
+                      {hist.matchScore}% Fit
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Company Selector Form Card */}
+        <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4 text-left">
+          <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
+            <div className="flex items-center space-x-2">
+              <div className="h-7 w-7 rounded bg-cyan-950 border border-cyan-800/35 flex items-center justify-center">
+                <Building2 className="h-4 w-4 text-cyan-400" />
+              </div>
+              <span className="text-xs font-black text-white font-mono uppercase tracking-wider">
+                Target Company & Role Optimization
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Company Select */}
+            <div className="space-y-1.5 text-left">
+              <label className="text-[9px] font-black text-zinc-400 font-mono uppercase tracking-wider">Select Company</label>
+              <select
+                value={companySelection}
+                onChange={(e) => setCompanySelection(e.target.value)}
+                className="w-full bg-zinc-900 border border-zinc-850 hover:border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 rounded-xl p-3 text-xs leading-relaxed outline-none transition-all font-mono"
+              >
+                <option value="Google">Google</option>
+                <option value="Microsoft">Microsoft</option>
+                <option value="Amazon">Amazon</option>
+                <option value="Meta">Meta</option>
+                <option value="Apple">Apple</option>
+                <option value="Netflix">Netflix</option>
+                <option value="TCS">TCS</option>
+                <option value="Infosys">Infosys</option>
+                <option value="Wipro">Wipro</option>
+                <option value="Accenture">Accenture</option>
+                <option value="Deloitte">Deloitte</option>
+                <option value="Capgemini">Capgemini</option>
+                <option value="Cognizant">Cognizant</option>
+              </select>
+            </div>
+
+            {/* Target Role input */}
+            <div className="space-y-1.5 text-left">
+              <label className="text-[9px] font-black text-zinc-400 font-mono uppercase tracking-wider">Target Job Role</label>
+              <input
+                type="text"
+                value={roleSelection}
+                onChange={(e) => setRoleSelection(e.target.value)}
+                placeholder="e.g. Software Engineer Intern, Specialist Programmer"
+                className="w-full bg-zinc-900 border border-zinc-850 hover:border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 rounded-xl p-3 text-xs leading-relaxed outline-none transition-all font-sans font-semibold"
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handleCompanyAnalysis}
+            disabled={isAnalyzingCompany || !roleSelection.trim()}
+            className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-zinc-950 font-black text-xs shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2 cursor-pointer"
+          >
+            {isAnalyzingCompany ? (
+              <>
+                <div className="h-4 w-4 border-2 border-zinc-955 border-t-transparent rounded-full animate-spin" />
+                <span>Running Company Suitability Audits...</span>
+              </>
+            ) : (
+              <>
+                <Building2 className="h-4 w-4 text-zinc-955" />
+                <span>Analyze Placements Suitability</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Company Fit Report visualizations */}
+        {!companyMatchResult ? (
+          renderEmptyState("company")
+        ) : (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 text-left">
+            
+            {/* Overall Company Match Gauge */}
+            <div className="glass-panel border border-cyan-500/25 bg-gradient-to-tr from-cyan-950/20 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)]">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 pointer-events-none rounded-full blur-2xl" />
+              
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black font-mono text-cyan-400 tracking-wider uppercase">
+                  🏢 Target Company Match score
+                </span>
+                <span className="text-[9px] font-black font-mono text-zinc-400">
+                  {companySelection.toUpperCase()} • {roleSelection.toUpperCase()}
+                </span>
+              </div>
+
+              <div className="flex items-baseline space-x-2.5 pt-1.5 justify-start">
+                <span className="text-4xl font-black font-mono text-white tracking-tight drop-shadow-[0_0_15px_rgba(6,182,212,0.35)]">
+                  {companyMatchResult.matchScore}%
+                </span>
+                <span className="text-xs font-bold font-mono text-cyan-400">Suitability Match</span>
+              </div>
+
+              <p className="text-[10px] text-zinc-400 leading-relaxed font-semibold">
+                This represents how ready your resume is for {companySelection}'s screening filters, based on preferred skills, project depth guidelines, and certification expectations.
+              </p>
+            </div>
+
+            {/* Multi-Dimensional Fit Score Progress Bars */}
+            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+                <BarChart3 className="h-4 w-4 text-cyan-400" />
+                <span>Multi-Dimensional Suitability Matrix</span>
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                {/* Technical Match */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-[10px] font-bold font-mono">
+                    <span className="text-zinc-400">Technical Match</span>
+                    <span className="text-cyan-400">{companyMatchResult.technicalMatch}%</span>
+                  </div>
+                  <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+                    <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.technicalMatch}%` }} />
+                  </div>
+                </div>
+
+                {/* Experience Match */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-[10px] font-bold font-mono">
+                    <span className="text-zinc-400">Experience Match</span>
+                    <span className="text-purple-400">{companyMatchResult.experienceMatch}%</span>
+                  </div>
+                  <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+                    <div className="bg-gradient-to-r from-purple-500 to-purple-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.experienceMatch}%` }} />
+                  </div>
+                </div>
+
+                {/* Skills Match */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-[10px] font-bold font-mono">
+                    <span className="text-zinc-400">Keyword Density (Skills)</span>
+                    <span className="text-emerald-450">{companyMatchResult.skillsMatch}%</span>
+                  </div>
+                  <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+                    <div className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.skillsMatch}%` }} />
+                  </div>
+                </div>
+
+                {/* Project Match */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-[10px] font-bold font-mono">
+                    <span className="text-zinc-400">Project Depth Match</span>
+                    <span className="text-indigo-400">{companyMatchResult.projectMatch}%</span>
+                  </div>
+                  <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+                    <div className="bg-gradient-to-r from-indigo-500 to-indigo-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.projectMatch}%` }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Recruiter Gap Analysis table */}
+            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+                <ListChecks className="h-4 w-4 text-cyan-400" />
+                <span>{companySelection}-Specific Skills Gap Audit</span>
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Matching Skills */}
+                <div className="p-4 rounded-xl bg-emerald-950/5 border border-emerald-950/20 space-y-2.5 text-left">
+                  <span className="text-[9px] font-black text-emerald-450 font-mono uppercase tracking-widest block">MATCHING CONTAINS</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {companyMatchResult.gapAnalysis?.contains?.map((sk: string, idx: number) => (
+                      <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-mono font-bold text-emerald-400 flex items-center space-x-1">
+                        <span>✓</span>
+                        <span>{sk}</span>
+                      </span>
+                    ))}
+                    {(companyMatchResult.gapAnalysis?.contains?.length === 0) && (
+                      <span className="text-[8px] text-zinc-650 font-semibold italic">0 matching items found.</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Missing Gaps */}
+                <div className="p-4 rounded-xl bg-amber-955/5 border border-amber-955/20 space-y-2.5 text-left">
+                  <span className="text-[9px] font-black text-amber-400 font-mono uppercase tracking-widest block">MISSING EXPECTATIONS</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {companyMatchResult.gapAnalysis?.missing?.map((sk: string, idx: number) => (
+                      <span key={idx} className="px-2 py-0.5 rounded bg-amber-955/25 border border-amber-900/40 text-[9px] font-mono font-bold text-amber-450 flex items-center space-x-1">
+                        <span>✗</span>
+                        <span>{sk}</span>
+                      </span>
+                    ))}
+                    {(companyMatchResult.gapAnalysis?.missing?.length === 0) && (
+                      <span className="text-[8px] text-zinc-500 font-semibold italic">Perfect match! No gaps found.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section sequencing guidance: Focus Mode */}
+            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+                <Zap className="h-4 w-4 text-cyan-400" />
+                <span>Resume Focus Mode: Section Sequencing Guidance</span>
+              </h4>
+              <div className="p-4 rounded-xl bg-zinc-900/30 border border-zinc-850 flex items-start space-x-3 text-left">
+                <div className="h-6 w-6 rounded bg-cyan-950/40 border border-cyan-800/40 text-[10px] font-bold text-cyan-400 flex items-center justify-center flex-shrink-0 mt-0.5">ℹ</div>
+                <div className="space-y-1">
+                  <span className="text-[9px] font-black text-cyan-400 font-mono uppercase tracking-wider block">RECOMMENDED ORDER FOR {companySelection}</span>
+                  <p className="text-[10px] font-bold text-slate-200 leading-normal">{companyMatchResult.focusMode}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Recruiter Perspective Feed */}
+            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+                <Sparkles className="h-4 w-4 text-cyan-400" strokeWidth={2.5} />
+                <span>Recruiter Perspective Feed</span>
+              </h4>
+
+              <div className="space-y-3.5 pr-1">
+                {/* Strengths */}
+                <div className="space-y-1.5">
+                  <span className="text-[9px] font-black text-emerald-450 font-mono tracking-widest uppercase block">✓ KEY STRENGTHS RECRUITER NOTICED</span>
+                  <div className="space-y-1">
+                    {companyMatchResult.recruiterPerspective?.strengths?.map((str: string, idx: number) => (
+                      <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-350 font-semibold leading-relaxed">
+                        <span className="text-emerald-500 font-bold">•</span>
+                        <span>{str}</span>
+                      </div>
+                    ))}
+                    {(companyMatchResult.recruiterPerspective?.strengths?.length === 0) && (
+                      <p className="text-[9px] text-zinc-500 italic">No particular highlights found.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Weaknesses */}
+                <div className="space-y-1.5 pt-2 border-t border-zinc-900">
+                  <span className="text-[9px] font-black text-red-400 font-mono tracking-widest uppercase block">✗ WEAKNESSES & GAP WARNINGS</span>
+                  <div className="space-y-1">
+                    {companyMatchResult.recruiterPerspective?.weaknesses?.map((weak: string, idx: number) => (
+                      <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-350 font-semibold leading-relaxed">
+                        <span className="text-red-500 font-bold">•</span>
+                        <span>{weak}</span>
+                      </div>
+                    ))}
+                    {(companyMatchResult.recruiterPerspective?.weaknesses?.length === 0) && (
+                      <p className="text-[9px] text-zinc-500 italic">No major warnings found.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Opportunities */}
+                <div className="space-y-1.5 pt-2 border-t border-zinc-900">
+                  <span className="text-[9px] font-black text-amber-500 font-mono tracking-widest uppercase block">⚡ PLACEMENT IMPROVEMENT OPPORTUNITIES</span>
+                  <div className="space-y-1">
+                    {companyMatchResult.recruiterPerspective?.opportunities?.map((opp: string, idx: number) => (
+                      <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-350 font-semibold leading-relaxed">
+                        <span className="text-amber-500 font-bold">•</span>
+                        <span>{opp}</span>
+                      </div>
+                    ))}
+                    {(companyMatchResult.recruiterPerspective?.opportunities?.length === 0) && (
+                      <p className="text-[9px] text-zinc-500 italic">No distinct opportunities noted.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Company Suggestions */}
+            <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
+              <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+                <Award className="h-4 w-4 text-cyan-400" />
+                <span>Actionable Placement Recommendations</span>
+              </h4>
+              <div className="space-y-2.5">
+                {companyMatchResult.suggestions?.map((sug: string, idx: number) => (
+                  <div key={idx} className="p-3 rounded-xl bg-zinc-900/50 border border-zinc-850 text-[10px] font-bold text-slate-200 leading-normal flex items-start space-x-2 hover:border-zinc-800 transition-all">
+                    <span className="text-cyan-400 font-mono font-black mt-0.5">#{idx + 1}</span>
+                    <span>{sug}</span>
+                  </div>
+                ))}
+                {(companyMatchResult.suggestions?.length === 0) && (
+                  <p className="text-[9px] text-zinc-500 italic">No recommendations available.</p>
+                )}
+              </div>
+            </div>
+
+          </div>
+        )}
+
+      </div>
+    );
+  };
+
+  const renderScanHistoryWorkspace = () => {
+    const hasJdHistory = analysisHistory.length > 0;
+    const hasCompHistory = companyHistory.length > 0;
+
+    if (!hasJdHistory && !hasCompHistory) {
+      return renderEmptyState("history");
+    }
+
+    return (
+      <div className="space-y-6 text-left animate-in fade-in duration-300">
+        {/* Job description scans */}
+        {hasJdHistory && (
+          <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
+            <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center justify-between">
+              <span className="flex items-center space-x-1.5">
+                <Briefcase className="h-4 w-4 text-cyan-400" />
+                <span>Job Description Matches ({analysisHistory.length})</span>
+              </span>
+              <button
+                onClick={() => {
+                  setAnalysisHistory([]);
+                  if (user) saveResume(user.uid, resumeId, resumeData, atsScore, tailorApplied, parsedReport, [], companyHistory);
+                }}
+                className="text-[9px] font-bold text-zinc-550 hover:text-red-400 transition-colors"
+              >
+                Clear JD History
+              </button>
+            </h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[350px] overflow-y-auto pr-1">
+              {analysisHistory.map((hist) => (
+                <div 
+                  key={hist.id} 
+                  className="p-4 rounded-2xl bg-zinc-900/20 border border-zinc-900/60 flex flex-col justify-between hover:border-zinc-800 transition-all hover:bg-zinc-900/30"
+                >
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-bold text-slate-200 font-mono truncate">{hist.jobTitle}</p>
+                    <p className="text-[9px] text-zinc-500 font-mono font-semibold uppercase tracking-wider">{hist.companyName} • {hist.timestamp}</p>
+                  </div>
+                  <div className="flex justify-between items-center mt-4 pt-2 border-t border-zinc-900">
+                    <span className="text-[10px] font-black font-mono text-cyan-400 bg-cyan-955/20 border border-cyan-900/30 px-2 py-0.5 rounded">
+                      {hist.matchScore}% Match
                     </span>
                     <button
                       onClick={() => {
-                        setCompanyHistory([]);
-                        if (user) saveResume(user.uid, resumeId, resumeData, atsScore, tailorApplied, parsedReport, analysisHistory, []);
+                        setMatchResult(hist);
+                        setResumeData(hist.tailoredResume);
+                        setAtsScore(hist.scoreImprovement);
+                        setTailorApplied(true);
+                        setActiveTab("matcher");
                       }}
-                      className="text-[9px] font-bold text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
+                      className="text-[9px] font-bold text-cyan-400 hover:text-cyan-300 cursor-pointer"
                     >
-                      Clear History
+                      Reload Draft →
                     </button>
                   </div>
-                  <div className="flex flex-col space-y-2 max-h-40 overflow-y-auto pr-1">
-                    {companyHistory.map((hist) => (
-                      <button
-                        key={hist.id}
-                        onClick={() => {
-                          setCompanySelection(hist.companyName);
-                          setRoleSelection(hist.roleName);
-                          setCompanyMatchResult(hist);
-                        }}
-                        className={`p-2.5 rounded-lg border text-left flex justify-between items-center transition-all cursor-pointer ${
-                          companyMatchResult?.id === hist.id
-                            ? "bg-cyan-950/20 border-cyan-800/40 text-cyan-400"
-                            : "bg-zinc-900/10 border-zinc-900/60 hover:bg-zinc-900/30 text-zinc-450 hover:text-zinc-300"
-                        }`}
-                      >
-                        <div className="space-y-0.5 max-w-[70%]">
-                          <div className="text-[10px] font-bold font-mono truncate">{hist.companyName}</div>
-                          <div className="text-[8px] font-mono text-zinc-500">{hist.roleName} • {hist.timestamp}</div>
-                        </div>
-                        <div className="text-right flex items-center space-x-2">
-                          <span className="text-xs font-black font-mono bg-zinc-950 border border-zinc-800/80 px-2 py-0.5 rounded text-cyan-400">
-                            {hist.matchScore}% Fit
-                          </span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
                 </div>
-              )}
-
-              {/* Company Selector Form Card */}
-              <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4 text-left">
-                <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
-                  <div className="flex items-center space-x-2">
-                    <div className="h-7 w-7 rounded bg-cyan-950 border border-cyan-800/35 flex items-center justify-center">
-                      <Building2 className="h-4 w-4 text-cyan-400" />
-                    </div>
-                    <span className="text-xs font-black text-white font-mono uppercase tracking-wider">
-                      Target Company & Role Optimization
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Company Select */}
-                  <div className="space-y-1.5 text-left">
-                    <label className="text-[9px] font-black text-zinc-400 font-mono uppercase tracking-wider">Select Company</label>
-                    <select
-                      value={companySelection}
-                      onChange={(e) => setCompanySelection(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-850 hover:border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 rounded-xl p-3 text-xs leading-relaxed outline-none transition-all font-mono"
-                    >
-                      <option value="Google">Google</option>
-                      <option value="Microsoft">Microsoft</option>
-                      <option value="Amazon">Amazon</option>
-                      <option value="Meta">Meta</option>
-                      <option value="Apple">Apple</option>
-                      <option value="Netflix">Netflix</option>
-                      <option value="TCS">TCS</option>
-                      <option value="Infosys">Infosys</option>
-                      <option value="Wipro">Wipro</option>
-                      <option value="Accenture">Accenture</option>
-                      <option value="Deloitte">Deloitte</option>
-                      <option value="Capgemini">Capgemini</option>
-                      <option value="Cognizant">Cognizant</option>
-                    </select>
-                  </div>
-
-                  {/* Target Role input */}
-                  <div className="space-y-1.5 text-left">
-                    <label className="text-[9px] font-black text-zinc-400 font-mono uppercase tracking-wider">Target Job Role</label>
-                    <input
-                      type="text"
-                      value={roleSelection}
-                      onChange={(e) => setRoleSelection(e.target.value)}
-                      placeholder="e.g. Software Engineer Intern, Specialist Programmer"
-                      className="w-full bg-zinc-900 border border-zinc-850 hover:border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-200 rounded-xl p-3 text-xs leading-relaxed outline-none transition-all font-sans font-semibold"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleCompanyAnalysis}
-                  disabled={isAnalyzingCompany || !roleSelection.trim()}
-                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-zinc-950 font-black text-xs shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2 cursor-pointer"
-                >
-                  {isAnalyzingCompany ? (
-                    <>
-                      <div className="h-4 w-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
-                      <span>Running Company Suitability Audits...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Building2 className="h-4 w-4 text-zinc-950" />
-                      <span>Analyze Placements Suitability</span>
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* Company Fit Report visualizations */}
-              {companyMatchResult && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 text-left">
-                  
-                  {/* Overall Company Match Gauge */}
-                  <div className="glass-panel border border-cyan-500/25 bg-gradient-to-tr from-cyan-950/20 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)]">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 pointer-events-none rounded-full blur-2xl" />
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black font-mono text-cyan-400 tracking-wider uppercase">
-                        🏢 Target Company Match score
-                      </span>
-                      <span className="text-[9px] font-black font-mono text-zinc-400">
-                        {companySelection.toUpperCase()} • {roleSelection.toUpperCase()}
-                      </span>
-                    </div>
-
-                    <div className="flex items-baseline space-x-2.5 pt-1.5 justify-start">
-                      <span className="text-4xl font-black font-mono text-white tracking-tight drop-shadow-[0_0_15px_rgba(6,182,212,0.35)]">
-                        {companyMatchResult.matchScore}%
-                      </span>
-                      <span className="text-xs font-bold font-mono text-cyan-400">Suitability Match</span>
-                    </div>
-
-                    <p className="text-[10px] text-zinc-400 leading-relaxed font-semibold">
-                      This represents how ready your resume is for {companySelection}'s screening filters, based on preferred skills, project depth guidelines, and certification expectations.
-                    </p>
-                  </div>
-
-                  {/* Multi-Dimensional Fit Score Progress Bars */}
-                  <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-                    <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-                      <BarChart3 className="h-4 w-4 text-cyan-400" />
-                      <span>Multi-Dimensional Suitability Matrix</span>
-                    </h4>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                      {/* Technical Match */}
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-[10px] font-bold font-mono">
-                          <span className="text-zinc-400">Technical Match</span>
-                          <span className="text-cyan-400">{companyMatchResult.technicalMatch}%</span>
-                        </div>
-                        <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                          <div className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.technicalMatch}%` }} />
-                        </div>
-                      </div>
-
-                      {/* Experience Match */}
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-[10px] font-bold font-mono">
-                          <span className="text-zinc-400">Experience Match</span>
-                          <span className="text-purple-400">{companyMatchResult.experienceMatch}%</span>
-                        </div>
-                        <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                          <div className="bg-gradient-to-r from-purple-500 to-purple-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.experienceMatch}%` }} />
-                        </div>
-                      </div>
-
-                      {/* Skills Match */}
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-[10px] font-bold font-mono">
-                          <span className="text-zinc-400">Keyword Density (Skills)</span>
-                          <span className="text-emerald-400">{companyMatchResult.skillsMatch}%</span>
-                        </div>
-                        <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                          <div className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.skillsMatch}%` }} />
-                        </div>
-                      </div>
-
-                      {/* Project Match */}
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-[10px] font-bold font-mono">
-                          <span className="text-zinc-400">Project Depth Match</span>
-                          <span className="text-indigo-400">{companyMatchResult.projectMatch}%</span>
-                        </div>
-                        <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
-                          <div className="bg-gradient-to-r from-indigo-500 to-indigo-400 h-full transition-all duration-500" style={{ width: `${companyMatchResult.projectMatch}%` }} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Recruiter Gap Analysis table */}
-                  <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-                    <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-                      <ListChecks className="h-4 w-4 text-cyan-400" />
-                      <span>{companySelection}-Specific Skills Gap Audit</span>
-                    </h4>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Matching Skills */}
-                      <div className="p-4 rounded-xl bg-emerald-950/5 border border-emerald-950/20 space-y-2.5 text-left">
-                        <span className="text-[9px] font-black text-emerald-450 font-mono uppercase tracking-widest block">MATCHING CONTAINS</span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {companyMatchResult.gapAnalysis?.contains?.map((sk: string, idx: number) => (
-                            <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/30 text-[9px] font-mono font-bold text-emerald-400 flex items-center space-x-1">
-                              <span>✓</span>
-                              <span>{sk}</span>
-                            </span>
-                          ))}
-                          {(companyMatchResult.gapAnalysis?.contains?.length === 0) && (
-                            <span className="text-[8px] text-zinc-650 font-semibold italic">0 matching items found.</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Missing Gaps */}
-                      <div className="p-4 rounded-xl bg-amber-950/5 border border-amber-950/20 space-y-2.5 text-left">
-                        <span className="text-[9px] font-black text-amber-400 font-mono uppercase tracking-widest block">MISSING EXPECTATIONS</span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {companyMatchResult.gapAnalysis?.missing?.map((sk: string, idx: number) => (
-                            <span key={idx} className="px-2 py-0.5 rounded bg-amber-950/25 border border-amber-900/40 text-[9px] font-mono font-bold text-amber-450 flex items-center space-x-1">
-                              <span>✗</span>
-                              <span>{sk}</span>
-                            </span>
-                          ))}
-                          {(companyMatchResult.gapAnalysis?.missing?.length === 0) && (
-                            <span className="text-[8px] text-zinc-500 font-semibold italic">Perfect match! No gaps found.</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Section sequencing guidance: Focus Mode */}
-                  <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-                    <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-                      <Zap className="h-4 w-4 text-cyan-400" />
-                      <span>Resume Focus Mode: Section Sequencing Guidance</span>
-                    </h4>
-                    <div className="p-4 rounded-xl bg-zinc-900/30 border border-zinc-850 flex items-start space-x-3 text-left">
-                      <div className="h-6 w-6 rounded bg-cyan-950/40 border border-cyan-800/40 text-[10px] font-bold text-cyan-400 flex items-center justify-center flex-shrink-0 mt-0.5">ℹ</div>
-                      <div className="space-y-1">
-                        <span className="text-[9px] font-black text-cyan-400 font-mono uppercase tracking-wider block">RECOMMENDED ORDER FOR {companySelection}</span>
-                        <p className="text-[10px] font-bold text-slate-200 leading-normal">{companyMatchResult.focusMode}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Recruiter Perspective Feed */}
-                  <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-                    <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-                      <Sparkles className="h-4 w-4 text-cyan-400" strokeWidth={2.5} />
-                      <span>Recruiter Perspective Feed</span>
-                    </h4>
-
-                    <div className="space-y-3.5 pr-1">
-                      {/* Strengths */}
-                      <div className="space-y-1.5">
-                        <span className="text-[9px] font-black text-emerald-450 font-mono tracking-widest uppercase block">✓ KEY STRENGTHS RECRUITER NOTICED</span>
-                        <div className="space-y-1">
-                          {companyMatchResult.recruiterPerspective?.strengths?.map((str: string, idx: number) => (
-                            <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-350 font-semibold leading-relaxed">
-                              <span className="text-emerald-500 font-bold">•</span>
-                              <span>{str}</span>
-                            </div>
-                          ))}
-                          {(companyMatchResult.recruiterPerspective?.strengths?.length === 0) && (
-                            <p className="text-[9px] text-zinc-500 italic">No particular highlights found.</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Weaknesses */}
-                      <div className="space-y-1.5 pt-2 border-t border-zinc-900">
-                        <span className="text-[9px] font-black text-red-400 font-mono tracking-widest uppercase block">✗ WEAKNESSES & GAP WARNINGS</span>
-                        <div className="space-y-1">
-                          {companyMatchResult.recruiterPerspective?.weaknesses?.map((weak: string, idx: number) => (
-                            <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-350 font-semibold leading-relaxed">
-                              <span className="text-red-500 font-bold">•</span>
-                              <span>{weak}</span>
-                            </div>
-                          ))}
-                          {(companyMatchResult.recruiterPerspective?.weaknesses?.length === 0) && (
-                            <p className="text-[9px] text-zinc-500 italic">No major warnings found.</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Opportunities */}
-                      <div className="space-y-1.5 pt-2 border-t border-zinc-900">
-                        <span className="text-[9px] font-black text-amber-500 font-mono tracking-widest uppercase block">⚡ PLACEMENT IMPROVEMENT OPPORTUNITIES</span>
-                        <div className="space-y-1">
-                          {companyMatchResult.recruiterPerspective?.opportunities?.map((opp: string, idx: number) => (
-                            <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-350 font-semibold leading-relaxed">
-                              <span className="text-amber-500 font-bold">•</span>
-                              <span>{opp}</span>
-                            </div>
-                          ))}
-                          {(companyMatchResult.recruiterPerspective?.opportunities?.length === 0) && (
-                            <p className="text-[9px] text-zinc-500 italic">No distinct opportunities noted.</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Company Suggestions */}
-                  <div className="glass-panel border border-zinc-900 rounded-2xl p-5 space-y-4">
-                    <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
-                      <Award className="h-4 w-4 text-cyan-400" />
-                      <span>Actionable Placement Recommendations</span>
-                    </h4>
-                    <div className="space-y-2.5">
-                      {companyMatchResult.suggestions?.map((sug: string, idx: number) => (
-                        <div key={idx} className="p-3 rounded-xl bg-zinc-900/50 border border-zinc-850 text-[10px] font-bold text-slate-200 leading-normal flex items-start space-x-2 hover:border-zinc-800 transition-all">
-                          <span className="text-cyan-400 font-mono font-black mt-0.5">#{idx + 1}</span>
-                          <span>{sug}</span>
-                        </div>
-                      ))}
-                      {(companyMatchResult.suggestions?.length === 0) && (
-                        <p className="text-[9px] text-zinc-500 italic">No recommendations available.</p>
-                      )}
-                    </div>
-                  </div>
-
-                </div>
-              )}
-
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
+        {/* Company Suitability scans */}
+        {hasCompHistory && (
+          <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
+            <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center justify-between">
+              <span className="flex items-center space-x-1.5">
+                <Building2 className="h-4 w-4 text-cyan-400" />
+                <span>Company Optimization Suitability ({companyHistory.length})</span>
+              </span>
+              <button
+                onClick={() => {
+                  setCompanyHistory([]);
+                  if (user) saveResume(user.uid, resumeId, resumeData, atsScore, tailorApplied, parsedReport, analysisHistory, []);
+                }}
+                className="text-[9px] font-bold text-zinc-550 hover:text-red-400 transition-colors"
+              >
+                Clear Company History
+              </button>
+            </h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[350px] overflow-y-auto pr-1">
+              {companyHistory.map((hist) => (
+                <div 
+                  key={hist.id} 
+                  className="p-4 rounded-2xl bg-zinc-900/20 border border-zinc-900/60 flex flex-col justify-between hover:border-zinc-800 transition-all hover:bg-zinc-900/30"
+                >
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-bold text-slate-200 font-mono truncate">{hist.companyName}</p>
+                    <p className="text-[9px] text-zinc-500 font-mono font-semibold uppercase tracking-wider">{hist.roleName} • {hist.timestamp}</p>
+                  </div>
+                  <div className="flex justify-between items-center mt-4 pt-2 border-t border-zinc-900">
+                    <span className="text-[10px] font-black font-mono text-cyan-400 bg-cyan-955/20 border border-cyan-900/30 px-2 py-0.5 rounded">
+                      {hist.matchScore}% Suitability
+                    </span>
+                    <button
+                      onClick={() => {
+                        setCompanySelection(hist.companyName);
+                        setRoleSelection(hist.roleName);
+                        setCompanyMatchResult(hist);
+                        setActiveTab("company");
+                      }}
+                      className="text-[9px] font-bold text-cyan-400 hover:text-cyan-300 cursor-pointer"
+                    >
+                      Open Report →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderSaaSAccountWorkspace = () => {
+    return (
+      <div className="space-y-6 text-left animate-in fade-in duration-300">
+        
+        {/* Premium Profile Status Card */}
+        <div className="glass-panel border border-zinc-900 rounded-3xl p-6 relative overflow-hidden text-left hover-card-premium">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 pointer-events-none rounded-full blur-3xl" />
+          
+          <div className="flex items-center space-x-4">
+            <div className="h-14 w-14 rounded-2xl bg-gradient-to-tr from-cyan-955 to-zinc-900 border border-cyan-800/30 flex items-center justify-center font-mono font-black text-lg text-cyan-400 shadow-inner">
+              {user.email?.charAt(0).toUpperCase()}
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <span className="text-[9px] font-mono font-black text-cyan-400 tracking-widest uppercase leading-none">BOOSTCV SUITE</span>
+                <span className={`text-[8px] font-mono font-bold px-2 py-0.5 rounded uppercase ${isPaid ? "bg-emerald-955/20 border border-emerald-900/50 text-emerald-400" : "bg-zinc-900/80 border border-zinc-800 text-zinc-400"}`}>
+                  {isPaid ? "Pro Developer License" : "Free Preview Mode"}
+                </span>
+              </div>
+              <h3 className="text-base font-black text-white font-mono">{user.email}</h3>
+            </div>
+          </div>
         </div>
 
-        {/* Right Output Panel (ATS Score Tracker & Live Blurrable HTML Preview) */}
+        {/* Security & Anti-Exploit explanations */}
+        <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
+          <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+            <Lock className="h-4 w-4 text-cyan-400" />
+            <span>Premium Security & Session Lock Gating</span>
+          </h4>
+          <p className="text-xs text-zinc-400 leading-relaxed font-semibold">
+            BOOSTCV implements a transaction-aware, highly secure 10-minute temporary checkout session system. Unlocked premium access allows unlimited live previews and PDF downloads but invalidates itself upon successful download compile to protect the SaaS micro-payment structures.
+          </p>
+          
+          {/* Quick specs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[10px] font-bold font-mono">
+            <div className="p-3 bg-zinc-900/30 border border-zinc-900 rounded-xl space-y-0.5">
+              <span className="text-zinc-500 uppercase tracking-wider block">PREVIEW STATUS:</span>
+              <span className={isPaid ? "text-emerald-450" : "text-amber-400"}>
+                {isPaid ? "🔓 UNLOCKED (Export Session Active)" : "🔒 LOCKED (Partially blurred & faded)"}
+              </span>
+            </div>
+            <div className="p-3 bg-zinc-900/30 border border-zinc-900 rounded-xl space-y-0.5">
+              <span className="text-zinc-500 uppercase tracking-wider block">EXPORT CHARGES:</span>
+              <span className="text-slate-200">₹80.00 / resume download session</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Referral Scheme details */}
+        <div className="glass-panel border border-zinc-900 rounded-3xl p-6 space-y-4">
+          <h4 className="text-xs font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-3 flex items-center space-x-1.5">
+            <Award className="h-4 w-4 text-cyan-400" />
+            <span>Classmates Referral Scheme (Get Free Downloads)</span>
+          </h4>
+          <p className="text-xs text-zinc-450 leading-relaxed font-semibold">
+            Invite your peers and classmates to optimize their resumes! Once **3 of your friends** sign up via your unique link, your account instantly unlocks a lifetime Pro Developer License for free.
+          </p>
+
+          <div className="p-4 bg-zinc-900/20 border border-zinc-900 rounded-2xl space-y-3">
+            <div className="flex justify-between items-center text-[10px] font-mono font-bold">
+              <span className="text-zinc-400">Classmates Referral Counter</span>
+              <span className="text-cyan-400 font-extrabold">{referralCount} / 3 Peers Joined</span>
+            </div>
+            <div className="w-full bg-zinc-950 h-2 rounded-full overflow-hidden">
+              <div 
+                className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500" 
+                style={{ width: `${(referralCount / 3) * 100}%` }}
+              />
+            </div>
+
+            <div className="flex items-center space-x-2 pt-1.5">
+              <input
+                type="text"
+                readOnly
+                value={referralLink}
+                className="bg-zinc-950 border border-zinc-900 text-[10px] p-2.5 rounded-lg flex-1 text-zinc-500 outline-none select-all font-mono"
+              />
+              <button
+                onClick={copyReferral}
+                className="px-4 py-2.5 rounded-lg bg-cyan-955 border border-cyan-800 text-cyan-400 hover:bg-cyan-900 transition-colors font-bold font-mono text-[10px]"
+              >
+                {copied ? "Copied!" : "Copy Link"}
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    );
+  };
+
+  const handleLockOverlayTrigger = () => {
+    triggerRazorpayCheckout();
+  };
+
+  const renderAtsInsightsContainer = () => {
+    if (!parsedReport) {
+      return (
+        <div className="py-12 text-center text-zinc-500 text-xs font-mono font-semibold space-y-2">
+          <AlertCircle className="h-8 w-8 text-zinc-600 mx-auto" />
+          <p>No diagnostics calculated yet.</p>
+          <p className="text-[10px] text-zinc-650 max-w-xs mx-auto">Fill in the fields or trigger a deep parsing update to see warnings.</p>
+        </div>
+      );
+    }
+
+    const bd = parsedReport.breakdown || {};
+    const structureVal = bd.structure !== undefined ? bd.structure : 80;
+    const formattingVal = bd.formatting !== undefined ? bd.formatting : 95;
+    const readabilityVal = bd.readability !== undefined ? bd.readability : 85;
+    const keywordsVal = bd.keywords !== undefined ? bd.keywords : 70;
+    const projectsVal = bd.projects !== undefined ? bd.projects : 75;
+    const achievementsVal = bd.achievements !== undefined ? bd.achievements : 60;
+
+    return (
+      <div className="space-y-5 text-left animate-in fade-in duration-300">
+        
+        {/* Compact gauge */}
+        <div className="flex items-center space-x-4 bg-zinc-900/30 p-4 rounded-2xl border border-zinc-900">
+          <AtsScoreGauge score={atsScore} size={85} />
+          <div className="space-y-1">
+            <span className="text-[9px] font-black font-mono text-cyan-400 uppercase tracking-wider block">ATS COMPATIBILITY SCORE</span>
+            <p className="text-[10px] text-zinc-400 font-semibold font-sans leading-relaxed">
+              Your resume layout matches {atsScore}% of corporate standards. Switch tabs below to optimize warnings.
+            </p>
+          </div>
+        </div>
+
+        {/* Small breakdowns */}
+        <div className="grid grid-cols-2 gap-3 text-[9px] font-bold font-mono">
+          <div className="space-y-1">
+            <div className="flex justify-between text-zinc-500">
+              <span>Structure completeness</span>
+              <span className="text-cyan-400">{structureVal}%</span>
+            </div>
+            <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
+              <div className="bg-cyan-500 h-full transition-all duration-300" style={{ width: `${structureVal}%` }} />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="flex justify-between text-zinc-500">
+              <span>Formatting & symbols</span>
+              <span className="text-cyan-400">{formattingVal}%</span>
+            </div>
+            <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
+              <div className="bg-cyan-500 h-full transition-all duration-300" style={{ width: `${formattingVal}%` }} />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="flex justify-between text-zinc-500">
+              <span>Readability indexes</span>
+              <span className="text-cyan-400">{readabilityVal}%</span>
+            </div>
+            <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
+              <div className="bg-cyan-500 h-full transition-all duration-300" style={{ width: `${readabilityVal}%` }} />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="flex justify-between text-zinc-500">
+              <span>Keywords matches</span>
+              <span className="text-cyan-400">{keywordsVal}%</span>
+            </div>
+            <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
+              <div className="bg-cyan-500 h-full transition-all duration-300" style={{ width: `${keywordsVal}%` }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Top Warnings list */}
+        {parsedReport.warnings && parsedReport.warnings.length > 0 && (
+          <div className="space-y-2 pt-2 border-t border-zinc-900">
+            <span className="text-[9px] font-black font-mono text-zinc-400 uppercase tracking-widest block">RECRUITER STRENGTH NOTES</span>
+            <div className="space-y-1">
+              {parsedReport.warnings.slice(0, 3).map((warn: string, idx: number) => (
+                <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-400 font-semibold leading-relaxed">
+                  <span className="text-emerald-500 font-extrabold">•</span>
+                  <span>{warn}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {parsedReport.keywordGaps && parsedReport.keywordGaps.length > 0 && (
+          <div className="space-y-2 pt-2 border-t border-zinc-900">
+            <span className="text-[9px] font-black font-mono text-zinc-400 uppercase tracking-widest block">IDENTIFIED GAPS WARNINGS</span>
+            <div className="space-y-1">
+              {parsedReport.keywordGaps.slice(0, 3).map((gap: string, idx: number) => (
+                <div key={idx} className="flex items-start space-x-2 text-[10px] text-zinc-400 font-semibold leading-relaxed">
+                  <span className="text-red-500 font-extrabold">•</span>
+                  <span>{gap}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
+    );
+  };
+
+  const renderResumePreviewContainer = () => {
+    return (
+      <div 
+         onContextMenu={!isPaid ? (e) => e.preventDefault() : undefined}
+         className={`w-full p-8 text-[9px] text-[#111] leading-normal bg-white overflow-y-auto relative flex flex-col min-h-[500px] border border-zinc-200 rounded-2xl shadow-inner ${
+           selectedTemplate === "minimal" 
+             ? "font-sans px-10 py-10" 
+             : selectedTemplate === "technical" 
+             ? "font-sans px-6 py-6 text-[8.5px]" 
+             : "font-sans px-8 py-8"
+         } ${!isPaid ? "select-none" : "select-text"}`}>
+        
+        {/* Subtle repeating watermark pattern over the sheet if not paid */}
+        {!isPaid && (
+          <div 
+            className="absolute inset-0 pointer-events-none select-none z-10" 
+            style={{
+              backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='120' viewBox='0 0 160 120'><text x='50%' y='50%' fill='%23000000' font-family='monospace' font-weight='bold' font-size='7.5' opacity='0.04' transform='rotate(-25 80 60)' text-anchor='middle'>BOOSTCV PREVIEW</text></svg>")`,
+              backgroundRepeat: "repeat",
+            }}
+          />
+        )}
+
+        {/* Header */}
+        <div className={`mb-4 flex flex-col ${
+          selectedTemplate === "minimal" 
+            ? "items-start text-left mb-6" 
+            : "items-center text-center"
+        }`}>
+          <h2 className={`font-bold text-black ${
+            selectedTemplate === "minimal"
+              ? "text-2xl text-cyan-600 mb-1 tracking-tight"
+              : selectedTemplate === "technical"
+              ? "text-lg mb-0.5"
+              : "text-xl mb-1"
+          }`}>{resumeData.personal.fullName || "Your Full Name"}</h2>
+          <div className={`flex flex-wrap gap-2 text-zinc-650 text-[8px] ${
+            selectedTemplate === "minimal" 
+              ? "justify-start" 
+              : "justify-center"
+          }`}>
+            {resumeData.personal.phone && <span>{resumeData.personal.phone}</span>}
+            {resumeData.personal.phone && resumeData.personal.email && <span className="text-zinc-400">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+            {resumeData.personal.email && <span>{resumeData.personal.email}</span>}
+            {resumeData.personal.email && resumeData.personal.linkedin && <span className="text-zinc-400">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+            {resumeData.personal.linkedin && <span>{resumeData.personal.linkedin}</span>}
+            {resumeData.personal.linkedin && resumeData.personal.github && <span className="text-zinc-400">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+            {resumeData.personal.github && <span>{resumeData.personal.github}</span>}
+          </div>
+        </div>
+
+        {/* Education - Unprotected */}
+        {resumeData.education.length > 0 && (
+          <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
+            <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+              selectedTemplate === "minimal"
+                ? "text-cyan-600 border-none mb-1 mt-2"
+                : "text-black border-b border-zinc-800 mb-1.5"
+            }`}>
+              Education
+            </h3>
+            {resumeData.education.map((edu, idx) => (
+              <div key={idx} className={selectedTemplate === "technical" ? "mb-1" : "mb-2"}>
+                <div className="flex justify-between font-bold">
+                  <span>{edu.institution || "Institution Name"}</span>
+                  <span>{edu.year || "2022 - 2026"}</span>
+                </div>
+                <div className="flex justify-between text-zinc-600 italic">
+                  <span>{edu.degree || "B.Tech"}</span>
+                  <span>{edu.gpa || "9.0 CGPA"}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Technical Skills - Unprotected */}
+        <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
+          <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+            selectedTemplate === "minimal"
+              ? "text-cyan-600 border-none mb-1 mt-2"
+              : "text-black border-b border-zinc-800 mb-1.5"
+          }`}>
+            Technical Skills
+          </h3>
+          <div className={`text-zinc-850 text-left ${
+            selectedTemplate === "technical" ? "space-y-0.5 text-[8px]" : "space-y-1 text-[8.5px]"
+          }`}>
+            {resumeData.skills.languages.length > 0 && (
+              <div>
+                <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-cyan-600" : "text-black"}`}>Languages: </strong>
+                <span>{resumeData.skills.languages.join(", ")}</span>
+              </div>
+            )}
+            {resumeData.skills.frameworks.length > 0 && (
+              <div>
+                <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-cyan-600" : "text-black"}`}>Frameworks: </strong>
+                <span>{resumeData.skills.frameworks.join(", ")}</span>
+              </div>
+            )}
+            {resumeData.skills.tools.length > 0 && (
+              <div>
+                <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-cyan-600" : "text-black"}`}>Developer Tools: </strong>
+                <span>{resumeData.skills.tools.join(", ")}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Certifications - Unprotected */}
+        {resumeData.certifications && resumeData.certifications.length > 0 && (
+          <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
+            <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+              selectedTemplate === "minimal"
+                ? "text-cyan-600 border-none mb-1 mt-2"
+                : "text-black border-b border-zinc-800 mb-1.5"
+            }`}>
+              Certifications
+            </h3>
+            <ul className={`list-disc pl-4 text-zinc-850 text-left ${
+              selectedTemplate === "minimal"
+                ? "space-y-1 text-[8.5px]"
+                : selectedTemplate === "technical"
+                ? "space-y-0.5 text-[8.2px]"
+                : "space-y-0.5 text-[8.5px]"
+            }`}>
+              {resumeData.certifications.map((cert, idx) => (
+                cert.trim().length > 0 && (
+                  <li key={idx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{cert}</li>
+                )
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Experience and Projects Gated Container */}
+        {((resumeData.experience.length > 0) || (resumeData.projects.length > 0)) && (
+          <div className={!isPaid ? "relative overflow-hidden max-h-[220px] select-none pointer-events-none blur-[1.5px] border-b border-zinc-200" : ""}>
+            
+            {/* Experience */}
+            {resumeData.experience.length > 0 && (
+              <div className={selectedTemplate === "technical" ? "mb-2.5 relative text-left" : "mb-4 relative text-left"}>
+                <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                  selectedTemplate === "minimal"
+                    ? "text-cyan-600 border-none mb-1 mt-2"
+                    : "text-black border-b border-zinc-800 mb-1.5"
+                }`}>
+                  Experience
+                </h3>
+                {resumeData.experience.map((exp, idx) => (
+                  <div key={idx} className={selectedTemplate === "technical" ? "mb-2" : "mb-3"}>
+                    <div className="flex justify-between font-bold text-black">
+                      <span>{exp.company || "Company Name"}</span>
+                      <span className="text-zinc-650 font-normal text-[8px]">{exp.duration || "Duration"}</span>
+                    </div>
+                    <div className={`italic text-zinc-650 mb-1 ${selectedTemplate === "technical" ? "font-bold text-black" : ""}`}>{exp.role || "Role"}</div>
+                    
+                    <ul className={`list-disc pl-4 text-zinc-800 ${
+                      selectedTemplate === "minimal"
+                        ? "space-y-1.5 text-[8.5px]"
+                        : selectedTemplate === "technical"
+                        ? "space-y-0.5 text-[8.2px]"
+                        : "space-y-1 text-[8.5px]"
+                    }`}>
+                      {exp.bullets.map((bullet, bIdx) => (
+                        bullet.trim().length > 0 && (
+                          <li key={bIdx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{bullet}</li>
+                        )
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Projects */}
+            {resumeData.projects.length > 0 && (
+              <div className={selectedTemplate === "technical" ? "mb-2.5 relative text-left" : "mb-4 relative text-left"}>
+                <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                  selectedTemplate === "minimal"
+                    ? "text-cyan-600 border-none mb-1 mt-2"
+                    : "text-black border-b border-zinc-800 mb-1.5"
+                }`}>
+                  Projects
+                </h3>
+                {resumeData.projects.map((proj, idx) => (
+                  <div key={idx} className={selectedTemplate === "technical" ? "mb-1.5" : "mb-2"}>
+                    <div className="flex justify-between font-bold text-black">
+                      <span>{proj.title || "Project Title"}</span>
+                      <span className="text-zinc-550 text-[8px] font-normal">Tech: {proj.techStack || "Tech Stack"}</span>
+                    </div>
+                    
+                    <ul className={`list-disc pl-4 text-zinc-800 mt-1 ${
+                      selectedTemplate === "minimal"
+                        ? "space-y-1.5 text-[8.5px]"
+                        : selectedTemplate === "technical"
+                        ? "space-y-0.5 text-[8.2px]"
+                        : "space-y-0.5 text-[8.5px]"
+                    }`}>
+                      {proj.description.split("\n").map((line, lIdx) => (
+                        line.trim().length > 0 && (
+                          <li key={lIdx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{line}</li>
+                        )
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+          </div>
+        )}
+
+        {/* Paywall Bottom Fade Mask Overlay & Floating glassmorphic CTA */}
+        {!isPaid && (
+          <>
+            {/* Premium Dark Gradient Fade blending the white page into dark dashboard background */}
+            <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-zinc-950 via-zinc-950/85 to-transparent pointer-events-none z-20" />
+
+            {/* Floating premium Glassmorphism Checkout CTA */}
+            <div className="absolute bottom-4 left-4 right-4 z-30 flex flex-col items-center">
+              <div className="w-full max-w-md p-5 rounded-xl border border-cyan-500/25 bg-zinc-950/90 backdrop-blur-md shadow-[0_0_30px_rgba(6,182,212,0.15)] space-y-4 animate-neon-pulse">
+                
+                {/* Header cyber lock emblem */}
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="h-6 w-6 rounded-full bg-cyan-950 border border-cyan-500/35 flex items-center justify-center shadow-sm">
+                    <Lock className="h-3 w-3 text-cyan-400 animate-pulse" />
+                  </div>
+                  <span className="text-[10px] font-black font-mono tracking-widest text-cyan-400 uppercase">
+                    PREMIUM ATS FORMAT LOCKED
+                  </span>
+                </div>
+
+                {/* Sales Copy */}
+                <div className="text-center space-y-1">
+                  <h4 className="text-xs font-extrabold text-white leading-tight">
+                    Unlock Final Recruiter-Ready PDF
+                  </h4>
+                  <p className="text-[9px] text-zinc-400 font-semibold leading-normal">
+                    Secure your 100% clean selectable-text PDF. Fully verified against placements scanner guidelines.
+                  </p>
+                </div>
+
+                {/* Quick Trust Checks */}
+                <div className="grid grid-cols-2 gap-2 border-y border-zinc-900 py-2.5 text-[8.5px] text-zinc-300 font-bold font-mono">
+                  <div className="flex items-center space-x-1.5">
+                    <span className="text-cyan-400">✓</span>
+                    <span>98%+ ATS Pass Guaranteed</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <span className="text-cyan-400">✓</span>
+                    <span>Standard Single-Column</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <span className="text-cyan-400">✓</span>
+                    <span>100% Editable Selection Text</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <span className="text-cyan-400">✓</span>
+                    <span>Lifetime Free AI Re-tuner</span>
+                  </div>
+                </div>
+
+                {/* Razorpay Standard Instant Unlock Button */}
+                <button
+                  onClick={triggerRazorpayCheckout}
+                  className="w-full py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-zinc-950 font-black text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
+                >
+                  <Zap className="h-4 w-4 text-zinc-950 fill-zinc-955 stroke-[2.5]" />
+                  <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 80}</span>
+                </button>
+
+                {/* Classmate referral share widget for free access */}
+                <div className="border-t border-zinc-900 pt-3 space-y-2">
+                  <div className="flex justify-between items-center text-[9px] font-bold">
+                    <span className="text-zinc-400">B.Tech Referral Scheme (Unlock Free)</span>
+                    <span className="text-cyan-400 font-mono">{referralCount} / 3 Classmates Joined</span>
+                  </div>
+                  <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                    <div 
+                      className="bg-cyan-500 h-full transition-all duration-500" 
+                      style={{ width: `${(referralCount / 3) * 100}%` }}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center space-x-1.5 pt-1">
+                    <input
+                      type="text"
+                      readOnly
+                      value={referralLink}
+                      className="bg-zinc-900/60 border border-zinc-900 text-[8.5px] p-2 rounded flex-1 text-zinc-500 outline-none select-all font-mono"
+                    />
+                    <button
+                      onClick={copyReferral}
+                      className="px-3 py-2 rounded bg-cyan-950 border border-cyan-800 text-cyan-400 hover:bg-cyan-900 transition-colors font-bold text-[8.5px] cursor-pointer"
+                    >
+                      {copied ? "Copied!" : "Copy Link"}
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="flex flex-row h-screen w-screen overflow-hidden bg-zinc-950 font-sans antialiased text-slate-200">
+      
+      {/* Dynamic script tags for Razorpay SDK */}
+      <script src="https://checkout.razorpay.com/v1/checkout.js" async />
+
+      {/* 1. Left Vertical Navigation Rail */}
+      <aside className="hidden md:flex flex-col w-60 border-r border-zinc-900 bg-zinc-950/70 p-5 space-y-6 flex-shrink-0 relative">
+        
+        {/* Brand header */}
+        <div className="flex items-center space-x-2.5 px-3 py-1.5 bg-zinc-900/35 border border-zinc-850 rounded-2xl shadow-sm">
+          <div className="h-7 w-7 rounded-lg bg-gradient-to-tr from-cyan-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/10">
+            <Zap className="h-4 w-4 text-zinc-950 stroke-[2.5]" />
+          </div>
+          <div className="flex flex-col text-left">
+            <span className="text-xs font-black text-white font-mono tracking-wider uppercase leading-none">BOOSTCV</span>
+            <span className="text-[7.5px] font-bold text-cyan-400 font-mono tracking-widest leading-none mt-1 uppercase">SaaS Optimization</span>
+          </div>
+        </div>
+
+        {/* Tab links */}
+        <nav className="flex-1 flex flex-col space-y-1.5 text-left">
+          <button
+            onClick={() => setActiveTab("edit")}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 ${activeTab === "edit" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
+          >
+            <FileText className="h-4 w-4" />
+            <span>Resume Builder</span>
+          </button>
+          
+          <button
+            onClick={() => setActiveTab("ats")}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 relative ${activeTab === "ats" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
+          >
+            <BarChart3 className="h-4 w-4" />
+            <span>ATS Deep Scan</span>
+            {atsScore > 0 && (
+              <span className="absolute right-3 text-[8.5px] font-black bg-zinc-900 border border-zinc-800 px-1.5 py-0.25 rounded text-cyan-400">{atsScore}%</span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab("matcher")}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 relative ${activeTab === "matcher" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
+          >
+            <Sparkles className="h-4 w-4" />
+            <span>AI Job Matcher</span>
+            {tailorApplied && (
+              <span className="absolute right-3 h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab("company")}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 ${activeTab === "company" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
+          >
+            <Building2 className="h-4 w-4" />
+            <span>Company Intelligence</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("history")}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 relative ${activeTab === "history" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
+          >
+            <History className="h-4 w-4" />
+            <span>Resume History</span>
+            {(analysisHistory.length + companyHistory.length) > 0 && (
+              <span className="absolute right-3 text-[8.5px] bg-zinc-900 border border-zinc-800 px-1.5 py-0.25 rounded text-zinc-450">{analysisHistory.length + companyHistory.length}</span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab("account")}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 ${activeTab === "account" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
+          >
+            <User className="h-4 w-4" />
+            <span>Account & Billing</span>
+          </button>
+        </nav>
+
+        {/* Profile Card Bottom */}
+        {user && (
+          <div className="mt-auto border-t border-zinc-900 pt-4 flex items-center space-x-3 text-left">
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-cyan-955 to-zinc-900 border border-cyan-800/30 flex items-center justify-center font-mono font-black text-[10px] text-cyan-400">
+              {user.email?.charAt(0).toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold text-slate-200 truncate leading-none">{user.email}</p>
+              <div className="flex items-center space-x-1.5 mt-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                <span className="text-[7.5px] font-bold font-mono text-zinc-500 uppercase tracking-widest leading-none">
+                  {isPaid ? "Pro Unlocked" : "Free Preview"}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </aside>
+
+      {/* 2. Main Work Panel View Area */}
+      <div className="flex-grow flex flex-col h-full overflow-hidden bg-zinc-950/20">
+        
+        {/* Contextual top workspace header */}
+        <header className="h-14 border-b border-zinc-900 px-6 flex items-center justify-between bg-zinc-950/85 z-10 flex-shrink-0">
+          <div className="flex items-center space-x-3">
+            <span className="text-xs font-black font-mono text-white tracking-widest uppercase">
+              {activeTab === "edit" && "Resume Builder Workspace"}
+              {activeTab === "ats" && "ATS Compatibility deep scan"}
+              {activeTab === "matcher" && "AI Job Matcher Dashboard"}
+              {activeTab === "company" && "Target Placements Optimization"}
+              {activeTab === "history" && "Analysis Scans Log History"}
+              {activeTab === "account" && "SaaS Subscription Details"}
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            {isPaid && (
+              <span className="text-[9px] font-black font-mono text-emerald-450 bg-emerald-950/20 border border-emerald-900/50 px-2 py-0.5 rounded uppercase tracking-wider animate-pulse hidden sm:inline">
+                🔓 Active Premium Session
+              </span>
+            )}
+            <button 
+              onClick={signOut}
+              className="text-[10px] text-zinc-550 hover:text-zinc-300 font-bold font-mono transition-colors cursor-pointer"
+            >
+              Logout
+            </button>
+          </div>
+        </header>
+
+        {/* Central Workspace splitter */}
+        <div className="flex-grow flex flex-col lg:flex-row overflow-hidden p-4 md:p-6 space-y-6 lg:space-y-0 lg:space-x-6">
+          
+          {/* Main workspace container */}
+          <div className={`flex-1 flex flex-col overflow-y-auto h-full pr-1 space-y-6 ${activeTab === "edit" ? "w-full lg:w-1/2" : "w-full"}`}>
+            
+            {/* Horizontal onboarding stepper */}
+            {renderOnboardingStepper()}
+
+            {/* Tab conditional panels rendering */}
+            {activeTab === "edit" && (
+              <ResumeForm data={resumeData} onChange={handleFormChange} />
+            )}
+
+            {activeTab === "ats" && renderAtsDeepScanWorkspace()}
+
+            {activeTab === "matcher" && renderJobMatcherWorkspace()}
+
+            {activeTab === "company" && renderCompanyIntelligenceWorkspace()}
+
+            {activeTab === "history" && renderScanHistoryWorkspace()}
+
+            {activeTab === "account" && renderSaaSAccountWorkspace()}
+
+          </div>
+
+          {/* Right Contextual Insights Panel (Toggle subtabs Preview vs ATS diagnostics on builder tab) */}
+          {activeTab === "edit" && (
         <div className="w-full lg:w-1/2 p-4 md:p-6 overflow-y-auto bg-zinc-950/80 h-full flex flex-col space-y-6">
           
           {/* Diagnostic Stats Header */}
@@ -2030,9 +3142,9 @@ export default function DashboardPage() {
             )}
 
         </div>
- 
       </div>
-
+      )}
+      </div>
     </div>
 
       {/* Simulated Payment Sandbox Modal Overlay */}
