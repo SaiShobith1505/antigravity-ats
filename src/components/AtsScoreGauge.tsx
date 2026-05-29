@@ -24,7 +24,7 @@ export const AtsScoreGauge: React.FC<AtsScoreGaugeProps> = ({
       return;
     }
 
-    const duration = 1.5; // seconds
+    const duration = 1.2; // seconds
     const stepTime = Math.abs(Math.floor((duration * 1000) / end));
     
     const timer = setInterval(() => {
@@ -38,34 +38,40 @@ export const AtsScoreGauge: React.FC<AtsScoreGaugeProps> = ({
     return () => clearInterval(timer);
   }, [score]);
 
-  const strokeWidth = 12;
+  const strokeWidth = 10;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (displayScore / 100) * circumference;
 
-  // Score thematic color picker
+  // Outcome-based theme color mapping matching rebrand palette
   const getScoreColor = (val: number) => {
-    if (val < 45) return { color: "#ef4444", text: "FAILING", textClass: "text-red-500", glow: "rgba(239, 68, 68, 0.2)" };
-    if (val < 75) return { color: "#f59e0b", text: "WARNING", textClass: "text-amber-500", glow: "rgba(245, 158, 11, 0.2)" };
-    return { color: "#06b6d4", text: "OPTIMIZED", textClass: "text-cyan-400", glow: "rgba(6, 182, 212, 0.35)" };
+    if (val < 45) {
+      return { 
+        color: "#D32F2F", // Error Red
+        text: "NEEDS WORK", 
+        textClass: "text-[#D32F2F] bg-[#D32F2F]/6 border-[#D32F2F]/15", 
+      };
+    }
+    if (val < 75) {
+      return { 
+        color: "#E6A700", // Warning Gold/Amber
+        text: "IMPROVING", 
+        textClass: "text-[#E6A700] bg-[#E6A700]/6 border-[#E6A700]/15", 
+      };
+    }
+    return { 
+      color: "#0B2E33", // Brand Green
+      text: "EXCELLENT", 
+      textClass: "text-[#0B2E33] bg-[#0B2E33]/6 border-[#0B2E33]/15", 
+    };
   };
 
   const currentTheme = getScoreColor(displayScore);
 
   return (
-    <div className="flex flex-col items-center justify-center relative" style={{ width: size, height: size + 40 }}>
-      {/* Glow Backdrop */}
-      <div 
-        className="absolute rounded-full transition-all duration-1000"
-        style={{
-          width: size - 20,
-          height: size - 20,
-          backgroundColor: currentTheme.glow,
-          filter: "blur(24px)",
-          top: 10
-        }}
-      />
-
+    <div className="flex flex-col items-center justify-center relative select-none" style={{ width: size, height: size + 35 }}>
+      
+      {/* 1. Circle container with clean gray base track */}
       <div className="relative" style={{ width: size, height: size }}>
         <svg width={size} height={size} className="transform -rotate-90">
           {/* Base Circle */}
@@ -74,10 +80,10 @@ export const AtsScoreGauge: React.FC<AtsScoreGaugeProps> = ({
             cy={size / 2}
             r={radius}
             fill="transparent"
-            stroke="#16161a"
+            stroke="#f1f5f9" // slate-100 base
             strokeWidth={strokeWidth}
           />
-          {/* Neon Active Arc */}
+          {/* Active progress arc */}
           <motion.circle
             cx={size / 2}
             cy={size / 2}
@@ -92,25 +98,26 @@ export const AtsScoreGauge: React.FC<AtsScoreGaugeProps> = ({
           />
         </svg>
 
-        {/* Counter Overlay */}
+        {/* Counter Overlay (Premium Inter font) */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <motion.span 
-            initial={{ scale: 0.9 }}
+            initial={{ scale: 0.95 }}
             animate={{ scale: 1 }}
-            className="text-4xl font-extrabold tracking-tight text-white font-mono"
+            className="text-3xl font-black tracking-tight text-[#1E1E1E] font-sans"
           >
             {displayScore}%
           </motion.span>
-          <span className="text-[10px] tracking-widest text-zinc-500 font-bold uppercase mt-0.5">
-            ATS Score
+          <span className="text-[9px] tracking-wider text-zinc-400 font-extrabold uppercase mt-0.5 font-sans">
+            Resume Health
           </span>
         </div>
       </div>
 
-      {/* Dynamic Status Text */}
-      <div className={`mt-3 font-semibold text-xs tracking-wider uppercase font-mono ${currentTheme.textClass}`}>
+      {/* 2. Elegant status badge */}
+      <div className={`mt-3.5 px-3 py-0.5 rounded-full border text-[9px] font-black tracking-wider uppercase font-sans ${currentTheme.textClass}`}>
         {currentTheme.text}
       </div>
+
     </div>
   );
 };

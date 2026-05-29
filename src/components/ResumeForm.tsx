@@ -225,7 +225,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 value={data.personal.fullName}
                 onChange={(e) => updatePersonal("fullName", e.target.value)}
                 placeholder="Amit Sharma"
-                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -238,7 +238,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   value={data.personal.email}
                   onChange={(e) => updatePersonal("email", e.target.value)}
                   placeholder="amit@college.edu"
-                  className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                  className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                 />
               </div>
               <div>
@@ -250,7 +250,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   value={data.personal.phone}
                   onChange={(e) => updatePersonal("phone", e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                  className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                 />
               </div>
             </div>
@@ -264,7 +264,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   value={data.personal.linkedin}
                   onChange={(e) => updatePersonal("linkedin", e.target.value)}
                   placeholder="linkedin.com/in/username"
-                  className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                  className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                 />
               </div>
               <div>
@@ -276,7 +276,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   value={data.personal.github}
                   onChange={(e) => updatePersonal("github", e.target.value)}
                   placeholder="github.com/username"
-                  className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                  className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                 />
               </div>
             </div>
@@ -294,7 +294,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
-                <h4 className="text-xs font-bold text-[#006039] uppercase tracking-widest">
+                <h4 className="text-xs font-bold text-[#0B2E33] uppercase tracking-widest">
                   Institution #{idx + 1}
                 </h4>
 
@@ -307,7 +307,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                     value={edu.institution}
                     onChange={(e) => updateEducation(idx, "institution", e.target.value)}
                     placeholder="Delhi Technological University (DTU)"
-                    className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                    className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                   />
                 </div>
 
@@ -321,7 +321,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={edu.degree}
                       onChange={(e) => updateEducation(idx, "degree", e.target.value)}
                       placeholder="B.Tech in Computer Science"
-                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -333,7 +333,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={edu.gpa}
                       onChange={(e) => updateEducation(idx, "gpa", e.target.value)}
                       placeholder="8.85 CGPA"
-                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -347,7 +347,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                     value={edu.year}
                     onChange={(e) => updateEducation(idx, "year", e.target.value)}
                     placeholder="2022 - 2026"
-                    className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                    className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                   />
                 </div>
               </div>
@@ -355,7 +355,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
 
             <button
               onClick={addEducation}
-              className="w-full py-3 rounded-lg border border-dashed border-stone-200 text-xs font-bold text-[#666666] hover:border-stone-200 hover:text-[#006039] transition-all flex items-center justify-center space-x-2"
+              className="w-full py-3 rounded-lg border border-dashed border-stone-200 text-xs font-bold text-[#666666] hover:border-stone-200 hover:text-[#0B2E33] transition-all flex items-center justify-center space-x-2"
             >
               <Plus className="h-4 w-4" />
               <span>Add College / School</span>
@@ -375,7 +375,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   <Trash2 className="h-4 w-4" />
                 </button>
                 
-                <h4 className="text-xs font-bold text-[#006039] uppercase tracking-widest flex items-center space-x-2">
+                <h4 className="text-xs font-bold text-[#0B2E33] uppercase tracking-widest flex items-center space-x-2">
                   <span>Job / Internship #{idx + 1}</span>
                 </h4>
 
@@ -389,7 +389,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={exp.company}
                       onChange={(e) => updateExperience(idx, "company", e.target.value)}
                       placeholder="InnovateTech Solutions"
-                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -401,7 +401,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={exp.role}
                       onChange={(e) => updateExperience(idx, "role", e.target.value)}
                       placeholder="Backend Engineering Intern"
-                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -415,7 +415,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                     value={exp.duration}
                     onChange={(e) => updateExperience(idx, "duration", e.target.value)}
                     placeholder="May 2025 - July 2025"
-                    className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                    className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                   />
                 </div>
 
@@ -435,7 +435,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                             value={bullet}
                             onChange={(e) => updateBullet(idx, bIdx, e.target.value)}
                             placeholder="Developed backend routing features to support client data."
-                            className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-2.5 flex-1 text-sm outline-none transition-all"
+                            className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-2.5 flex-1 text-sm outline-none transition-all"
                           />
                           <button
                             onClick={() => removeBullet(idx, bIdx)}
@@ -458,7 +458,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
 
                   <button
                     onClick={() => addBullet(idx)}
-                    className="text-xs font-bold text-[#666666] hover:text-[#006039] flex items-center space-x-1 py-1"
+                    className="text-xs font-bold text-[#666666] hover:text-[#0B2E33] flex items-center space-x-1 py-1"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     <span>Add Bullet Point</span>
@@ -469,7 +469,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 <div className="border-t border-stone-200 pt-4 mt-2">
                   {activeAiBox === idx ? (
                     <div className="p-4 bg-stone-50 border border-stone-200 rounded-xl space-y-3">
-                      <div className="flex items-center space-x-1 text-xs font-bold text-[#006039]">
+                      <div className="flex items-center space-x-1 text-xs font-bold text-[#0B2E33]">
                         <Sparkles className="h-4 w-4" />
                         <span>BOOSTCV AI Optimizer (Google XYZ Format)</span>
                       </div>
@@ -506,7 +506,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   ) : (
                     <button
                       onClick={() => setActiveAiBox(idx)}
-                      className="px-3 py-1.5 rounded-lg border border-stone-200 bg-stone-50 text-[#006039] text-xs font-bold hover:bg-stone-50 transition-all flex items-center space-x-1.5"
+                      className="px-3 py-1.5 rounded-lg border border-stone-200 bg-stone-50 text-[#0B2E33] text-xs font-bold hover:bg-stone-50 transition-all flex items-center space-x-1.5"
                     >
                       <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
                       <span>Optimize Experience with Gemini AI</span>
@@ -518,7 +518,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
 
             <button
               onClick={addExperience}
-              className="w-full py-3 rounded-lg border border-dashed border-stone-200 text-xs font-bold text-[#666666] hover:border-stone-200 hover:text-[#006039] transition-all flex items-center justify-center space-x-2"
+              className="w-full py-3 rounded-lg border border-dashed border-stone-200 text-xs font-bold text-[#666666] hover:border-stone-200 hover:text-[#0B2E33] transition-all flex items-center justify-center space-x-2"
             >
               <Plus className="h-4 w-4" />
               <span>Add Job / Internship</span>
@@ -537,7 +537,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
-                <h4 className="text-xs font-bold text-[#006039] uppercase tracking-widest">
+                <h4 className="text-xs font-bold text-[#0B2E33] uppercase tracking-widest">
                   Technical Project #{idx + 1}
                 </h4>
 
@@ -551,7 +551,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={proj.title}
                       onChange={(e) => updateProject(idx, "title", e.target.value)}
                       placeholder="BOOSTCV (ATS SaaS Compiler)"
-                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -563,7 +563,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={proj.techStack}
                       onChange={(e) => updateProject(idx, "techStack", e.target.value)}
                       placeholder="Next.js, React, Node.js, @react-pdf/renderer"
-                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -576,7 +576,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                     value={proj.description}
                     onChange={(e) => updateProject(idx, "description", e.target.value)}
                     placeholder="Engineered single-column document generator, yielding 98%+ ATS parsability rates.&#10;Integrated Razorpay checkout client endpoints, lowering paywall abandonment rates by 12%."
-                    className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-sm p-3 rounded-lg w-full h-24 outline-none text-[#1E1E1E] placeholder-stone-400 transition-all resize-none"
+                    className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-sm p-3 rounded-lg w-full h-24 outline-none text-[#1E1E1E] placeholder-stone-400 transition-all resize-none"
                   />
                 </div>
               </div>
@@ -584,7 +584,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
 
             <button
               onClick={addProject}
-              className="w-full py-3 rounded-lg border border-dashed border-stone-200 text-xs font-bold text-[#666666] hover:border-stone-200 hover:text-[#006039] transition-all flex items-center justify-center space-x-2"
+              className="w-full py-3 rounded-lg border border-dashed border-stone-200 text-xs font-bold text-[#666666] hover:border-stone-200 hover:text-[#0B2E33] transition-all flex items-center justify-center space-x-2"
             >
               <Plus className="h-4 w-4" />
               <span>Add Technical Project</span>
@@ -596,8 +596,8 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
         {activeTab === "skills" && (
           <div className="space-y-4">
             <div className="p-4 bg-stone-50 border border-stone-200 rounded-xl flex items-start space-x-2 mb-2">
-              <Lightbulb className="h-5 w-5 text-[#006039] mt-0.5 flex-shrink-0" />
-              <div className="text-xs text-[#006039] leading-relaxed">
+              <Lightbulb className="h-5 w-5 text-[#0B2E33] mt-0.5 flex-shrink-0" />
+              <div className="text-xs text-[#0B2E33] leading-relaxed">
                 <strong>ATS Tip:</strong> Separate keywords with commas. Ensure you incorporate terms from placement job cards (e.g. \"Docker\", \"TypeScript\", \"Redis\"). Do not build complex graphics or stars.
               </div>
             </div>
@@ -611,7 +611,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 value={data.skills.languages.join(", ")}
                 onChange={(e) => updateSkillsArray("languages", e.target.value)}
                 placeholder="JavaScript, TypeScript, Python, SQL, C++"
-                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
               />
             </div>
 
@@ -624,7 +624,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 value={data.skills.frameworks.join(", ")}
                 onChange={(e) => updateSkillsArray("frameworks", e.target.value)}
                 placeholder="React, Next.js, Express, Node.js, Tailwind CSS"
-                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
               />
             </div>
 
@@ -637,7 +637,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 value={data.skills.tools.join(", ")}
                 onChange={(e) => updateSkillsArray("tools", e.target.value)}
                 placeholder="Git, GitHub Actions, Docker, Firebase, AWS"
-                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
+                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
               />
             </div>
           </div>
@@ -658,7 +658,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
               <button
                 type="button"
                 onClick={addCertification}
-                className="py-2 px-4 rounded-lg bg-stone-50 border border-stone-200 text-[#006039] hover:bg-[#004d2e] transition-colors font-bold text-xs flex items-center space-x-1 cursor-pointer"
+                className="py-2 px-4 rounded-lg bg-stone-50 border border-stone-200 text-[#0B2E33] hover:bg-[#004d2e] transition-colors font-bold text-xs flex items-center space-x-1 cursor-pointer"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>Add Certification</span>
@@ -678,7 +678,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       value={cert}
                       onChange={(e) => updateCertification(idx, e.target.value)}
                       placeholder="e.g. AWS Certified Solutions Architect - Associate"
-                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 flex-1 text-sm outline-none transition-all"
+                      className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-lg p-3 flex-1 text-sm outline-none transition-all"
                     />
                     <button
                       type="button"

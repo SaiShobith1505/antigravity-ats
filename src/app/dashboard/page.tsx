@@ -856,8 +856,8 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 bg-[#FAF8F3] flex items-center justify-center">
-        <div className="h-8 w-8 border-4 border-[#006039] border-t-transparent rounded-full animate-spin" />
+      <div className="flex-1 bg-[#B8E3E9] flex items-center justify-center">
+        <div className="h-8 w-8 border-4 border-[#0B2E33] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -865,9 +865,9 @@ export default function DashboardPage() {
   // FORCE ONBOARDING IF NOT AUTHENTICATED
   if (!user) {
     return (
-      <div className="flex-1 bg-[#FAF8F3] flex flex-col items-center justify-center p-4">
+      <div className="flex-1 bg-[#B8E3E9] flex flex-col items-center justify-center p-4">
         <div className="max-w-md w-full bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-8 text-center space-y-6">
-          <div className="h-12 w-12 rounded-xl bg-[#006039] flex items-center justify-center mx-auto shadow-sm">
+          <div className="h-12 w-12 rounded-xl bg-[#0B2E33] flex items-center justify-center mx-auto shadow-sm">
             <Zap className="h-6 w-6 text-[#1E1E1E] stroke-[2.5]" />
           </div>
           <div className="space-y-2">
@@ -878,11 +878,11 @@ export default function DashboardPage() {
           </div>
           <button
             onClick={signInWithGoogle}
-            className="w-full py-3.5 px-4 rounded-xl bg-[#006039] hover:bg-[#004f2f] text-[#1E1E1E] font-extrabold text-sm shadow-sm transition-all flex items-center justify-center space-x-2"
+            className="w-full py-3.5 px-4 rounded-xl bg-[#0B2E33] hover:bg-[#004f2f] text-[#1E1E1E] font-extrabold text-sm shadow-sm transition-all flex items-center justify-center space-x-2"
           >
             <span>Continue with Google Sign-In</span>
           </button>
-          <Link href="/" className="text-xs text-[#666666] hover:text-[#006039] block">
+          <Link href="/" className="text-xs text-[#666666] hover:text-[#0B2E33] block">
             ← Return to Homepage
           </Link>
         </div>
@@ -895,10 +895,10 @@ export default function DashboardPage() {
     return (
       <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-10 flex flex-col items-center justify-center text-center space-y-4 max-w-md mx-auto mt-12 animate-in fade-in duration-300">
         <div className="h-14 w-14 rounded-2xl bg-stone-50 border border-stone-200 flex items-center justify-center shadow-md">
-          {type === "ats" && <BarChart3 className="h-6 w-6 text-[#006039]" />}
-          {type === "matcher" && <Sparkles className="h-6 w-6 text-[#006039]" />}
-          {type === "company" && <Building2 className="h-6 w-6 text-[#006039]" />}
-          {type === "history" && <History className="h-6 w-6 text-[#006039]" />}
+          {type === "ats" && <BarChart3 className="h-6 w-6 text-[#0B2E33]" />}
+          {type === "matcher" && <Sparkles className="h-6 w-6 text-[#0B2E33]" />}
+          {type === "company" && <Building2 className="h-6 w-6 text-[#0B2E33]" />}
+          {type === "history" && <History className="h-6 w-6 text-[#0B2E33]" />}
         </div>
         <div className="space-y-1">
           <h3 className="text-xs font-black text-[#1E1E1E] uppercase tracking-wider font-sans">
@@ -941,36 +941,36 @@ export default function DashboardPage() {
           onClick={() => setActiveTab("edit")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep1Done ? "bg-[#006039]" : activeTab === "edit" ? "bg-[#C6A769] animate-pulse" : "bg-stone-150"}`} />
-          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "edit" ? "text-[#006039]" : isStep1Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>1. Upload</span>
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep1Done ? "bg-[#0B2E33]" : activeTab === "edit" ? "bg-[#4F7C82] animate-pulse" : "bg-stone-150"}`} />
+          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "edit" ? "text-[#0B2E33]" : isStep1Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>1. Upload</span>
         </button>
         <button 
           onClick={() => setActiveTab("ats")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep2Done ? "bg-[#006039]" : activeTab === "ats" ? "bg-[#C6A769] animate-pulse" : "bg-stone-150"}`} />
-          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "ats" ? "text-[#006039]" : isStep2Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>2. Diagnostics</span>
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep2Done ? "bg-[#0B2E33]" : activeTab === "ats" ? "bg-[#4F7C82] animate-pulse" : "bg-stone-150"}`} />
+          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "ats" ? "text-[#0B2E33]" : isStep2Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>2. Diagnostics</span>
         </button>
         <button 
           onClick={() => setActiveTab("matcher")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep3Done ? "bg-[#006039]" : activeTab === "matcher" ? "bg-[#C6A769] animate-pulse" : "bg-stone-150"}`} />
-          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "matcher" ? "text-[#006039]" : isStep3Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>3. Match JD</span>
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep3Done ? "bg-[#0B2E33]" : activeTab === "matcher" ? "bg-[#4F7C82] animate-pulse" : "bg-stone-150"}`} />
+          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "matcher" ? "text-[#0B2E33]" : isStep3Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>3. Match JD</span>
         </button>
         <button 
           onClick={() => setActiveTab("company")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep4Done ? "bg-[#006039]" : activeTab === "company" ? "bg-[#C6A769] animate-pulse" : "bg-stone-150"}`} />
-          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "company" ? "text-[#006039]" : isStep4Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>4. Company Fit</span>
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep4Done ? "bg-[#0B2E33]" : activeTab === "company" ? "bg-[#4F7C82] animate-pulse" : "bg-stone-150"}`} />
+          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "company" ? "text-[#0B2E33]" : isStep4Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>4. Company Fit</span>
         </button>
         <button 
           onClick={() => setActiveTab("account")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep5Done ? "bg-[#006039]" : activeTab === "account" ? "bg-[#C6A769] animate-pulse" : "bg-stone-150"}`} />
-          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "account" ? "text-[#006039]" : isStep5Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>5. Export</span>
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep5Done ? "bg-[#0B2E33]" : activeTab === "account" ? "bg-[#4F7C82] animate-pulse" : "bg-stone-150"}`} />
+          <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "account" ? "text-[#0B2E33]" : isStep5Done ? "text-[#1E1E1E]" : "text-[#666666]"}`}>5. Export</span>
         </button>
       </div>
     );
@@ -999,7 +999,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex-grow space-y-2">
             <div className="flex items-center space-x-2">
-              <span className="text-[9px] font-sans font-black text-[#006039] uppercase tracking-wider">⚡ SHORTLIST READY REPORT</span>
+              <span className="text-[9px] font-sans font-black text-[#0B2E33] uppercase tracking-wider">⚡ SHORTLIST READY REPORT</span>
               <span className="text-[8px] font-sans font-bold text-emerald-455 bg-emerald-955/20 border border-emerald-900/50 px-2 py-0.5 rounded uppercase">Verified Shortlisting Format</span>
             </div>
             <h3 className="text-base font-black text-[#1E1E1E] leading-tight uppercase font-sans">Dynamic Content-Quality Assessment</h3>
@@ -1012,7 +1012,7 @@ export default function DashboardPage() {
         {/* Score Breakdown Progress Bars */}
         <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
           <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
-            <BarChart3 className="h-4 w-4 text-[#006039]" />
+            <BarChart3 className="h-4 w-4 text-[#0B2E33]" />
             <span>Category Optimization Matrix</span>
           </h4>
 
@@ -1020,7 +1020,7 @@ export default function DashboardPage() {
             <div className="space-y-1.5">
               <div className="flex justify-between text-zinc-455">
                 <span>Structure Completeness</span>
-                <span className="text-[#006039]">{structureVal}%</span>
+                <span className="text-[#0B2E33]">{structureVal}%</span>
               </div>
               <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
                 <div className="h-full transition-all duration-500" style={{ width: `${structureVal}%` }} />
@@ -1030,7 +1030,7 @@ export default function DashboardPage() {
             <div className="space-y-1.5">
               <div className="flex justify-between text-zinc-455">
                 <span>Formatting & Emojis</span>
-                <span className="text-[#006039]">{formattingVal}%</span>
+                <span className="text-[#0B2E33]">{formattingVal}%</span>
               </div>
               <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
                 <div className="h-full transition-all duration-500" style={{ width: `${formattingVal}%` }} />
@@ -1040,7 +1040,7 @@ export default function DashboardPage() {
             <div className="space-y-1.5">
               <div className="flex justify-between text-zinc-455">
                 <span>Recruiter Readability</span>
-                <span className="text-[#006039]">{readabilityVal}%</span>
+                <span className="text-[#0B2E33]">{readabilityVal}%</span>
               </div>
               <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
                 <div className="h-full transition-all duration-500" style={{ width: `${readabilityVal}%` }} />
@@ -1050,7 +1050,7 @@ export default function DashboardPage() {
             <div className="space-y-1.5">
               <div className="flex justify-between text-zinc-455">
                 <span>Keywords Density</span>
-                <span className="text-[#006039]">{keywordsVal}%</span>
+                <span className="text-[#0B2E33]">{keywordsVal}%</span>
               </div>
               <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
                 <div className="h-full transition-all duration-500" style={{ width: `${keywordsVal}%` }} />
@@ -1060,7 +1060,7 @@ export default function DashboardPage() {
             <div className="space-y-1.5">
               <div className="flex justify-between text-zinc-455">
                 <span>Projects Depth</span>
-                <span className="text-[#006039]">{projectsVal}%</span>
+                <span className="text-[#0B2E33]">{projectsVal}%</span>
               </div>
               <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
                 <div className="h-full transition-all duration-500" style={{ width: `${projectsVal}%` }} />
@@ -1070,7 +1070,7 @@ export default function DashboardPage() {
             <div className="space-y-1.5">
               <div className="flex justify-between text-zinc-455">
                 <span>Achievements Quality</span>
-                <span className="text-[#006039]">{achievementsVal}%</span>
+                <span className="text-[#0B2E33]">{achievementsVal}%</span>
               </div>
               <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
                 <div className="h-full transition-all duration-500" style={{ width: `${achievementsVal}%` }} />
@@ -1125,7 +1125,7 @@ export default function DashboardPage() {
         {/* Action checklist items */}
         <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
           <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
-            <ListChecks className="h-4 w-4 text-[#006039]" />
+            <ListChecks className="h-4 w-4 text-[#0B2E33]" />
             <span>Placement Preparation Sprints Checklist</span>
           </h4>
           <div className="space-y-3">
@@ -1134,7 +1134,7 @@ export default function DashboardPage() {
                 key={idx} 
                 className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-xs text-[#1E1E1E] font-semibold leading-relaxed flex items-start space-x-3 hover:border-stone-200 transition-all text-left"
               >
-                <div className="h-5 w-5 rounded-full border border-stone-200 text-[#006039] font-sans text-[9px] font-black flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="h-5 w-5 rounded-full border border-stone-200 text-[#0B2E33] font-sans text-[9px] font-black flex items-center justify-center flex-shrink-0 mt-0.5">
                   !
                 </div>
                 <div className="space-y-0.5">
@@ -1161,7 +1161,7 @@ export default function DashboardPage() {
           <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-3 relative overflow-hidden">
             <div className="flex items-center justify-between border-b border-stone-200 pb-2.5">
               <span className="text-[10px] font-black text-[#1E1E1E] font-sans uppercase tracking-wider flex items-center space-x-1.5">
-                <History className="h-3.5 w-3.5 text-[#006039]" />
+                <History className="h-3.5 w-3.5 text-[#0B2E33]" />
                 <span>JD Scan History Logs ({analysisHistory.length})</span>
               </span>
               <button
@@ -1210,7 +1210,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between border-b border-stone-200 pb-3">
             <div className="flex items-center space-x-2">
               <div className="h-7 w-7 rounded bg-stone-50 border border-stone-200 flex items-center justify-center">
-                <Briefcase className="h-4 w-4 text-[#006039]" />
+                <Briefcase className="h-4 w-4 text-[#0B2E33]" />
               </div>
               <span className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider">
                 Target Job Description
@@ -1227,7 +1227,7 @@ export default function DashboardPage() {
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value.slice(0, 3000))}
               placeholder="Paste the target company job description here (e.g. required frameworks, technologies, roles, verbs)..."
-              className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] placeholder-stone-400 rounded-xl p-4 w-full text-xs leading-relaxed outline-none transition-all font-sans resize-none"
+              className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] placeholder-stone-400 rounded-xl p-4 w-full text-xs leading-relaxed outline-none transition-all font-sans resize-none"
             />
             <div className="flex justify-between items-center text-[10px] font-sans font-bold text-[#666666] px-1">
               <span>{jobDescription.length} / 3000 characters</span>
@@ -1270,10 +1270,10 @@ export default function DashboardPage() {
             
             {/* ATS Compatibility Improvement Indicator */}
             <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)] text-left">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#006039]/5 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#0B2E33]/5 rounded-full blur-2xl pointer-events-none" />
               
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black font-sans text-[#006039] tracking-wider uppercase">
+                <span className="text-[10px] font-black font-sans text-[#0B2E33] tracking-wider uppercase">
                   ⚡ ATS Match Compatibility Optimized
                 </span>
                 <span className="text-[10px] font-sans font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded">
@@ -1317,7 +1317,7 @@ export default function DashboardPage() {
             {/* Skills Gap Analysis */}
             <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
               <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5 text-left">
-                <ListChecks className="h-4 w-4 text-[#006039]" />
+                <ListChecks className="h-4 w-4 text-[#0B2E33]" />
                 <span>Job Fit Gap Audit</span>
               </h4>
 
@@ -1377,7 +1377,7 @@ export default function DashboardPage() {
             {/* Keyword Frequency Report */}
             <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
               <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5 text-left">
-                <BarChart3 className="h-4 w-4 text-[#006039]" />
+                <BarChart3 className="h-4 w-4 text-[#0B2E33]" />
                 <span>Keyword Frequency Coverage</span>
               </h4>
               
@@ -1410,7 +1410,7 @@ export default function DashboardPage() {
             {/* Prioritised Optimization Checklist */}
             <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
               <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5 text-left">
-                <ListChecks className="h-4 w-4 text-[#006039]" />
+                <ListChecks className="h-4 w-4 text-[#0B2E33]" />
                 <span>Placements Sprints Priority Action Checklist</span>
               </h4>
 
@@ -1493,7 +1493,7 @@ export default function DashboardPage() {
           <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-3 relative overflow-hidden text-left">
             <div className="flex items-center justify-between border-b border-stone-200 pb-2.5">
               <span className="text-[10px] font-black text-[#1E1E1E] font-sans uppercase tracking-wider flex items-center space-x-1.5">
-                <History className="h-3.5 w-3.5 text-[#006039]" />
+                <History className="h-3.5 w-3.5 text-[#0B2E33]" />
                 <span>Company Suitability History Logs ({companyHistory.length})</span>
               </span>
               <button
@@ -1526,7 +1526,7 @@ export default function DashboardPage() {
                     <div className="text-[8px] font-sans text-[#666666]">{hist.roleName} • {hist.timestamp}</div>
                   </div>
                   <div className="text-right flex items-center space-x-2">
-                    <span className="text-xs font-black font-sans bg-white border border-stone-200 px-2 py-0.5 rounded text-[#006039]">
+                    <span className="text-xs font-black font-sans bg-white border border-stone-200 px-2 py-0.5 rounded text-[#0B2E33]">
                       {hist.matchScore}% Fit
                     </span>
                   </div>
@@ -1541,7 +1541,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between border-b border-stone-200 pb-3">
             <div className="flex items-center space-x-2">
               <div className="h-7 w-7 rounded bg-stone-50 border border-stone-200 flex items-center justify-center">
-                <Building2 className="h-4 w-4 text-[#006039]" />
+                <Building2 className="h-4 w-4 text-[#0B2E33]" />
               </div>
               <span className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider">
                 Target Company & Role Optimization
@@ -1556,7 +1556,7 @@ export default function DashboardPage() {
               <select
                 value={companySelection}
                 onChange={(e) => setCompanySelection(e.target.value)}
-                className="w-full bg-stone-50 border border-stone-200 hover:border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] rounded-xl p-3 text-xs leading-relaxed outline-none transition-all font-sans"
+                className="w-full bg-stone-50 border border-stone-200 hover:border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] rounded-xl p-3 text-xs leading-relaxed outline-none transition-all font-sans"
               >
                 <option value="Google">Google</option>
                 <option value="Microsoft">Microsoft</option>
@@ -1582,7 +1582,7 @@ export default function DashboardPage() {
                 value={roleSelection}
                 onChange={(e) => setRoleSelection(e.target.value)}
                 placeholder="e.g. Software Engineer Intern, Specialist Programmer"
-                className="w-full bg-stone-50 border border-stone-200 hover:border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#006039] text-[#1E1E1E] rounded-xl p-3 text-xs leading-relaxed outline-none transition-all font-sans font-semibold"
+                className="w-full bg-stone-50 border border-stone-200 hover:border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#0B2E33] text-[#1E1E1E] rounded-xl p-3 text-xs leading-relaxed outline-none transition-all font-sans font-semibold"
               />
             </div>
           </div>
@@ -1614,10 +1614,10 @@ export default function DashboardPage() {
             
             {/* Overall Company Match Gauge */}
             <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 to-zinc-950/90 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)]">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#006039]/5 pointer-events-none rounded-full blur-2xl" />
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#0B2E33]/5 pointer-events-none rounded-full blur-2xl" />
               
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black font-sans text-[#006039] tracking-wider uppercase">
+                <span className="text-[10px] font-black font-sans text-[#0B2E33] tracking-wider uppercase">
                   🏢 Target Company Match score
                 </span>
                 <span className="text-[9px] font-black font-sans text-[#666666]">
@@ -1629,7 +1629,7 @@ export default function DashboardPage() {
                 <span className="text-4xl font-black font-sans text-[#1E1E1E] tracking-tight drop-shadow-[0_0_15px_rgba(6,182,212,0.35)]">
                   {companyMatchResult.matchScore}%
                 </span>
-                <span className="text-xs font-bold font-sans text-[#006039]">Suitability Match</span>
+                <span className="text-xs font-bold font-sans text-[#0B2E33]">Suitability Match</span>
               </div>
 
               <p className="text-[10px] text-[#666666] leading-relaxed font-semibold">
@@ -1640,7 +1640,7 @@ export default function DashboardPage() {
             {/* Multi-Dimensional Fit Score Progress Bars */}
             <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
               <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
-                <BarChart3 className="h-4 w-4 text-[#006039]" />
+                <BarChart3 className="h-4 w-4 text-[#0B2E33]" />
                 <span>Multi-Dimensional Suitability Matrix</span>
               </h4>
 
@@ -1649,7 +1649,7 @@ export default function DashboardPage() {
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-[10px] font-bold font-sans">
                     <span className="text-[#666666]">Technical Match</span>
-                    <span className="text-[#006039]">{companyMatchResult.technicalMatch}%</span>
+                    <span className="text-[#0B2E33]">{companyMatchResult.technicalMatch}%</span>
                   </div>
                   <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden">
                     <div className="h-full transition-all duration-500" style={{ width: `${companyMatchResult.technicalMatch}%` }} />
@@ -1694,7 +1694,7 @@ export default function DashboardPage() {
             {/* Recruiter Gap Analysis table */}
             <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
               <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
-                <ListChecks className="h-4 w-4 text-[#006039]" />
+                <ListChecks className="h-4 w-4 text-[#0B2E33]" />
                 <span>{companySelection}-Specific Skills Gap Audit</span>
               </h4>
 
@@ -1736,13 +1736,13 @@ export default function DashboardPage() {
             {/* Section sequencing guidance: Focus Mode */}
             <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
               <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
-                <Zap className="h-4 w-4 text-[#006039]" />
+                <Zap className="h-4 w-4 text-[#0B2E33]" />
                 <span>Resume Focus Mode: Section Sequencing Guidance</span>
               </h4>
               <div className="p-4 rounded-xl bg-stone-50 border border-stone-200 flex items-start space-x-3 text-left">
-                <div className="h-6 w-6 rounded bg-stone-50 border border-stone-200 text-[10px] font-bold text-[#006039] flex items-center justify-center flex-shrink-0 mt-0.5">ℹ</div>
+                <div className="h-6 w-6 rounded bg-stone-50 border border-stone-200 text-[10px] font-bold text-[#0B2E33] flex items-center justify-center flex-shrink-0 mt-0.5">ℹ</div>
                 <div className="space-y-1">
-                  <span className="text-[9px] font-black text-[#006039] font-sans uppercase tracking-wider block">RECOMMENDED ORDER FOR {companySelection}</span>
+                  <span className="text-[9px] font-black text-[#0B2E33] font-sans uppercase tracking-wider block">RECOMMENDED ORDER FOR {companySelection}</span>
                   <p className="text-[10px] font-bold text-[#1E1E1E] leading-normal">{companyMatchResult.focusMode}</p>
                 </div>
               </div>
@@ -1751,7 +1751,7 @@ export default function DashboardPage() {
             {/* Recruiter Perspective Feed */}
             <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
               <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
-                <Sparkles className="h-4 w-4 text-[#006039]" strokeWidth={2.5} />
+                <Sparkles className="h-4 w-4 text-[#0B2E33]" strokeWidth={2.5} />
                 <span>Recruiter Perspective Feed</span>
               </h4>
 
@@ -1809,13 +1809,13 @@ export default function DashboardPage() {
             {/* Company Suggestions */}
             <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-5 space-y-4">
               <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
-                <Award className="h-4 w-4 text-[#006039]" />
+                <Award className="h-4 w-4 text-[#0B2E33]" />
                 <span>Actionable Placement Recommendations</span>
               </h4>
               <div className="space-y-2.5">
                 {companyMatchResult.suggestions?.map((sug: string, idx: number) => (
                   <div key={idx} className="p-3 rounded-xl bg-stone-50 border border-stone-200 text-[10px] font-bold text-[#1E1E1E] leading-normal flex items-start space-x-2 hover:border-stone-200 transition-all">
-                    <span className="text-[#006039] font-sans font-black mt-0.5">#{idx + 1}</span>
+                    <span className="text-[#0B2E33] font-sans font-black mt-0.5">#{idx + 1}</span>
                     <span>{sug}</span>
                   </div>
                 ))}
@@ -1847,7 +1847,7 @@ export default function DashboardPage() {
           <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
             <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center justify-between">
               <span className="flex items-center space-x-1.5">
-                <Briefcase className="h-4 w-4 text-[#006039]" />
+                <Briefcase className="h-4 w-4 text-[#0B2E33]" />
                 <span>Job Description Matches ({analysisHistory.length})</span>
               </span>
               <button
@@ -1872,7 +1872,7 @@ export default function DashboardPage() {
                     <p className="text-[9px] text-[#666666] font-sans font-semibold uppercase tracking-wider">{hist.companyName} • {hist.timestamp}</p>
                   </div>
                   <div className="flex justify-between items-center mt-4 pt-2 border-t border-stone-200">
-                    <span className="text-[10px] font-black font-sans text-[#006039] bg-stone-50 border border-stone-200 px-2 py-0.5 rounded">
+                    <span className="text-[10px] font-black font-sans text-[#0B2E33] bg-stone-50 border border-stone-200 px-2 py-0.5 rounded">
                       {hist.matchScore}% Match
                     </span>
                     <button
@@ -1883,7 +1883,7 @@ export default function DashboardPage() {
                         setTailorApplied(true);
                         setActiveTab("matcher");
                       }}
-                      className="text-[9px] font-bold text-[#006039] hover:text-[#006039] cursor-pointer"
+                      className="text-[9px] font-bold text-[#0B2E33] hover:text-[#0B2E33] cursor-pointer"
                     >
                       Reload Draft →
                     </button>
@@ -1899,7 +1899,7 @@ export default function DashboardPage() {
           <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
             <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center justify-between">
               <span className="flex items-center space-x-1.5">
-                <Building2 className="h-4 w-4 text-[#006039]" />
+                <Building2 className="h-4 w-4 text-[#0B2E33]" />
                 <span>Company Optimization Suitability ({companyHistory.length})</span>
               </span>
               <button
@@ -1924,7 +1924,7 @@ export default function DashboardPage() {
                     <p className="text-[9px] text-[#666666] font-sans font-semibold uppercase tracking-wider">{hist.roleName} • {hist.timestamp}</p>
                   </div>
                   <div className="flex justify-between items-center mt-4 pt-2 border-t border-stone-200">
-                    <span className="text-[10px] font-black font-sans text-[#006039] bg-stone-50 border border-stone-200 px-2 py-0.5 rounded">
+                    <span className="text-[10px] font-black font-sans text-[#0B2E33] bg-stone-50 border border-stone-200 px-2 py-0.5 rounded">
                       {hist.matchScore}% Suitability
                     </span>
                     <button
@@ -1934,7 +1934,7 @@ export default function DashboardPage() {
                         setCompanyMatchResult(hist);
                         setActiveTab("company");
                       }}
-                      className="text-[9px] font-bold text-[#006039] hover:text-[#006039] cursor-pointer"
+                      className="text-[9px] font-bold text-[#0B2E33] hover:text-[#0B2E33] cursor-pointer"
                     >
                       Open Report →
                     </button>
@@ -1954,15 +1954,15 @@ export default function DashboardPage() {
         
         {/* Premium Profile Status Card */}
         <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 relative overflow-hidden text-left hover-card-premium">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#006039]/5 pointer-events-none rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#0B2E33]/5 pointer-events-none rounded-full blur-3xl" />
           
           <div className="flex items-center space-x-4">
-            <div className="h-14 w-14 rounded-2xl to-zinc-900 border border-stone-200 flex items-center justify-center font-sans font-black text-lg text-[#006039] shadow-inner">
+            <div className="h-14 w-14 rounded-2xl to-zinc-900 border border-stone-200 flex items-center justify-center font-sans font-black text-lg text-[#0B2E33] shadow-inner">
               {user.email?.charAt(0).toUpperCase()}
             </div>
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
-                <span className="text-[9px] font-sans font-black text-[#006039] tracking-widest uppercase leading-none">BOOSTCV SUITE</span>
+                <span className="text-[9px] font-sans font-black text-[#0B2E33] tracking-widest uppercase leading-none">BOOSTCV SUITE</span>
                 <span className={`text-[8px] font-mono font-bold px-2 py-0.5 rounded uppercase ${isPaid ? "bg-emerald-955/20 border border-emerald-900/50 text-emerald-400" : "bg-zinc-900/80 border border-zinc-800 text-zinc-400"}`}>
                   {isPaid ? "Pro Developer License" : "Free Preview Mode"}
                 </span>
@@ -1975,7 +1975,7 @@ export default function DashboardPage() {
         {/* Security & Anti-Exploit explanations */}
         <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
           <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
-            <Lock className="h-4 w-4 text-[#006039]" />
+            <Lock className="h-4 w-4 text-[#0B2E33]" />
             <span>Premium Security & Session Lock Gating</span>
           </h4>
           <p className="text-xs text-[#666666] leading-relaxed font-semibold">
@@ -2000,7 +2000,7 @@ export default function DashboardPage() {
         {/* Referral Scheme details */}
         <div className="bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-3xl p-6 space-y-4">
           <h4 className="text-xs font-black text-[#1E1E1E] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
-            <Award className="h-4 w-4 text-[#006039]" />
+            <Award className="h-4 w-4 text-[#0B2E33]" />
             <span>Classmates Referral Scheme (Get Free Downloads)</span>
           </h4>
           <p className="text-xs text-[#666666] leading-relaxed font-semibold">
@@ -2010,7 +2010,7 @@ export default function DashboardPage() {
           <div className="p-4 bg-stone-50 border border-stone-200 rounded-2xl space-y-3">
             <div className="flex justify-between items-center text-[10px] font-sans font-bold">
               <span className="text-[#666666]">Classmates Referral Counter</span>
-              <span className="text-[#006039] font-extrabold">{referralCount} / 3 Peers Joined</span>
+              <span className="text-[#0B2E33] font-extrabold">{referralCount} / 3 Peers Joined</span>
             </div>
             <div className="w-full bg-white h-2 rounded-full overflow-hidden">
               <div 
@@ -2028,7 +2028,7 @@ export default function DashboardPage() {
               />
               <button
                 onClick={copyReferral}
-                className="px-4 py-2.5 rounded-lg bg-stone-50 border border-stone-200 text-[#006039] hover:bg-[#004d2e] transition-colors font-bold font-sans text-[10px]"
+                className="px-4 py-2.5 rounded-lg bg-stone-50 border border-stone-200 text-[#0B2E33] hover:bg-[#004d2e] transition-colors font-bold font-sans text-[10px]"
               >
                 {copied ? "Copied!" : "Copy Link"}
               </button>
@@ -2070,7 +2070,7 @@ export default function DashboardPage() {
         <div className="flex items-center space-x-4 bg-stone-50 p-4 rounded-2xl border border-stone-200">
           <AtsScoreGauge score={atsScore} size={85} />
           <div className="space-y-1">
-            <span className="text-[9px] font-black font-sans text-[#006039] uppercase tracking-wider block">SHORTLISTING READINESS SCORE</span>
+            <span className="text-[9px] font-black font-sans text-[#0B2E33] uppercase tracking-wider block">SHORTLISTING READINESS SCORE</span>
             <p className="text-[10px] text-[#666666] font-semibold font-sans leading-relaxed">
               Your resume layout matches {atsScore}% of corporate standards. Switch tabs below to optimize warnings.
             </p>
@@ -2082,37 +2082,37 @@ export default function DashboardPage() {
           <div className="space-y-1">
             <div className="flex justify-between text-[#666666]">
               <span>Structure completeness</span>
-              <span className="text-[#006039]">{structureVal}%</span>
+              <span className="text-[#0B2E33]">{structureVal}%</span>
             </div>
             <div className="w-full bg-stone-50 h-1 rounded-full overflow-hidden">
-              <div className="bg-[#006039] h-full transition-all duration-300" style={{ width: `${structureVal}%` }} />
+              <div className="bg-[#0B2E33] h-full transition-all duration-300" style={{ width: `${structureVal}%` }} />
             </div>
           </div>
           <div className="space-y-1">
             <div className="flex justify-between text-[#666666]">
               <span>Formatting & symbols</span>
-              <span className="text-[#006039]">{formattingVal}%</span>
+              <span className="text-[#0B2E33]">{formattingVal}%</span>
             </div>
             <div className="w-full bg-stone-50 h-1 rounded-full overflow-hidden">
-              <div className="bg-[#006039] h-full transition-all duration-300" style={{ width: `${formattingVal}%` }} />
+              <div className="bg-[#0B2E33] h-full transition-all duration-300" style={{ width: `${formattingVal}%` }} />
             </div>
           </div>
           <div className="space-y-1">
             <div className="flex justify-between text-[#666666]">
               <span>Readability indexes</span>
-              <span className="text-[#006039]">{readabilityVal}%</span>
+              <span className="text-[#0B2E33]">{readabilityVal}%</span>
             </div>
             <div className="w-full bg-stone-50 h-1 rounded-full overflow-hidden">
-              <div className="bg-[#006039] h-full transition-all duration-300" style={{ width: `${readabilityVal}%` }} />
+              <div className="bg-[#0B2E33] h-full transition-all duration-300" style={{ width: `${readabilityVal}%` }} />
             </div>
           </div>
           <div className="space-y-1">
             <div className="flex justify-between text-[#666666]">
               <span>Keywords matches</span>
-              <span className="text-[#006039]">{keywordsVal}%</span>
+              <span className="text-[#0B2E33]">{keywordsVal}%</span>
             </div>
             <div className="w-full bg-stone-50 h-1 rounded-full overflow-hidden">
-              <div className="bg-[#006039] h-full transition-all duration-300" style={{ width: `${keywordsVal}%` }} />
+              <div className="bg-[#0B2E33] h-full transition-all duration-300" style={{ width: `${keywordsVal}%` }} />
             </div>
           </div>
         </div>
@@ -2376,9 +2376,9 @@ export default function DashboardPage() {
                 {/* Header cyber lock emblem */}
                 <div className="flex items-center justify-center space-x-2">
                   <div className="h-6 w-6 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center shadow-sm">
-                    <Lock className="h-3 w-3 text-[#006039] animate-pulse" />
+                    <Lock className="h-3 w-3 text-[#0B2E33] animate-pulse" />
                   </div>
-                  <span className="text-[10px] font-black font-sans tracking-widest text-[#006039] uppercase">
+                  <span className="text-[10px] font-black font-sans tracking-widest text-[#0B2E33] uppercase">
                     PREMIUM PRO FORMAT LOCKED
                   </span>
                 </div>
@@ -2396,19 +2396,19 @@ export default function DashboardPage() {
                 {/* Quick Trust Checks */}
                 <div className="grid grid-cols-2 gap-2 border-y border-stone-200 py-2.5 text-[8.5px] text-[#666666] font-bold font-sans">
                   <div className="flex items-center space-x-1.5">
-                    <span className="text-[#006039]">✓</span>
+                    <span className="text-[#0B2E33]">✓</span>
                     <span>98%+ Shortlist Guaranteed</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
-                    <span className="text-[#006039]">✓</span>
+                    <span className="text-[#0B2E33]">✓</span>
                     <span>Standard Single-Column</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
-                    <span className="text-[#006039]">✓</span>
+                    <span className="text-[#0B2E33]">✓</span>
                     <span>100% Editable Selection Text</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
-                    <span className="text-[#006039]">✓</span>
+                    <span className="text-[#0B2E33]">✓</span>
                     <span>Lifetime Free AI Re-tuner</span>
                   </div>
                 </div>
@@ -2426,11 +2426,11 @@ export default function DashboardPage() {
                 <div className="border-t border-stone-200 pt-3 space-y-2">
                   <div className="flex justify-between items-center text-[9px] font-bold">
                     <span className="text-[#666666]">B.Tech Referral Scheme (Unlock Free)</span>
-                    <span className="text-[#006039] font-sans">{referralCount} / 3 Classmates Joined</span>
+                    <span className="text-[#0B2E33] font-sans">{referralCount} / 3 Classmates Joined</span>
                   </div>
                   <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
                     <div 
-                      className="bg-[#006039] h-full transition-all duration-500" 
+                      className="bg-[#0B2E33] h-full transition-all duration-500" 
                       style={{ width: `${(referralCount / 3) * 100}%` }}
                     />
                   </div>
@@ -2444,7 +2444,7 @@ export default function DashboardPage() {
                     />
                     <button
                       onClick={copyReferral}
-                      className="px-3 py-2 rounded bg-stone-50 border border-stone-200 text-[#006039] hover:bg-[#004d2e] transition-colors font-bold text-[8.5px] cursor-pointer"
+                      className="px-3 py-2 rounded bg-stone-50 border border-stone-200 text-[#0B2E33] hover:bg-[#004d2e] transition-colors font-bold text-[8.5px] cursor-pointer"
                     >
                       {copied ? "Copied!" : "Copy Link"}
                     </button>
@@ -2460,7 +2460,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex flex-row h-screen w-screen overflow-hidden bg-[#FAF8F3] font-sans antialiased text-[#1E1E1E]">
+    <div className="flex flex-row h-screen w-screen overflow-hidden bg-[#B8E3E9] font-sans antialiased text-[#1E1E1E]">
       
       {/* Dynamic script tags for Razorpay SDK */}
       <script src="https://checkout.razorpay.com/v1/checkout.js" async />
@@ -2470,12 +2470,12 @@ export default function DashboardPage() {
         
         {/* Brand header */}
         <div className="flex items-center space-x-2.5 px-3 py-1.5 bg-stone-50 border border-stone-150 rounded-2xl shadow-sm">
-          <div className="h-7 w-7 rounded-lg bg-[#006039] flex items-center justify-center shadow-sm">
+          <div className="h-7 w-7 rounded-lg bg-[#0B2E33] flex items-center justify-center shadow-sm">
             <Zap className="h-4 w-4 text-[#1E1E1E] stroke-[2.5]" />
           </div>
           <div className="flex flex-col text-left">
             <span className="text-xs font-black text-[#1E1E1E] font-sans tracking-wide uppercase leading-none">BOOSTCV</span>
-            <span className="text-[7.5px] font-black text-[#006039] font-sans tracking-wider leading-none mt-1.5 uppercase">SaaS Career Platform</span>
+            <span className="text-[7.5px] font-black text-[#0B2E33] font-sans tracking-wider leading-none mt-1.5 uppercase">SaaS Career Platform</span>
           </div>
         </div>
 
@@ -2483,7 +2483,7 @@ export default function DashboardPage() {
         <nav className="flex-1 flex flex-col space-y-1.5 text-left">
           <button
             onClick={() => setActiveTab("edit")}
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 ${activeTab === "edit" ? "bg-[#006039] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 ${activeTab === "edit" ? "bg-[#0B2E33] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
           >
             <FileText className="h-4 w-4" />
             <span>Resume Builder</span>
@@ -2491,29 +2491,29 @@ export default function DashboardPage() {
           
           <button
             onClick={() => setActiveTab("ats")}
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 relative ${activeTab === "ats" ? "bg-[#006039] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 relative ${activeTab === "ats" ? "bg-[#0B2E33] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
           >
             <BarChart3 className="h-4 w-4" />
             <span>Shortlisting Scan</span>
             {atsScore > 0 && (
-              <span className={`absolute right-3 text-[8.5px] font-black px-1.5 py-0.25 rounded ${activeTab === "ats" ? "bg-[#004f2f] text-white" : "bg-stone-100 border border-stone-250 text-[#006039]"}`}>{atsScore}%</span>
+              <span className={`absolute right-3 text-[8.5px] font-black px-1.5 py-0.25 rounded ${activeTab === "ats" ? "bg-[#004f2f] text-white" : "bg-stone-100 border border-stone-250 text-[#0B2E33]"}`}>{atsScore}%</span>
             )}
           </button>
 
           <button
             onClick={() => setActiveTab("matcher")}
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 relative ${activeTab === "matcher" ? "bg-[#006039] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 relative ${activeTab === "matcher" ? "bg-[#0B2E33] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
           >
             <Sparkles className="h-4 w-4" />
             <span>AI Job Matcher</span>
             {tailorApplied && (
-              <span className="absolute right-3 h-2 w-2 rounded-full bg-[#006039] animate-ping" />
+              <span className="absolute right-3 h-2 w-2 rounded-full bg-[#0B2E33] animate-ping" />
             )}
           </button>
 
           <button
             onClick={() => setActiveTab("company")}
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 ${activeTab === "company" ? "bg-[#006039] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 ${activeTab === "company" ? "bg-[#0B2E33] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
           >
             <Building2 className="h-4 w-4" />
             <span>Company Intelligence</span>
@@ -2521,7 +2521,7 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setActiveTab("history")}
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 relative ${activeTab === "history" ? "bg-[#006039] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 relative ${activeTab === "history" ? "bg-[#0B2E33] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
           >
             <History className="h-4 w-4" />
             <span>Resume History</span>
@@ -2532,7 +2532,7 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setActiveTab("account")}
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 ${activeTab === "account" ? "bg-[#006039] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 ${activeTab === "account" ? "bg-[#0B2E33] text-white shadow-sm" : "text-[#666666] hover:text-[#1E1E1E]"}`}
           >
             <User className="h-4 w-4" />
             <span>Account & Billing</span>
@@ -2542,14 +2542,14 @@ export default function DashboardPage() {
         {/* Profile Card Bottom */}
         {user && (
           <div className="mt-auto border-t border-stone-200 pt-4 flex items-center space-x-3 text-left">
-            <div className="h-8 w-8 rounded-xl bg-[#006039] flex items-center justify-center font-sans font-black text-[10px] text-[#1E1E1E]">
+            <div className="h-8 w-8 rounded-xl bg-[#0B2E33] flex items-center justify-center font-sans font-black text-[10px] text-[#1E1E1E]">
               {user.email?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[10px] font-bold text-[#1E1E1E] truncate leading-none">{user.email}</p>
               <div className="flex items-center space-x-1.5 mt-1.5">
-                <span className={`h-1.5 w-1.5 rounded-full ${isPaid ? "bg-[#C6A769]" : "bg-stone-400"} animate-pulse`} />
-                <span className={`text-[7.5px] font-black uppercase tracking-wider leading-none ${isPaid ? "text-[#C6A769]" : "text-[#666666]"}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${isPaid ? "bg-[#4F7C82]" : "bg-stone-400"} animate-pulse`} />
+                <span className={`text-[7.5px] font-black uppercase tracking-wider leading-none ${isPaid ? "text-[#4F7C82]" : "text-[#666666]"}`}>
                   {isPaid ? "Pro Unlocked" : "Free Preview"}
                 </span>
               </div>
@@ -2559,7 +2559,7 @@ export default function DashboardPage() {
       </aside>
 
       {/* 2. Main Work Panel View Area */}
-      <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#FAF8F3]/30">
+      <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#B8E3E9]/30">
         
         {/* Contextual top workspace header */}
         <header className="h-14 border-b border-stone-200 px-6 flex items-center justify-between bg-white z-10 flex-shrink-0">
@@ -2576,7 +2576,7 @@ export default function DashboardPage() {
 
           <div className="flex items-center space-x-4">
             {isPaid && (
-              <span className="text-[9px] font-black bg-[#C6A769] border border-[#b29358] px-2 py-0.5 rounded text-[#1E1E1E] uppercase tracking-wider hidden sm:inline shadow-sm">
+              <span className="text-[9px] font-black bg-[#4F7C82] border border-[#b29358] px-2 py-0.5 rounded text-[#1E1E1E] uppercase tracking-wider hidden sm:inline shadow-sm">
                 🔓 Active Premium Session
               </span>
             )}
@@ -2647,60 +2647,60 @@ export default function DashboardPage() {
                         <div className="space-y-1">
                           <div className="flex justify-between text-[#666666]">
                             <span>Structure completeness:</span>
-                            <span className="text-[#006039]">{structureVal}%</span>
+                            <span className="text-[#0B2E33]">{structureVal}%</span>
                           </div>
                           <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-[#006039] h-full transition-all duration-500" style={{ width: `${structureVal}%` }} />
+                            <div className="bg-[#0B2E33] h-full transition-all duration-500" style={{ width: `${structureVal}%` }} />
                           </div>
                         </div>
 
                         <div className="space-y-1">
                           <div className="flex justify-between text-[#666666]">
                             <span>Formatting & symbols:</span>
-                            <span className="text-[#006039]">{formattingVal}%</span>
+                            <span className="text-[#0B2E33]">{formattingVal}%</span>
                           </div>
                           <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-[#006039] h-full transition-all duration-500" style={{ width: `${formattingVal}%` }} />
+                            <div className="bg-[#0B2E33] h-full transition-all duration-500" style={{ width: `${formattingVal}%` }} />
                           </div>
                         </div>
 
                         <div className="space-y-1">
                           <div className="flex justify-between text-[#666666]">
                             <span>Recruiter readability:</span>
-                            <span className="text-[#006039]">{readabilityVal}%</span>
+                            <span className="text-[#0B2E33]">{readabilityVal}%</span>
                           </div>
                           <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-[#006039] h-full transition-all duration-500" style={{ width: `${readabilityVal}%` }} />
+                            <div className="bg-[#0B2E33] h-full transition-all duration-500" style={{ width: `${readabilityVal}%` }} />
                           </div>
                         </div>
 
                         <div className="space-y-1">
                           <div className="flex justify-between text-[#666666]">
                             <span>Target keywords:</span>
-                            <span className="text-[#006039]">{keywordsVal}%</span>
+                            <span className="text-[#0B2E33]">{keywordsVal}%</span>
                           </div>
                           <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-[#006039] h-full transition-all duration-500" style={{ width: `${keywordsVal}%` }} />
+                            <div className="bg-[#0B2E33] h-full transition-all duration-500" style={{ width: `${keywordsVal}%` }} />
                           </div>
                         </div>
 
                         <div className="space-y-1">
                           <div className="flex justify-between text-[#666666]">
                             <span>Project depth:</span>
-                            <span className="text-[#006039]">{projectsVal}%</span>
+                            <span className="text-[#0B2E33]">{projectsVal}%</span>
                           </div>
                           <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-[#006039] h-full transition-all duration-500" style={{ width: `${projectsVal}%` }} />
+                            <div className="bg-[#0B2E33] h-full transition-all duration-500" style={{ width: `${projectsVal}%` }} />
                           </div>
                         </div>
 
                         <div className="space-y-1">
                           <div className="flex justify-between text-[#666666]">
                             <span>Achievements quality:</span>
-                            <span className="text-[#006039]">{achievementsVal}%</span>
+                            <span className="text-[#0B2E33]">{achievementsVal}%</span>
                           </div>
                           <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-[#006039] h-full transition-all duration-500" style={{ width: `${achievementsVal}%` }} />
+                            <div className="bg-[#0B2E33] h-full transition-all duration-500" style={{ width: `${achievementsVal}%` }} />
                           </div>
                         </div>
                       </div>
@@ -2745,11 +2745,11 @@ export default function DashboardPage() {
               ) : (
                 <ul className="text-xs space-y-2 text-[#666666]">
                   <li className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-[#006039] mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-[#0B2E33] mt-0.5 flex-shrink-0" />
                     <span><strong>Format check:</strong> Clean single-column layout detected (Pass).</span>
                   </li>
                   <li className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-[#006039] mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-[#0B2E33] mt-0.5 flex-shrink-0" />
                     <span><strong>Fonts standard:</strong> Helvetica / Arial parsed cleanly.</span>
                   </li>
                   {atsScore < 85 ? (
@@ -2758,8 +2758,8 @@ export default function DashboardPage() {
                       <span><strong>Quantify suggestion:</strong> Add metrics to experience for 98%+ score.</span>
                     </li>
                   ) : (
-                    <li className="flex items-start space-x-2 text-[#006039]">
-                      <CheckCircle2 className="h-4 w-4 text-[#006039] mt-0.5 flex-shrink-0" />
+                    <li className="flex items-start space-x-2 text-[#0B2E33]">
+                      <CheckCircle2 className="h-4 w-4 text-[#0B2E33] mt-0.5 flex-shrink-0" />
                       <span><strong>Quantified bullets:</strong> Standard XYZ numbers detected!</span>
                     </li>
                   )}
@@ -3061,9 +3061,9 @@ export default function DashboardPage() {
                     {/* Header cyber lock emblem */}
                     <div className="flex items-center justify-center space-x-2">
                       <div className="h-6 w-6 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center shadow-sm">
-                        <Lock className="h-3 w-3 text-[#006039] animate-pulse" />
+                        <Lock className="h-3 w-3 text-[#0B2E33] animate-pulse" />
                       </div>
-                      <span className="text-[10px] font-black font-sans tracking-widest text-[#006039] uppercase">
+                      <span className="text-[10px] font-black font-sans tracking-widest text-[#0B2E33] uppercase">
                         PREMIUM PRO FORMAT LOCKED
                       </span>
                     </div>
@@ -3081,19 +3081,19 @@ export default function DashboardPage() {
                     {/* Quick Trust Checks */}
                     <div className="grid grid-cols-2 gap-2 border-y border-stone-200 py-2.5 text-[9px] text-[#666666] font-bold font-sans">
                       <div className="flex items-center space-x-1.5">
-                        <span className="text-[#006039]">✓</span>
+                        <span className="text-[#0B2E33]">✓</span>
                         <span>98%+ Shortlist Guaranteed</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
-                        <span className="text-[#006039]">✓</span>
+                        <span className="text-[#0B2E33]">✓</span>
                         <span>Standard Single-Column</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
-                        <span className="text-[#006039]">✓</span>
+                        <span className="text-[#0B2E33]">✓</span>
                         <span>100% Editable Selection Text</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
-                        <span className="text-[#006039]">✓</span>
+                        <span className="text-[#0B2E33]">✓</span>
                         <span>Lifetime Free AI Re-tuner</span>
                       </div>
                     </div>
@@ -3111,11 +3111,11 @@ export default function DashboardPage() {
                     <div className="border-t border-stone-200 pt-3 space-y-2">
                       <div className="flex justify-between items-center text-[10px] font-bold">
                         <span className="text-[#666666]">B.Tech Referral Scheme (Unlock Free)</span>
-                        <span className="text-[#006039] font-sans">{referralCount} / 3 Classmates Joined</span>
+                        <span className="text-[#0B2E33] font-sans">{referralCount} / 3 Classmates Joined</span>
                       </div>
                       <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
                         <div 
-                          className="bg-[#006039] h-full transition-all duration-500" 
+                          className="bg-[#0B2E33] h-full transition-all duration-500" 
                           style={{ width: `${(referralCount / 3) * 100}%` }}
                         />
                       </div>
@@ -3129,7 +3129,7 @@ export default function DashboardPage() {
                         />
                         <button
                           onClick={copyReferral}
-                          className="px-3 py-2 rounded bg-stone-50 border border-stone-200 text-[#006039] hover:bg-[#004d2e] transition-colors font-bold text-[9px]"
+                          className="px-3 py-2 rounded bg-stone-50 border border-stone-200 text-[#0B2E33] hover:bg-[#004d2e] transition-colors font-bold text-[9px]"
                         >
                           {copied ? "Copied!" : "Copy Link"}
                         </button>
@@ -3161,7 +3161,7 @@ export default function DashboardPage() {
                 <h3 className="text-sm font-black text-[#1E1E1E] font-sans tracking-wide uppercase">
                   Razorpay Sandbox Gateway
                 </h3>
-                <p className="text-[10px] text-[#006039] font-bold font-sans tracking-widest uppercase">
+                <p className="text-[10px] text-[#0B2E33] font-bold font-sans tracking-widest uppercase">
                   Offline Development Mode
                 </p>
               </div>
@@ -3175,7 +3175,7 @@ export default function DashboardPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-[#666666]">Simulated Order:</span>
-                <span className="text-[#006039] font-bold select-all">{mockOrderId}</span>
+                <span className="text-[#0B2E33] font-bold select-all">{mockOrderId}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#666666]">Amount Due:</span>
@@ -3193,7 +3193,7 @@ export default function DashboardPage() {
 
             {/* Information Callout */}
             <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200 text-[#666666] text-[10px] leading-relaxed space-y-1 text-left">
-              <div className="flex items-center space-x-1 text-[#006039] font-black">
+              <div className="flex items-center space-x-1 text-[#0B2E33] font-black">
                 <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-ping mr-1" />
                 <span>DEVELOPER INFO</span>
               </div>

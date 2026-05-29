@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import * as THREE from "three";
-import { AlertTriangle, CheckCircle, HelpCircle, Lock, ShieldAlert, Sparkles, User, Zap } from "lucide-react";
+import { AlertTriangle, CheckCircle, ShieldAlert, Target } from "lucide-react";
 
 export function LandingHero3D() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,10 +13,9 @@ export function LandingHero3D() {
 
   // 1. Scroll-linked 3D Card Rotation
   const { scrollYProgress } = useScroll();
-  // We want the card to flip between scroll progress 0.05 and 0.25
   const scrollRotation = useTransform(scrollYProgress, [0.05, 0.25], [0, 180]);
   
-  // 2. Interactive Mouse Tilt Effect (hardware-accelerated via Spring)
+  // 2. Interactive Mouse Tilt Effect
   const rotateXVal = useMotionValue(0);
   const rotateYVal = useMotionValue(0);
 
@@ -24,16 +23,12 @@ export function LandingHero3D() {
   const springRotateX = useSpring(rotateXVal, springConfig);
   const springRotateY = useSpring(rotateYVal, springConfig);
 
-  // Combine scroll flip + mouse tilt
-  // When card is rotated by scroll, we add scrollRotation to rotateY
   const combinedRotateY = useTransform(scrollRotation, (latestScrollRot) => {
     return latestScrollRot + springRotateY.get();
   });
 
-  // Track flip state for text/badges visibility helper
   useEffect(() => {
     return scrollRotation.on("change", (latest) => {
-      // If rotated past 90 degrees, show the optimized "after" side
       setIsFlipped(latest > 90);
     });
   }, [scrollRotation]);
@@ -45,29 +40,25 @@ export function LandingHero3D() {
     const width = rect.width;
     const height = rect.height;
     
-    // Calculate cursor coordinate offset from center (-0.5 to 0.5)
     const x = (e.clientX - rect.left) / width - 0.5;
     const y = (e.clientY - rect.top) / height - 0.5;
 
-    // Map coordinates to minor rotations (max 12 deg)
-    rotateXVal.set(-y * 24);
-    rotateYVal.set(x * 24);
+    rotateXVal.set(-y * 20);
+    rotateYVal.set(x * 20);
   };
 
   const handleMouseLeave = () => {
-    // Return smooth back to center
     rotateXVal.set(0);
     rotateYVal.set(0);
   };
 
-  // 3. Three.js Ambient Particle Space Field
+  // 3. Three.js Elegant Light Canvas
   useEffect(() => {
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
     const scene = new THREE.Scene();
     
-    // Smooth camera setup
     const camera = new THREE.PerspectiveCamera(
       60,
       canvas.clientWidth / canvas.clientHeight,
@@ -84,23 +75,21 @@ export function LandingHero3D() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
 
-    // Particle Array Generation
-    const particlesCount = 280;
+    // Particle Array Generation - Warm gold and white dust motes
+    const particlesCount = 200;
     const positionArray = new Float32Array(particlesCount * 3);
     const colorArray = new Float32Array(particlesCount * 3);
 
-    // Soft cyan color token for ambient particles
-    const themeColor = new THREE.Color("#0891b2"); // cyan-600
+    const goldColor = new THREE.Color("#4F7C82"); // Brand premium gold
+    const whiteColor = new THREE.Color("#ffffff");
 
     for (let i = 0; i < particlesCount * 3; i += 3) {
-      // Scatter points in a spatial field
-      positionArray[i] = (Math.random() - 0.5) * 65;     // X
-      positionArray[i + 1] = (Math.random() - 0.5) * 45; // Y
-      positionArray[i + 2] = (Math.random() - 0.5) * 40; // Z
+      positionArray[i] = (Math.random() - 0.5) * 60;     // X
+      positionArray[i + 1] = (Math.random() - 0.5) * 40; // Y
+      positionArray[i + 2] = (Math.random() - 0.5) * 35; // Z
 
-      // Color variation (glowing whites & soft cyans)
       const mixRatio = Math.random();
-      const color = new THREE.Color("#ffffff").lerp(themeColor, mixRatio);
+      const color = whiteColor.clone().lerp(goldColor, mixRatio);
       colorArray[i] = color.r;
       colorArray[i + 1] = color.g;
       colorArray[i + 2] = color.b;
@@ -110,7 +99,6 @@ export function LandingHero3D() {
     particleGeometry.setAttribute("position", new THREE.BufferAttribute(positionArray, 3));
     particleGeometry.setAttribute("color", new THREE.BufferAttribute(colorArray, 3));
 
-    // Custom Canvas round texture for circular particles
     const createCircleTexture = () => {
       const size = 16;
       const canvasTex = document.createElement("canvas");
@@ -127,10 +115,10 @@ export function LandingHero3D() {
     };
 
     const particleMaterial = new THREE.PointsMaterial({
-      size: 0.32,
+      size: 0.38,
       vertexColors: true,
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.55,
       map: createCircleTexture(),
       depthWrite: false,
     });
@@ -138,13 +126,13 @@ export function LandingHero3D() {
     const particlesMesh = new THREE.Points(particleGeometry, particleMaterial);
     scene.add(particlesMesh);
 
-    // Subtle 3D Ambient Wireframe Grid to create Linear/Vercel spatial feel
+    // Minimalist Beige/Stone wireframe bottom grid
     const gridGeometry = new THREE.PlaneGeometry(80, 80, 20, 20);
     const gridMaterial = new THREE.MeshBasicMaterial({
-      color: 0x18181b, // zinc-900 wireframe
+      color: 0xe7e5e4, // stone-200 wireframe grid
       wireframe: true,
       transparent: true,
-      opacity: 0.3,
+      opacity: 0.55,
     });
     const gridMesh = new THREE.Mesh(gridGeometry, gridMaterial);
     gridMesh.rotation.x = Math.PI / 2.3;
@@ -158,19 +146,15 @@ export function LandingHero3D() {
     const animate = () => {
       const elapsedTime = clock.getElapsedTime();
 
-      // Soft particles float
-      particlesMesh.rotation.y = elapsedTime * 0.035;
-      particlesMesh.rotation.x = elapsedTime * 0.015;
+      particlesMesh.rotation.y = elapsedTime * 0.025;
+      particlesMesh.rotation.x = elapsedTime * 0.012;
 
-      // Soft grid breathing wave
       const positions = gridGeometry.attributes.position;
       if (positions) {
         for (let i = 0; i < positions.count; i++) {
-          const z = positions.getZ(i);
           const x = positions.getX(i);
           const y = positions.getY(i);
-          // Apply sinusoidal wave
-          const offset = Math.sin(elapsedTime + (x * 0.1) + (y * 0.1)) * 0.6;
+          const offset = Math.sin(elapsedTime * 0.8 + (x * 0.08) + (y * 0.08)) * 0.45;
           positions.setZ(i, offset);
         }
         positions.needsUpdate = true;
@@ -182,7 +166,6 @@ export function LandingHero3D() {
 
     animate();
 
-    // Window Resizer Handler
     const handleResize = () => {
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
@@ -193,7 +176,6 @@ export function LandingHero3D() {
 
     window.addEventListener("resize", handleResize);
 
-    // Cleanup context
     return () => {
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animationFrameId);
@@ -211,11 +193,11 @@ export function LandingHero3D() {
       {/* 1. Spatial Ambient Canvas Background */}
       <canvas 
         ref={canvasRef} 
-        className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-70"
+        className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-80"
       />
 
       {/* Subtle bottom fade to blend with next section */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-zinc-950 to-transparent pointer-events-none z-1" />
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#B8E3E9] to-transparent pointer-events-none z-1" />
 
       {/* 2. Interactive Card 3D viewport wrapper */}
       <div
@@ -229,14 +211,14 @@ export function LandingHero3D() {
       >
         
         {/* Helper Scroll/Tilt Indicator Overlay */}
-        <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-1 z-20">
-          <span className="text-[9px] font-bold font-mono tracking-widest text-zinc-550 uppercase">
-            {!mouseMoved ? "Hover to Tilt Card" : "Scroll down to optimize"}
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-1.5 z-20">
+          <span className="text-[9px] font-bold font-mono tracking-widest text-[#666666] uppercase">
+            {!mouseMoved ? "Hover to Tilt Profile" : "Scroll down to optimize"}
           </span>
-          <div className="flex items-center space-x-1">
-            <span className={`h-1.5 w-1.5 rounded-full ${isFlipped ? "bg-emerald-400" : "bg-red-400 animate-pulse"}`} />
-            <span className="text-[10px] font-black font-mono tracking-wider text-white uppercase">
-              {isFlipped ? "OPTIMIZED PROFILE" : "UNOPTIMIZED DETECTED"}
+          <div className="flex items-center space-x-1.5">
+            <span className={`h-1.5 w-1.5 rounded-full ${isFlipped ? "bg-[#2E7D32]" : "bg-[#D32F2F] animate-pulse"}`} />
+            <span className="text-[10px] font-black font-sans tracking-wide text-[#1E1E1E] uppercase">
+              {isFlipped ? "OPTIMIZED FOR RECRUITERS" : "ISSUES FLAGGED"}
             </span>
           </div>
         </div>
@@ -253,24 +235,24 @@ export function LandingHero3D() {
         >
           
           {/* ======================================================== */}
-          {/* FRONT SIDE: Muted Zinc & Red Warn Outline (Before Optimization) */}
+          {/* FRONT SIDE: Elegant Zinc border & Red Warn Checklist (Before) */}
           {/* ======================================================== */}
           <div 
-            className="absolute inset-0 w-full h-full rounded-3xl border border-red-950/20 bg-zinc-950/95 p-6 flex flex-col justify-between shadow-[0_20px_50px_rgba(239,68,68,0.06)]"
+            className="absolute inset-0 w-full h-full rounded-3xl border border-stone-200 bg-white p-6 flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.03)]"
             style={{
               backfaceVisibility: "hidden",
               WebkitBackfaceVisibility: "hidden",
             }}
           >
             {/* Header branding */}
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-900">
+            <div className="flex items-center justify-between pb-3.5 border-b border-stone-100">
               <div className="flex items-center space-x-2">
-                <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-[9px] font-black font-mono tracking-widest text-zinc-500 uppercase">
-                  UNRESOLVED PLACEMENT FILTERS
+                <span className="h-2 w-2 rounded-full bg-[#D32F2F] animate-pulse" />
+                <span className="text-[9px] font-black font-sans tracking-wide text-[#666666] uppercase">
+                  UNRESOLVED RECRUITER ISSUES
                 </span>
               </div>
-              <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-red-950/40 text-red-400 border border-red-900/30 uppercase font-mono">
+              <span className="text-[9px] font-black px-2.5 py-0.5 rounded-full bg-[#D32F2F]/6 text-[#D32F2F] border border-[#D32F2F]/15 uppercase font-sans">
                 Readiness: 38%
               </span>
             </div>
@@ -280,40 +262,40 @@ export function LandingHero3D() {
               
               {/* Header profile section in resume */}
               <div className="space-y-1">
-                <div className="h-4 w-32 bg-zinc-800 rounded animate-pulse" />
-                <div className="h-2 w-48 bg-zinc-900 rounded" />
+                <div className="h-4 w-32 bg-stone-100 rounded" />
+                <div className="h-2.5 w-48 bg-stone-50 rounded" />
               </div>
 
               {/* Warning checklist items simulating placement warnings */}
-              <div className="space-y-3 pt-2 font-mono text-[10px]">
+              <div className="space-y-3 pt-1 font-sans text-[10px]">
                 
-                <div className="p-3 bg-red-950/15 border border-red-950/30 rounded-xl space-y-1.5">
-                  <div className="flex items-center space-x-2 text-red-400 font-extrabold">
+                <div className="p-3 bg-[#D32F2F]/4 border border-[#D32F2F]/12 rounded-xl space-y-1.5">
+                  <div className="flex items-center space-x-2 text-[#D32F2F] font-black text-[10px]">
                     <ShieldAlert className="h-3.5 w-3.5 flex-shrink-0" />
-                    <span>Multi-Column Layout Error</span>
+                    <span>Incompatible Column Spacing</span>
                   </div>
-                  <p className="text-[9px] text-zinc-400 leading-normal font-sans font-medium pl-5">
-                    Parser scrambles columns horizontally. Recruiter matches read education and experience as overlapping lines.
+                  <p className="text-[9.5px] text-[#666666] leading-normal font-medium pl-5">
+                    Parser vertical grid mismatch. Recruiter systems merge sections horizontally, creating horizontal scrambled lines.
                   </p>
                 </div>
 
-                <div className="p-3 bg-red-950/15 border border-red-950/30 rounded-xl space-y-1.5">
-                  <div className="flex items-center space-x-2 text-red-400 font-extrabold">
+                <div className="p-3 bg-[#D32F2F]/4 border border-[#D32F2F]/12 rounded-xl space-y-1.5">
+                  <div className="flex items-center space-x-2 text-[#D32F2F] font-black text-[10px]">
                     <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
-                    <span>0 Placement Keywords Mapped</span>
+                    <span>Missing Core Skill Keywords</span>
                   </div>
-                  <p className="text-[9px] text-zinc-400 leading-normal font-sans font-medium pl-5">
-                    No matching technologies index. Core skills (Docker, AWS, SQL) are written in icons/bars, making them invisible.
+                  <p className="text-[9.5px] text-[#666666] leading-normal font-medium pl-5">
+                    Key target technologies (Docker, AWS, SQL) are written inside circular graphic dials, which are invisible to search engines.
                   </p>
                 </div>
 
-                <div className="p-3 bg-red-950/15 border border-red-950/30 rounded-xl space-y-1.5">
-                  <div className="flex items-center space-x-2 text-amber-500 font-extrabold">
+                <div className="p-3 bg-[#E6A700]/4 border border-[#E6A700]/12 rounded-xl space-y-1.5">
+                  <div className="flex items-center space-x-2 text-[#E6A700] font-black text-[10px]">
                     <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
                     <span>Unquantified Experience Bullets</span>
                   </div>
-                  <p className="text-[9px] text-zinc-400 leading-normal font-sans font-medium pl-5">
-                    Muted statements without XYZ metrics. No numbers measuring impact on latency, memory, or cost scales.
+                  <p className="text-[9.5px] text-[#666666] leading-normal font-medium pl-5">
+                    Muted role descriptions without metrics. Missing precise numbers measuring latency scales or percentage changes.
                   </p>
                 </div>
 
@@ -322,18 +304,18 @@ export function LandingHero3D() {
             </div>
 
             {/* Bottom Actions footer */}
-            <div className="pt-3 border-t border-zinc-900 flex items-center justify-between font-mono text-[9px] text-zinc-550 font-bold">
-              <span>SCANNER STATUS: CRITICAL FAILURE</span>
+            <div className="pt-3 border-t border-stone-100 flex items-center justify-between font-mono text-[9px] text-[#999999] font-bold">
+              <span>SCANNER: CRITICAL CONFLICTS</span>
               <span>VIT-PL-2026</span>
             </div>
 
           </div>
 
           {/* ======================================================== */}
-          {/* BACK SIDE: Premium Cyan & Emerald Checked (After Optimization) */}
+          {/* BACK SIDE: Premium White & Green Checkmarks (After) */}
           {/* ======================================================== */}
           <div 
-            className="absolute inset-0 w-full h-full rounded-3xl border border-cyan-500/25 bg-zinc-950/95 p-6 flex flex-col justify-between shadow-[0_20px_50px_rgba(6,182,212,0.1)]"
+            className="absolute inset-0 w-full h-full rounded-3xl border border-stone-200 bg-white p-6 flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
             style={{
               backfaceVisibility: "hidden",
               WebkitBackfaceVisibility: "hidden",
@@ -341,14 +323,14 @@ export function LandingHero3D() {
             }}
           >
             {/* Header branding */}
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-900">
+            <div className="flex items-center justify-between pb-3.5 border-b border-stone-100">
               <div className="flex items-center space-x-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[9px] font-black font-mono tracking-widest text-cyan-400 uppercase">
-                  BOOSTCV CERTIFIED READY
+                <span className="h-2 w-2 rounded-full bg-[#0B2E33]" />
+                <span className="text-[9px] font-black font-sans tracking-wide text-[#0B2E33] uppercase">
+                  BOOSTCV PLATINUM READY
                 </span>
               </div>
-              <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-900/30 uppercase font-mono shadow-[0_0_10px_rgba(16,185,129,0.15)] animate-pulse">
+              <span className="text-[9px] font-black px-2.5 py-0.5 rounded-full bg-[#0B2E33]/6 text-[#0B2E33] border border-[#0B2E33]/15 uppercase font-sans animate-pulse">
                 Readiness: 98%
               </span>
             </div>
@@ -358,40 +340,40 @@ export function LandingHero3D() {
               
               {/* Header profile section in resume */}
               <div className="space-y-1">
-                <div className="h-4 w-40 bg-white rounded" />
-                <div className="h-2 w-56 bg-zinc-800 rounded" />
+                <div className="h-4 w-40 bg-[#0B2E33] rounded" />
+                <div className="h-2.5 w-56 bg-stone-150 rounded" />
               </div>
 
               {/* Verified success checks representation */}
-              <div className="space-y-3 pt-2 font-mono text-[10px]">
+              <div className="space-y-3 pt-1 font-sans text-[10px]">
                 
-                <div className="p-3 bg-zinc-900/40 border border-zinc-900 rounded-xl space-y-1.5 hover:border-cyan-500/20 transition-all">
-                  <div className="flex items-center space-x-2 text-cyan-400 font-extrabold">
-                    <CheckCircle className="h-3.5 w-3.5 flex-shrink-0 text-cyan-400" />
-                    <span>Linear Single-Column Layout</span>
+                <div className="p-3 bg-stone-50 border border-stone-100 rounded-xl space-y-1.5 hover:border-[#0B2E33]/20 transition-all">
+                  <div className="flex items-center space-x-2 text-[#0B2E33] font-black text-[10px]">
+                    <CheckCircle className="h-3.5 w-3.5 flex-shrink-0 text-[#0B2E33]" />
+                    <span>Linear Recruiter-Approved Format</span>
                   </div>
-                  <p className="text-[9px] text-zinc-300 leading-normal font-sans font-medium pl-5">
-                    Verified 100% parsable text streams. Zero horizontal wrapping errors or table overlays. Standard Helvetica type.
+                  <p className="text-[9.5px] text-[#666666] leading-normal font-medium pl-5">
+                    Clean, single-column spacing guarantees 100% indexing score. Helvetica typography extracts cleanly on all portals.
                   </p>
                 </div>
 
-                <div className="p-3 bg-zinc-900/40 border border-zinc-900 rounded-xl space-y-1.5 hover:border-cyan-500/20 transition-all">
-                  <div className="flex items-center space-x-2 text-cyan-400 font-extrabold">
-                    <CheckCircle className="h-3.5 w-3.5 flex-shrink-0 text-cyan-400" />
-                    <span>Dynamic Placements Match Cloud</span>
+                <div className="p-3 bg-stone-50 border border-stone-100 rounded-xl space-y-1.5 hover:border-[#0B2E33]/20 transition-all">
+                  <div className="flex items-center space-x-2 text-[#0B2E33] font-black text-[10px]">
+                    <CheckCircle className="h-3.5 w-3.5 flex-shrink-0 text-[#0B2E33]" />
+                    <span>Target Placement Skills Grid</span>
                   </div>
-                  <p className="text-[9px] text-zinc-300 leading-normal font-sans font-medium pl-5">
-                    Skills grid automatically mapped to real job descriptions. 100% keyword extraction rates.
+                  <p className="text-[9.5px] text-[#666666] leading-normal font-medium pl-5">
+                    Skills section automatically mapped to target job requisitions. Core technology phrases indexed successfully.
                   </p>
                 </div>
 
-                <div className="p-3 bg-zinc-900/40 border border-zinc-900 rounded-xl space-y-1.5 hover:border-cyan-500/20 transition-all">
-                  <div className="flex items-center space-x-2 text-emerald-400 font-extrabold">
-                    <CheckCircle className="h-3.5 w-3.5 flex-shrink-0 text-emerald-400" />
-                    <span>Recruiter-Optimized XYZ Metrics</span>
+                <div className="p-3 bg-stone-50 border border-stone-100 rounded-xl space-y-1.5 hover:border-[#0B2E33]/20 transition-all">
+                  <div className="flex items-center space-x-2 text-[#2E7D32] font-black text-[10px]">
+                    <CheckCircle className="h-3.5 w-3.5 flex-shrink-0 text-[#2E7D32]" />
+                    <span>Google XYZ Impact Formulation</span>
                   </div>
-                  <p className="text-[9px] text-zinc-300 leading-normal font-sans font-medium pl-5">
-                    Achievements restructured with clear numbers: *\"Reduced API response times by 32% via Redis caching layer\"*.
+                  <p className="text-[9.5px] text-[#666666] leading-normal font-medium pl-5">
+                    Experience structured with verified numbers: *\"Reduced API response times by 32% via custom Redis cache\"*.
                   </p>
                 </div>
 
@@ -400,9 +382,12 @@ export function LandingHero3D() {
             </div>
 
             {/* Bottom Actions footer */}
-            <div className="pt-3 border-t border-zinc-900 flex items-center justify-between font-mono text-[9px] text-cyan-400 font-bold">
+            <div className="pt-3 border-t border-stone-100 flex items-center justify-between font-sans text-[9px] text-[#0B2E33] font-black uppercase">
               <span>SCANNER STATUS: PASS</span>
-              <span>PLACEMENT GUARANTEED</span>
+              <span className="text-[#4F7C82] font-black flex items-center">
+                <Target className="h-3 w-3 mr-0.5 text-[#4F7C82]" />
+                PRO TEMPLATE
+              </span>
             </div>
 
           </div>

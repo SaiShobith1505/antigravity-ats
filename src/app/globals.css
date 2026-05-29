@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-neon-cyan: #06b6d4;
-  --color-electric-blue: #00d2ff;
-  --color-dark-bg: #030303;
-  --color-dark-card: #0a0a0c;
-  --shadow-neon: 0 0 6px rgba(6, 182, 212, 0.08);
-  --shadow-neon-strong: 0 0 12px rgba(6, 182, 212, 0.12);
+  --color-primary-green: #0B2E33;
+  --color-premium-gold: #4F7C82;
+  --color-warm-bg: #B8E3E9;
+  --color-card-bg: #93B1B5;
+  --color-text-primary: #1E1E1E;
+  --color-text-secondary: #666666;
   --font-sans: var(--font-geist-sans), Inter, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 }
 
 :root {
-  --background: #030303;
-  --foreground: #f8fafc;
+  --background: #B8E3E9;
+  --foreground: #1E1E1E;
 }
 
 body {
@@ -22,84 +22,61 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Premium custom UI styles */
+/* Premium Light Theme Card Panels */
 .glass-panel {
-  background: rgba(10, 10, 12, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #93B1B5;
+  border: 1px solid #93B1B5; /* stone-200 */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.01);
 }
 
 .glass-panel-glow {
-  background: rgba(10, 10, 12, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(6, 182, 212, 0.12);
-  box-shadow: var(--shadow-neon);
+  background: #93B1B5;
+  border: 1px solid rgba(198, 167, 105, 0.25); /* Premium gold border */
+  box-shadow: 0 4px 12px rgba(198, 167, 105, 0.06);
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #ffffff 30%, #06b6d4 100%);
+  background: linear-gradient(135deg, #0B2E33 0%, #4F7C82 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .gradient-glow-text {
-  background: linear-gradient(135deg, #00d2ff 0%, #06b6d4 100%);
+  background: linear-gradient(135deg, #0B2E33 0%, #4F7C82 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.3));
 }
 
-/* Dots and Grid backgrounds mimicking Linear.app */
+/* Dots and Grid backgrounds mimicking high-end Stripe/Rolex landing pages */
 .bg-grid-pattern {
-  background-image: 
-    radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0),
-    radial-gradient(rgba(6, 182, 212, 0.02) 1px, transparent 0);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.018) 1.2px, transparent 0);
   background-size: 24px 24px;
-  background-position: 0 0, 12px 12px;
-}
-
-/* Keyframes for glow animations */
-@keyframes neonPulse {
-  0%, 100% {
-    box-shadow: 0 0 6px rgba(6, 182, 212, 0.08);
-    border-color: rgba(6, 182, 212, 0.12);
-  }
-  50% {
-    box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
-    border-color: rgba(6, 182, 212, 0.22);
-  }
-}
-
-.animate-neon-pulse {
-  animation: neonPulse 3s infinite ease-in-out;
 }
 
 /* Watermark Blur overlay */
 .paywall-blur {
-  filter: blur(10px);
+  filter: blur(8px);
   user-select: none;
   pointer-events: none;
 }
 
-/* Standard scrollbar stylings for premium dark UX */
+/* Standard scrollbar stylings for premium light UX */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #030303;
+  background: #B8E3E9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e1e24;
+  background: #93B1B5;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #32323f;
+  background: #93B1B5;
 }
 
 /* Premium SaaS UX Animations & Utilities */
@@ -109,37 +86,37 @@ body {
 }
 
 .skeleton-loading {
-  background: linear-gradient(90deg, #18181b 25%, #27272a 50%, #18181b 75%);
+  background: linear-gradient(90deg, #f5f5f4 25%, #93B1B5 50%, #f5f5f4 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite linear;
 }
 
 /* Notion-like soft badges */
 .badge-cyan {
-  background: rgba(6, 182, 212, 0.08);
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  color: #22d3ee;
+  background: rgba(0, 96, 57, 0.06);
+  border: 1px solid rgba(0, 96, 57, 0.15);
+  color: #0B2E33;
 }
 
 .badge-emerald {
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  color: #34d399;
+  background: rgba(46, 125, 50, 0.06);
+  border: 1px solid rgba(46, 125, 50, 0.15);
+  color: #2e7d32;
 }
 
 .badge-amber {
-  background: rgba(245, 158, 11, 0.08);
-  border: 1px solid rgba(245, 158, 11, 0.2);
-  color: #fbbf24;
+  background: rgba(198, 167, 105, 0.06);
+  border: 1px solid rgba(198, 167, 105, 0.25);
+  color: #4F7C82;
 }
 
 .badge-red {
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #f87171;
+  background: rgba(211, 47, 47, 0.06);
+  border: 1px solid rgba(211, 47, 47, 0.15);
+  color: #d32f2f;
 }
 
-/* Linear-like dashboard transitions */
+/* Dashboard transitions */
 .transition-smooth {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -149,7 +126,7 @@ body {
 }
 
 .hover-card-premium:hover {
-  border-color: rgba(6, 182, 212, 0.2);
-  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.05);
+  border-color: rgba(0, 96, 57, 0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
   transform: translateY(-1px);
 }
