@@ -12,7 +12,7 @@ interface PDFDownloadButtonProps {
   userEmail?: string | null;
   template?: "classic" | "minimal" | "technical";
   resumeId: string;
-  onDownloadConsumed: () => void;
+  onDownloadConsumed: (remaining: number) => void;
 }
 
 export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ 
@@ -28,17 +28,21 @@ export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({
   const handleDownloadClick = async () => {
     if (isAdmin) return;
     try {
-      await fetch("/api/payment/consume-session", {
+      const res = await fetch("/api/payment/consume-session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ resumeId }),
       });
-      // Allow 2 seconds for browser download buffer to spin up before re-locking UI
-      setTimeout(() => {
-        onDownloadConsumed();
-      }, 2000);
+      if (res.ok) {
+        const json = await res.json();
+        const remaining = json.downloadsRemaining !== undefined ? json.downloadsRemaining : 0;
+        // Allow 2 seconds for browser download buffer to spin up before re-locking UI
+        setTimeout(() => {
+          onDownloadConsumed(remaining);
+        }, 2000);
+      }
     } catch (err) {
       console.error("[DOWNLOAD] Error invalidating payment session:", err);
     }
@@ -46,7 +50,7 @@ export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({
 
   if (!isPaid && !isAdmin) {
     return (
-      <div className="p-3.5 bg-[#C0392B]/10 border border-[#C0392B]/20 text-[#C0392B] rounded-xl text-xs font-bold font-sans tracking-wide uppercase flex items-center space-x-2">
+      <div className="p-3.5 bg-red-50 border border-red-200 text-[#C0392B] rounded-xl text-xs font-bold font-sans tracking-wide uppercase flex items-center space-x-2 shadow-sm">
         <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
         <span>Bypass Scan Error: Unpaid PDF compilation blocked.</span>
       </div>
@@ -62,16 +66,16 @@ export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({
           <button
             disabled={loading}
             onClick={handleDownloadClick}
-            className="px-6 py-3 text-xs font-black rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-600 text-zinc-950 hover:brightness-110 active:scale-98 disabled:opacity-50 transition-all shadow-[0_0_15px_rgba(6,182,212,0.35)] flex items-center space-x-2 cursor-pointer"
+            className="px-6 py-3 text-xs font-black rounded-lg bg-[#1F5C4A] hover:bg-[#2F7A62] text-white active:scale-98 disabled:opacity-50 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
           >
             {loading ? (
               <>
-                <span className="h-3 w-3 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
+                <span className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 <span>Compiling PDF...</span>
               </>
             ) : (
               <>
-                <Download className="h-4 w-4 text-zinc-950 stroke-[2.5]" />
+                <Download className="h-4 w-4 text-white stroke-[2.5]" />
                 <span>Download Selectable PDF</span>
               </>
             )}

@@ -122,7 +122,7 @@ const stylesMinimal = StyleSheet.create({
     fontFamily: "Helvetica-Bold",
     fontSize: 20,
     letterSpacing: -0.5,
-    color: "#0891b2", // Sleek modern cyan accent
+    color: "#1F5C4A", // Sleek modern cyan accent
     marginBottom: 4,
   },
   contactDetails: {
@@ -135,7 +135,7 @@ const stylesMinimal = StyleSheet.create({
   sectionTitle: {
     fontFamily: "Helvetica-Bold",
     fontSize: 11,
-    color: "#0891b2",
+    color: "#1F5C4A",
     textTransform: "uppercase",
     paddingBottom: 2,
     marginTop: 14,
@@ -177,7 +177,7 @@ const stylesMinimal = StyleSheet.create({
   },
   bulletMarker: {
     width: 8,
-    color: "#0891b2",
+    color: "#1F5C4A",
   },
   bulletText: {
     flex: 1,
@@ -190,7 +190,7 @@ const stylesMinimal = StyleSheet.create({
   },
   skillsLabel: {
     fontFamily: "Helvetica-Bold",
-    color: "#0891b2",
+    color: "#1F5C4A",
     width: 95,
   },
   skillsText: {

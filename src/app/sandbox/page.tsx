@@ -92,13 +92,13 @@ export default function SandboxPage() {
   };
 
   return (
-    <div className="bg-grid-pattern min-h-screen flex flex-col font-sans selection:bg-cyan-500/30 text-slate-100">
+    <div className="bg-grid-pattern min-h-screen flex flex-col font-sans selection:bg-[#1F5C4A]/30 text-slate-100">
       
       {/* Header navbar */}
       <header className="sticky top-0 z-50 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded bg-gradient-to-tr from-cyan-500 to-electric-blue flex items-center justify-center">
+            <div className="h-8 w-8 rounded bg-gradient-to-tr from-[#1F5C4A] to-[#2F7A62] flex items-center justify-center">
               <Zap className="h-4.5 w-4.5 text-zinc-950 stroke-[2.5]" />
             </div>
             <span className="text-base font-black tracking-tight text-white font-mono">
@@ -108,7 +108,7 @@ export default function SandboxPage() {
 
           <Link 
             href="/dashboard"
-            className="text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center space-x-1"
+            className="text-xs font-bold text-[#1F5C4A] hover:text-[#2F7A62] flex items-center space-x-1"
           >
             <span>Go to Builder</span>
             <ArrowRight className="h-3 w-3" />
@@ -120,7 +120,7 @@ export default function SandboxPage() {
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-12 flex flex-col justify-center">
         
         <div className="text-center space-y-4 max-w-xl mx-auto mb-10">
-          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-cyan-950/30 border border-cyan-800/40 text-cyan-400 text-xs font-semibold tracking-wide uppercase">
+          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#1F5C4A]/10/30 border border-[#1F5C4A]/20/40 text-[#1F5C4A] text-xs font-semibold tracking-wide uppercase">
             <Sparkles className="h-3.5 w-3.5" />
             <span>Sandbox Scanner Gate v2.0</span>
           </div>
@@ -140,7 +140,7 @@ export default function SandboxPage() {
               <div 
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
-                className="border-2 border-dashed border-zinc-800 rounded-xl p-8 hover:border-cyan-500/50 hover:bg-cyan-950/5 transition-all cursor-pointer flex flex-col items-center justify-center space-y-4"
+                className="border-2 border-dashed border-zinc-800 rounded-xl p-8 hover:border-[#1F5C4A]/50 hover:bg-[#1F5C4A]/10/5 transition-all cursor-pointer flex flex-col items-center justify-center space-y-4"
               >
                 <input
                   type="file"
@@ -167,18 +167,18 @@ export default function SandboxPage() {
               /* SCANNING PROGRESS OVERLAY */
               <div className="py-12 space-y-6">
                 {/* Glowing Scanning sweep animation */}
-                <div className="relative w-28 h-28 mx-auto rounded-full border border-cyan-800/40 bg-cyan-950/10 flex items-center justify-center overflow-hidden">
-                  <div className="absolute inset-x-0 h-0.5 bg-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.8)] animate-bounce" />
-                  <FileText className="h-8 w-8 text-cyan-400" />
+                <div className="relative w-28 h-28 mx-auto rounded-full border border-[#1F5C4A]/20/40 bg-[#1F5C4A]/10/10 flex items-center justify-center overflow-hidden">
+                  <div className="absolute inset-x-0 h-0.5 bg-[#1F5C4A] shadow-[0_0_10px_rgba(6,182,212,0.8)] animate-bounce" />
+                  <FileText className="h-8 w-8 text-[#1F5C4A]" />
                 </div>
                 
                 <div className="space-y-2 max-w-xs mx-auto">
-                  <span className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase block">
+                  <span className="text-xs font-mono font-bold tracking-widest text-[#1F5C4A] uppercase block">
                     Scanning structure...
                   </span>
                   <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
                     <div 
-                      className="bg-cyan-500 h-full transition-all duration-300"
+                      className="bg-[#1F5C4A] h-full transition-all duration-300"
                       style={{ width: `${scanProgress}%` }}
                     />
                   </div>
@@ -197,13 +197,13 @@ export default function SandboxPage() {
                     value={jobDescription}
                     onChange={(e) => setJobDescription(e.target.value)}
                     placeholder="Paste the target job description here to check for terminology gaps, matching metrics, and role-specific skills..."
-                    className="bg-zinc-900/40 border border-zinc-800 focus:border-cyan-400 text-xs p-3.5 rounded-xl w-full h-24 outline-none text-slate-200 placeholder-zinc-600 transition-all resize-none font-medium leading-relaxed"
+                    className="bg-zinc-900/40 border border-zinc-800 focus:border-[#1F5C4A] text-xs p-3.5 rounded-xl w-full h-24 outline-none text-slate-200 placeholder-zinc-600 transition-all resize-none font-medium leading-relaxed"
                   />
                 </div>
                 
                 <button
                   onClick={triggerScan}
-                  className="w-full py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 text-zinc-950 font-black text-sm shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:brightness-110 active:scale-98 transition-all flex items-center justify-center space-x-2 cursor-pointer"
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-[#1F5C4A] to-[#2F7A62] text-zinc-950 font-black text-sm shadow-sm hover:brightness-110 active:scale-98 transition-all flex items-center justify-center space-x-2 cursor-pointer"
                 >
                   <Sparkles className="h-4.5 w-4.5 text-zinc-950" />
                   <span>Initialize Parser Check</span>
@@ -268,7 +268,7 @@ export default function SandboxPage() {
                     {result.keywordGaps.map((word: string, idx: number) => (
                       <span 
                         key={idx}
-                        className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-cyan-400 font-bold"
+                        className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-[#1F5C4A] font-bold"
                       >
                         + {word}
                       </span>
@@ -281,7 +281,7 @@ export default function SandboxPage() {
               )}
 
               {/* Action funnel to resume builder */}
-              <div className="glass-panel border border-cyan-900/30 bg-cyan-950/5 rounded-2xl p-6 text-center space-y-4">
+              <div className="glass-panel border border-[#1F5C4A]/30 bg-[#1F5C4A]/10 rounded-2xl p-6 text-center space-y-4">
                 <h4 className="text-sm font-black text-white">
                   Fix Your Gaps instantly in 5 Minutes
                 </h4>
@@ -290,7 +290,7 @@ export default function SandboxPage() {
                 </p>
                 <Link
                   href="/dashboard"
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 text-zinc-950 font-black text-xs shadow-md hover:brightness-110 active:scale-98 transition-all flex items-center justify-center space-x-1.5"
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#1F5C4A] to-[#2F7A62] text-zinc-950 font-black text-xs shadow-md hover:brightness-110 active:scale-98 transition-all flex items-center justify-center space-x-1.5"
                 >
                   <span>Build ATS-Safe Resume (₹80)</span>
                   <ArrowRight className="h-3.5 w-3.5 stroke-[2.5]" />

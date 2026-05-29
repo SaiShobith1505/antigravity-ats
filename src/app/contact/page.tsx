@@ -22,13 +22,13 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="bg-grid-pattern min-h-screen flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="bg-grid-pattern min-h-screen flex flex-col font-sans selection:bg-[#1F5C4A]/30 selection:text-[#2F7A62]/30">
       
       {/* Top Header Navbar */}
       <header className="sticky top-0 z-50 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <div className="h-9 w-9 rounded-lg bg-gradient-to-tr from-cyan-500 to-electric-blue flex items-center justify-center shadow-md">
+            <div className="h-9 w-9 rounded-lg bg-gradient-to-tr from-[#1F5C4A] to-[#2F7A62] flex items-center justify-center shadow-md">
               <Zap className="h-5 w-5 text-zinc-950 stroke-[2.5]" />
             </div>
             <span className="text-xl font-black tracking-tight text-white font-mono">
@@ -50,13 +50,13 @@ export default function ContactPage() {
       <main className="flex-grow max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 relative z-10 w-full">
         
         {/* Glow behind header */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-cyan-500/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-[#1F5C4A]/5 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="space-y-8">
           
           {/* Header Title */}
           <div className="space-y-3 text-center md:text-left">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-800/30 text-cyan-400 text-[10px] font-bold font-mono tracking-wider uppercase">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#1F5C4A]/10/40 border border-[#1F5C4A]/20/30 text-[#1F5C4A] text-[10px] font-bold font-mono tracking-wider uppercase">
               <Mail className="h-3.5 w-3.5" />
               <span>Campus Contact System</span>
             </div>
@@ -83,12 +83,12 @@ export default function ContactPage() {
                   
                   {/* Email Support */}
                   <li className="flex items-start space-x-4">
-                    <div className="h-10 w-10 rounded-xl bg-cyan-950 border border-cyan-800/30 flex items-center justify-center flex-shrink-0">
-                      <Mail className="h-5 w-5 text-cyan-400" />
+                    <div className="h-10 w-10 rounded-xl bg-[#1F5C4A]/10 border border-[#1F5C4A]/20/30 flex items-center justify-center flex-shrink-0">
+                      <Mail className="h-5 w-5 text-[#1F5C4A]" />
                     </div>
                     <div>
                       <div className="text-white font-bold text-xs uppercase tracking-wider font-mono">Email Support</div>
-                      <a href="mailto:support@boostcv.in" className="hover:text-cyan-400 transition-colors">
+                      <a href="mailto:support@boostcv.in" className="hover:text-[#1F5C4A] transition-colors">
                         support@boostcv.in
                       </a>
                       <div className="text-[10px] text-zinc-500 mt-1 font-mono">Average response time: &lt; 4 hours</div>
@@ -97,8 +97,8 @@ export default function ContactPage() {
 
                   {/* Hot-Line */}
                   <li className="flex items-start space-x-4">
-                    <div className="h-10 w-10 rounded-xl bg-cyan-950 border border-cyan-800/30 flex items-center justify-center flex-shrink-0">
-                      <Phone className="h-5 w-5 text-cyan-400" />
+                    <div className="h-10 w-10 rounded-xl bg-[#1F5C4A]/10 border border-[#1F5C4A]/20/30 flex items-center justify-center flex-shrink-0">
+                      <Phone className="h-5 w-5 text-[#1F5C4A]" />
                     </div>
                     <div>
                       <div className="text-white font-bold text-xs uppercase tracking-wider font-mono">Campus Support Call</div>
@@ -109,8 +109,8 @@ export default function ContactPage() {
 
                   {/* HQ Address */}
                   <li className="flex items-start space-x-4">
-                    <div className="h-10 w-10 rounded-xl bg-cyan-950 border border-cyan-800/30 flex items-center justify-center flex-shrink-0">
-                      <MapPin className="h-5 w-5 text-cyan-400" />
+                    <div className="h-10 w-10 rounded-xl bg-[#1F5C4A]/10 border border-[#1F5C4A]/20/30 flex items-center justify-center flex-shrink-0">
+                      <MapPin className="h-5 w-5 text-[#1F5C4A]" />
                     </div>
                     <div>
                       <div className="text-white font-bold text-xs uppercase tracking-wider font-mono">BOOSTCV HQ</div>
@@ -137,8 +137,8 @@ export default function ContactPage() {
                 </h3>
 
                 {success ? (
-                  <div className="p-4 rounded-xl bg-cyan-950/20 border border-cyan-800/30 text-cyan-400 text-xs font-bold font-mono tracking-wide flex items-center space-x-2.5">
-                    <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-cyan-400" />
+                  <div className="p-4 rounded-xl bg-[#1F5C4A]/10/20 border border-[#1F5C4A]/20/30 text-[#1F5C4A] text-xs font-bold font-mono tracking-wide flex items-center space-x-2.5">
+                    <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[#1F5C4A]" />
                     <span>Your placement query was logged successfully! We will email you back within 4 hours.</span>
                   </div>
                 ) : (
@@ -155,7 +155,7 @@ export default function ContactPage() {
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                           placeholder="Amit Sharma"
-                          className="bg-zinc-900/40 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-xl px-4 py-3 w-full text-sm outline-none transition-all"
+                          className="bg-zinc-900/40 border border-zinc-800 focus:border-[#1F5C4A] focus:ring-1 focus:ring-[#1F5C4A] text-slate-100 placeholder-zinc-600 rounded-xl px-4 py-3 w-full text-sm outline-none transition-all"
                         />
                       </div>
                       <div>
@@ -168,7 +168,7 @@ export default function ContactPage() {
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                           placeholder="amit.sharma@college.edu"
-                          className="bg-zinc-900/40 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-xl px-4 py-3 w-full text-sm outline-none transition-all"
+                          className="bg-zinc-900/40 border border-zinc-800 focus:border-[#1F5C4A] focus:ring-1 focus:ring-[#1F5C4A] text-slate-100 placeholder-zinc-600 rounded-xl px-4 py-3 w-full text-sm outline-none transition-all"
                         />
                       </div>
                     </div>
@@ -180,7 +180,7 @@ export default function ContactPage() {
                       <select
                         value={formData.subject}
                         onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                        className="bg-zinc-900/40 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 rounded-xl px-4 py-3 w-full text-sm outline-none transition-all"
+                        className="bg-zinc-900/40 border border-zinc-800 focus:border-[#1F5C4A] focus:ring-1 focus:ring-[#1F5C4A] text-slate-100 rounded-xl px-4 py-3 w-full text-sm outline-none transition-all"
                       >
                         <option value="B.Tech Placement Support">B.Tech Placement Support</option>
                         <option value="Refund & Cancellation">Refund & Cancellation Inquiry</option>
@@ -200,13 +200,13 @@ export default function ContactPage() {
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         placeholder="Please include your Order ID or email if related to a payment..."
-                        className="bg-zinc-900/40 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-xl px-4 py-3 w-full text-sm outline-none transition-all"
+                        className="bg-zinc-900/40 border border-zinc-800 focus:border-[#1F5C4A] focus:ring-1 focus:ring-[#1F5C4A] text-slate-100 placeholder-zinc-600 rounded-xl px-4 py-3 w-full text-sm outline-none transition-all"
                       />
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 hover:brightness-110 text-zinc-950 font-black text-sm transition-all transform active:scale-98 shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2"
+                      className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#1F5C4A] to-[#2F7A62] hover:brightness-110 text-zinc-950 font-black text-sm transition-all transform active:scale-98 shadow-sm flex items-center justify-center space-x-2"
                     >
                       <span>Submit Query</span>
                     </button>

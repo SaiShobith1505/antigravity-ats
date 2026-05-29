@@ -2,7 +2,8 @@
 
 @theme {
   --color-primary-green: #1F5C4A;
-  --color-muted-sage: #6B8F71;
+  --color-secondary-green: #2F7A62;
+  --color-success-green: #2E7D32;
   --color-premium-sand: #D6C5A4;
   --color-warm-bg: #F8F7F4;
   --color-card-bg: #FFFFFF;
@@ -37,13 +38,13 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #1F5C4A 0%, #6B8F71 100%);
+  background: linear-gradient(135deg, #1F5C4A 0%, #2F7A62 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .gradient-glow-text {
-  background: linear-gradient(135deg, #1F5C4A 0%, #6B8F71 100%);
+  background: linear-gradient(135deg, #1F5C4A 0%, #2F7A62 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

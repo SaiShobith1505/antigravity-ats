@@ -47,6 +47,9 @@ export async function POST(req: Request) {
         resumeRef,
         {
           paymentStatus: "paid",
+          downloadsRemaining: 2,
+          downloadsUsed: 0,
+          paymentDate: new Date().toISOString(),
           exportSession: {
             token: sessionToken,
             expiresAt,
@@ -56,7 +59,7 @@ export async function POST(req: Request) {
         },
         { merge: true }
       );
-      console.log(`[PAYMENT VERIFY] Successfully created secure temporary export session for resume ${resumeId}.`);
+      console.log(`[PAYMENT VERIFY] Successfully created secure temporary export session (2 allowance) for resume ${resumeId}.`);
     } catch (dbErr) {
       console.warn("[PAYMENT VERIFY] Firestore update failed, relying on client-side sync fallback:", dbErr);
     }

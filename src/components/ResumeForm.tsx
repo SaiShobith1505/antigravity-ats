@@ -199,8 +199,8 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg text-xs font-bold tracking-wider uppercase transition-all whitespace-nowrap ${
                 activeTab === tab.id
-                  ? "bg-cyan-950 border border-cyan-800 text-cyan-400 shadow-sm"
-                  : "text-zinc-500 hover:text-zinc-300"
+                  ? "bg-[#1F5C4A] text-white shadow-sm border border-[#1F5C4A]"
+                  : "text-[#6B7280] hover:text-[#1C1C1C]"
               }`}
             >
               <Icon className="h-4 w-4" />

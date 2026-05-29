@@ -7,7 +7,7 @@ export default function LoginButton() {
   const { user, signInWithGoogle, signOut } = useAuth();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white">
+    <div className="min-h-screen flex items-center justify-center bg-[#F8F7F4] text-[#1C1C1C]">
 
       {user ? (
 
@@ -21,7 +21,7 @@ export default function LoginButton() {
 
           <button
             onClick={signOut}
-            className="bg-red-500 px-6 py-3 rounded-xl"
+            className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl transition-colors font-bold"
           >
             Sign Out
           </button>
@@ -32,7 +32,7 @@ export default function LoginButton() {
 
         <button
           onClick={signInWithGoogle}
-          className="bg-cyan-500 text-black font-bold px-6 py-3 rounded-xl"
+          className="bg-[#1F5C4A] hover:bg-[#2F7A62] text-white font-bold px-6 py-3 rounded-xl transition-colors"
         >
           Sign In With Google
         </button>

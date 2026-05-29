@@ -53,6 +53,7 @@ export default function DashboardPage() {
   const [atsScore, setAtsScore] = useState(85);
   const [isPaid, setIsPaid] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [downloadsRemaining, setDownloadsRemaining] = useState<number>(0);
   
   // Referral Viral growth states
   const [referralCount, setReferralCount] = useState(0);
@@ -490,9 +491,27 @@ export default function DashboardPage() {
         }
         if (user.email === "admin@cvboost.co") {
           setIsPaid(true);
+          setDownloadsRemaining(999);
         } else {
           const paidStatus = await getPaymentStatus(resumeId);
           setIsPaid(prev => prev || paidStatus);
+          
+          // Fallback to check localStorage counters
+          const localData = localStorage.getItem(`cv_boost_resume_${resumeId}`);
+          if (localData) {
+            try {
+              const parsed = JSON.parse(localData);
+              if (parsed.downloadsRemaining !== undefined) {
+                setDownloadsRemaining(parsed.downloadsRemaining);
+              } else if (parsed.paymentStatus === "paid") {
+                setDownloadsRemaining(2);
+              }
+            } catch (_) {}
+          } else if (res && res.downloadsRemaining !== undefined) {
+            setDownloadsRemaining(res.downloadsRemaining);
+          } else if (paidStatus) {
+            setDownloadsRemaining(2);
+          }
         }
         setLoading(false);
       };
@@ -507,6 +526,13 @@ export default function DashboardPage() {
         const active = await getPaymentStatus(resumeId);
         if (!active) {
           setIsPaid(false);
+          setDownloadsRemaining(0);
+        } else {
+          // Sync counters
+          const res = await getResume(resumeId);
+          if (res && res.downloadsRemaining !== undefined) {
+            setDownloadsRemaining(res.downloadsRemaining);
+          }
         }
       };
       checkSession();
@@ -706,6 +732,7 @@ export default function DashboardPage() {
 
       if (verifyRes.ok) {
         setIsPaid(true);
+        setDownloadsRemaining(2);
         await setPaymentStatusPaid(resumeId);
         setPaymentError("");
         setShowMockModal(false);
@@ -796,6 +823,7 @@ export default function DashboardPage() {
             
             if (verifyRes.ok) {
               setIsPaid(true);
+              setDownloadsRemaining(2);
               setPaymentStatusPaid(resumeId);
               setPaymentError("");
             } else {
@@ -942,35 +970,35 @@ export default function DashboardPage() {
           onClick={() => setActiveTab("edit")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep1Done ? "bg-[#1F5C4A]" : activeTab === "edit" ? "bg-[#6B8F71] animate-pulse" : "bg-stone-200"}`} />
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep1Done ? "bg-[#1F5C4A]" : activeTab === "edit" ? "bg-[#2F7A62] animate-pulse" : "bg-stone-200"}`} />
           <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "edit" ? "text-[#1F5C4A]" : isStep1Done ? "text-[#1C1C1C]" : "text-[#6B7280]"}`}>1. Upload</span>
         </button>
         <button 
           onClick={() => setActiveTab("ats")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep2Done ? "bg-[#1F5C4A]" : activeTab === "ats" ? "bg-[#6B8F71] animate-pulse" : "bg-stone-200"}`} />
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep2Done ? "bg-[#1F5C4A]" : activeTab === "ats" ? "bg-[#2F7A62] animate-pulse" : "bg-stone-200"}`} />
           <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "ats" ? "text-[#1F5C4A]" : isStep2Done ? "text-[#1C1C1C]" : "text-[#6B7280]"}`}>2. Diagnostics</span>
         </button>
         <button 
           onClick={() => setActiveTab("matcher")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep3Done ? "bg-[#1F5C4A]" : activeTab === "matcher" ? "bg-[#6B8F71] animate-pulse" : "bg-stone-200"}`} />
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep3Done ? "bg-[#1F5C4A]" : activeTab === "matcher" ? "bg-[#2F7A62] animate-pulse" : "bg-stone-200"}`} />
           <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "matcher" ? "text-[#1F5C4A]" : isStep3Done ? "text-[#1C1C1C]" : "text-[#6B7280]"}`}>3. Match JD</span>
         </button>
         <button 
           onClick={() => setActiveTab("company")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep4Done ? "bg-[#1F5C4A]" : activeTab === "company" ? "bg-[#6B8F71] animate-pulse" : "bg-stone-200"}`} />
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep4Done ? "bg-[#1F5C4A]" : activeTab === "company" ? "bg-[#2F7A62] animate-pulse" : "bg-stone-200"}`} />
           <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "company" ? "text-[#1F5C4A]" : isStep4Done ? "text-[#1C1C1C]" : "text-[#6B7280]"}`}>4. Company Fit</span>
         </button>
         <button 
           onClick={() => setActiveTab("account")}
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
-          <div className={`h-1.5 w-full rounded-full transition-all ${isStep5Done ? "bg-[#1F5C4A]" : activeTab === "account" ? "bg-[#6B8F71] animate-pulse" : "bg-stone-200"}`} />
+          <div className={`h-1.5 w-full rounded-full transition-all ${isStep5Done ? "bg-[#1F5C4A]" : activeTab === "account" ? "bg-[#2F7A62] animate-pulse" : "bg-stone-200"}`} />
           <span className={`text-[8px] font-sans font-black uppercase tracking-wider ${activeTab === "account" ? "text-[#1F5C4A]" : isStep5Done ? "text-[#1C1C1C]" : "text-[#6B7280]"}`}>5. Export</span>
         </button>
       </div>
@@ -1187,7 +1215,7 @@ export default function DashboardPage() {
                   }}
                   className={`p-2.5 rounded-lg border text-left flex justify-between items-center transition-all cursor-pointer ${
                     matchResult?.id === hist.id
-                      ? "bg-cyan-950/20 border-cyan-800/40 text-cyan-400"
+                      ? "bg-stone-50/20 border-stone-200/40 text-[#1F5C4A]"
                       : "bg-zinc-900/10 border-zinc-900/60 hover:bg-zinc-900/30 text-zinc-450 hover:text-zinc-300"
                   }`}
                 >
@@ -1247,7 +1275,7 @@ export default function DashboardPage() {
           <button
             onClick={handleOptimizeResume}
             disabled={isAnalyzing || !jobDescription.trim()}
-            className="w-full py-3.5 px-4 rounded-xl hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-white font-black text-xs shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2 cursor-pointer"
+            className="w-full py-3.5 px-4 rounded-xl hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-white font-black text-xs shadow-sm flex items-center justify-center space-x-2 cursor-pointer"
           >
             {isAnalyzing ? (
               <>
@@ -1399,7 +1427,7 @@ export default function DashboardPage() {
                     <span className={`text-[7px] font-sans font-extrabold uppercase px-1 rounded ${
                       item.importance === "high" 
                         ? "bg-[#C0392B]/10 text-[#C0392B]" 
-                        : (item.importance === "medium" ? "bg-amber-950/30 text-amber-500" : "bg-cyan-950/30 text-cyan-500")
+                        : (item.importance === "medium" ? "bg-amber-950/30 text-amber-500" : "bg-stone-50/30 text-[#1F5C4A]")
                     }`}>
                       {item.importance}
                     </span>
@@ -1422,12 +1450,12 @@ export default function DashboardPage() {
                     className={`p-3.5 rounded-xl border flex justify-between items-center transition-all hover:bg-zinc-900/10 text-left ${
                       item.priority === "critical" 
                         ? "bg-[#C0392B]/5 border-[#C0392B]/20 text-[#C0392B]" 
-                        : (item.priority === "high" ? "bg-amber-950/5 border-amber-900/20 text-amber-400" : "bg-cyan-950/5 border-cyan-900/20 text-cyan-400")
+                        : (item.priority === "high" ? "bg-amber-950/5 border-amber-900/20 text-amber-400" : "bg-stone-50/5 border-[#1F5C4A]/20 text-[#1F5C4A]")
                     }`}
                   >
                     <div className="flex items-start space-x-2.5">
                       <span className={`h-4 w-4 rounded-full border text-[9px] font-sans font-black flex items-center justify-center mt-0.5 flex-shrink-0 ${
-                        item.priority === "critical" ? "border-red-500 text-[#C0392B] animate-pulse" : (item.priority === "high" ? "border-amber-500 text-amber-500" : "border-cyan-500 text-cyan-500")
+                        item.priority === "critical" ? "border-red-500 text-[#C0392B] animate-pulse" : (item.priority === "high" ? "border-amber-500 text-amber-500" : "border-[#1F5C4A] text-[#1F5C4A]")
                       }`}>
                         !
                       </span>
@@ -1437,7 +1465,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <span className={`text-[9px] font-bold font-sans px-2 py-0.5 rounded bg-zinc-900 border text-white ${
-                      item.priority === "critical" ? "border-[#C0392B]/20" : (item.priority === "high" ? "border-amber-900/50" : "border-cyan-900/50")
+                      item.priority === "critical" ? "border-[#C0392B]/20" : (item.priority === "high" ? "border-amber-900/50" : "border-[#1F5C4A]/25")
                     }`}>
                       {item.impact}
                     </span>
@@ -1518,7 +1546,7 @@ export default function DashboardPage() {
                   }}
                   className={`p-2.5 rounded-lg border text-left flex justify-between items-center transition-all cursor-pointer ${
                     companyMatchResult?.id === hist.id
-                      ? "bg-cyan-950/20 border-cyan-800/40 text-cyan-400"
+                      ? "bg-stone-50/20 border-stone-200/40 text-[#1F5C4A]"
                       : "bg-zinc-900/10 border-zinc-900/60 hover:bg-zinc-900/30 text-zinc-450 hover:text-zinc-300"
                   }`}
                 >
@@ -1591,7 +1619,7 @@ export default function DashboardPage() {
           <button
             onClick={handleCompanyAnalysis}
             disabled={isAnalyzingCompany || !roleSelection.trim()}
-            className="w-full py-3.5 px-4 rounded-xl hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-white font-black text-xs shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2 cursor-pointer"
+            className="w-full py-3.5 px-4 rounded-xl hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-white font-black text-xs shadow-sm flex items-center justify-center space-x-2 cursor-pointer"
           >
             {isAnalyzingCompany ? (
               <>
@@ -1627,7 +1655,7 @@ export default function DashboardPage() {
               </div>
 
               <div className="flex items-baseline space-x-2.5 pt-1.5 justify-start">
-                <span className="text-4xl font-black font-sans text-[#1C1C1C] tracking-tight drop-shadow-[0_0_15px_rgba(6,182,212,0.35)]">
+                <span className="text-4xl font-black font-sans text-[#1C1C1C] tracking-tight drop-shadow-sm">
                   {companyMatchResult.matchScore}%
                 </span>
                 <span className="text-xs font-bold font-sans text-[#1F5C4A]">Suitability Match</span>
@@ -2182,7 +2210,7 @@ export default function DashboardPage() {
         }`}>
           <h2 className={`font-bold text-black ${
             selectedTemplate === "minimal"
-              ? "text-2xl text-cyan-600 mb-1 tracking-tight"
+              ? "text-2xl text-[#1F5C4A] mb-1 tracking-tight"
               : selectedTemplate === "technical"
               ? "text-lg mb-0.5"
               : "text-xl mb-1"
@@ -2207,7 +2235,7 @@ export default function DashboardPage() {
           <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
             <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
               selectedTemplate === "minimal"
-                ? "text-cyan-600 border-none mb-1 mt-2"
+                ? "text-[#1F5C4A] border-none mb-1 mt-2"
                 : "text-black border-b border-stone-200 mb-1.5"
             }`}>
               Education
@@ -2231,7 +2259,7 @@ export default function DashboardPage() {
         <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
           <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
             selectedTemplate === "minimal"
-              ? "text-cyan-600 border-none mb-1 mt-2"
+              ? "text-[#1F5C4A] border-none mb-1 mt-2"
               : "text-black border-b border-stone-200 mb-1.5"
           }`}>
             Technical Skills
@@ -2241,19 +2269,19 @@ export default function DashboardPage() {
           }`}>
             {resumeData.skills.languages.length > 0 && (
               <div>
-                <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-cyan-600" : "text-black"}`}>Languages: </strong>
+                <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-[#1F5C4A]" : "text-black"}`}>Languages: </strong>
                 <span>{resumeData.skills.languages.join(", ")}</span>
               </div>
             )}
             {resumeData.skills.frameworks.length > 0 && (
               <div>
-                <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-cyan-600" : "text-black"}`}>Frameworks: </strong>
+                <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-[#1F5C4A]" : "text-black"}`}>Frameworks: </strong>
                 <span>{resumeData.skills.frameworks.join(", ")}</span>
               </div>
             )}
             {resumeData.skills.tools.length > 0 && (
               <div>
-                <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-cyan-600" : "text-black"}`}>Developer Tools: </strong>
+                <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-[#1F5C4A]" : "text-black"}`}>Developer Tools: </strong>
                 <span>{resumeData.skills.tools.join(", ")}</span>
               </div>
             )}
@@ -2265,7 +2293,7 @@ export default function DashboardPage() {
           <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
             <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
               selectedTemplate === "minimal"
-                ? "text-cyan-600 border-none mb-1 mt-2"
+                ? "text-[#1F5C4A] border-none mb-1 mt-2"
                 : "text-black border-b border-stone-200 mb-1.5"
             }`}>
               Certifications
@@ -2279,7 +2307,7 @@ export default function DashboardPage() {
             }`}>
               {resumeData.certifications.map((cert, idx) => (
                 cert.trim().length > 0 && (
-                  <li key={idx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{cert}</li>
+                  <li key={idx} className={selectedTemplate === "minimal" ? "marker:text-[#1F5C4A]" : ""}>{cert}</li>
                 )
               ))}
             </ul>
@@ -2295,7 +2323,7 @@ export default function DashboardPage() {
               <div className={selectedTemplate === "technical" ? "mb-2.5 relative text-left" : "mb-4 relative text-left"}>
                 <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
                   selectedTemplate === "minimal"
-                    ? "text-cyan-600 border-none mb-1 mt-2"
+                    ? "text-[#1F5C4A] border-none mb-1 mt-2"
                     : "text-black border-b border-stone-200 mb-1.5"
                 }`}>
                   Experience
@@ -2317,7 +2345,7 @@ export default function DashboardPage() {
                     }`}>
                       {exp.bullets.map((bullet, bIdx) => (
                         bullet.trim().length > 0 && (
-                          <li key={bIdx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{bullet}</li>
+                          <li key={bIdx} className={selectedTemplate === "minimal" ? "marker:text-[#1F5C4A]" : ""}>{bullet}</li>
                         )
                       ))}
                     </ul>
@@ -2331,7 +2359,7 @@ export default function DashboardPage() {
               <div className={selectedTemplate === "technical" ? "mb-2.5 relative text-left" : "mb-4 relative text-left"}>
                 <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
                   selectedTemplate === "minimal"
-                    ? "text-cyan-600 border-none mb-1 mt-2"
+                    ? "text-[#1F5C4A] border-none mb-1 mt-2"
                     : "text-black border-b border-stone-200 mb-1.5"
                 }`}>
                   Projects
@@ -2352,7 +2380,7 @@ export default function DashboardPage() {
                     }`}>
                       {proj.description.split("\n").map((line, lIdx) => (
                         line.trim().length > 0 && (
-                          <li key={lIdx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{line}</li>
+                          <li key={lIdx} className={selectedTemplate === "minimal" ? "marker:text-[#1F5C4A]" : ""}>{line}</li>
                         )
                       ))}
                     </ul>
@@ -2372,7 +2400,7 @@ export default function DashboardPage() {
 
             {/* Floating premium Glassmorphism Checkout CTA */}
             <div className="absolute bottom-4 left-4 right-4 z-30 flex flex-col items-center">
-              <div className="w-full max-w-md p-5 rounded-xl border border-stone-200 bg-white backdrop-blur-md shadow-[0_0_30px_rgba(6,182,212,0.15)] space-y-4 animate-neon-pulse">
+              <div className="w-full max-w-md p-5 rounded-xl border border-stone-200 bg-white backdrop-blur-md shadow-sm space-y-4 ">
                 
                 {/* Header cyber lock emblem */}
                 <div className="flex items-center justify-center space-x-2">
@@ -2417,7 +2445,7 @@ export default function DashboardPage() {
                 {/* Razorpay Standard Instant Unlock Button */}
                 <button
                   onClick={triggerRazorpayCheckout}
-                  className="w-full py-2.5 rounded-lg hover: hover: text-white font-black text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
+                  className="w-full py-2.5 rounded-lg hover: hover: text-white font-black text-xs shadow-sm transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
                 >
                   <Zap className="h-4 w-4 text-white fill-white stroke-[2.5]" />
                   <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 80}</span>
@@ -2470,7 +2498,7 @@ export default function DashboardPage() {
       <aside className="hidden md:flex flex-col w-60 border-r border-stone-200 bg-white p-5 space-y-6 flex-shrink-0 relative">
         
         {/* Brand header */}
-        <div className="flex items-center space-x-2.5 px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-2xl shadow-sm">
+        <Link href="/" className="flex items-center space-x-2.5 px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-2xl shadow-sm hover:border-[#1F5C4A]/40 hover:bg-stone-100/50 transition-all cursor-pointer">
           <div className="h-7 w-7 rounded-lg bg-[#1F5C4A] flex items-center justify-center shadow-sm">
             <Zap className="h-4 w-4 text-white stroke-[2.5]" />
           </div>
@@ -2478,7 +2506,7 @@ export default function DashboardPage() {
             <span className="text-xs font-black text-[#1C1C1C] font-sans tracking-wide uppercase leading-none">BOOSTCV</span>
             <span className="text-[7.5px] font-black text-[#1F5C4A] font-sans tracking-wider leading-none mt-1.5 uppercase">SaaS Career Platform</span>
           </div>
-        </div>
+        </Link>
 
         {/* Tab links */}
         <nav className="flex-1 flex flex-col space-y-1.5 text-left">
@@ -2549,8 +2577,8 @@ export default function DashboardPage() {
             <div className="flex-1 min-w-0">
               <p className="text-[10px] font-bold text-[#1C1C1C] truncate leading-none">{user.email}</p>
               <div className="flex items-center space-x-1.5 mt-1.5">
-                <span className={`h-1.5 w-1.5 rounded-full ${isPaid ? "bg-[#6B8F71]" : "bg-stone-400"} animate-pulse`} />
-                <span className={`text-[7.5px] font-black uppercase tracking-wider leading-none ${isPaid ? "text-[#6B8F71]" : "text-[#6B7280]"}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${isPaid ? "bg-[#2F7A62]" : "bg-stone-400"} animate-pulse`} />
+                <span className={`text-[7.5px] font-black uppercase tracking-wider leading-none ${isPaid ? "text-[#2F7A62]" : "text-[#6B7280]"}`}>
                   {isPaid ? "Pro Unlocked" : "Free Preview"}
                 </span>
               </div>
@@ -2577,8 +2605,8 @@ export default function DashboardPage() {
 
           <div className="flex items-center space-x-4">
             {isPaid && (
-              <span className="text-[9px] font-black bg-[#6B8F71] border border-[#b29358] px-2 py-0.5 rounded text-[#1C1C1C] uppercase tracking-wider hidden sm:inline shadow-sm">
-                🔓 Active Premium Session
+              <span className="text-[9px] font-black bg-[#D6C5A4]/20 border border-[#D6C5A4] px-2 py-0.5 rounded text-[#1F5C4A] uppercase tracking-wider hidden sm:inline shadow-sm">
+                🔓 Premium Exports Remaining: {downloadsRemaining}
               </span>
             )}
             <button 
@@ -2619,9 +2647,340 @@ export default function DashboardPage() {
           {/* Right Contextual Insights Panel (Toggle subtabs Preview vs Resume Health diagnostics on builder tab) */}
           {activeTab === "edit" && (
         <div className="w-full lg:w-1/2 p-4 md:p-6 overflow-y-auto bg-white h-full flex flex-col space-y-6">
-          
-          {/* Diagnostic Stats Header */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-white border border-stone-200 shadow-sm border border-stone-200 rounded-2xl p-4 md:p-6">
+          {/* Dynamic HTML Document Live Preview Panel */}
+<div className="flex-1 bg-white rounded-xl border border-stone-200 overflow-hidden relative min-h-[450px] shadow-lg flex flex-col">
+            
+            {/* Template Selector Bar */}
+            <div className="bg-stone-50 border-b border-stone-200 px-4 py-2.5 flex items-center justify-between flex-shrink-0">
+              <span className="text-[10px] font-black font-sans tracking-wider text-[#6B7280] uppercase">
+                Placement Template Compiler
+              </span>
+              <div className="flex items-center space-x-1.5 p-0.5 bg-white border border-stone-200 rounded-lg">
+                {(["classic", "minimal", "technical"] as const).map((temp) => (
+                  <button
+                    key={temp}
+                    onClick={() => setSelectedTemplate(temp)}
+                    className={`px-2.5 py-1 text-[9px] font-bold font-sans tracking-wide rounded-md transition-all uppercase cursor-pointer ${
+                      selectedTemplate === temp
+                        ? "bg-[#1F5C4A] text-white shadow-sm font-black"
+                        : "text-[#6B7280] hover:text-[#1F5C4A]"
+                    }`}
+                  >
+                    {temp}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Resume HTML-layout replica (Simulated Preview) */}
+            <div 
+               onContextMenu={!isPaid ? (e) => e.preventDefault() : undefined}
+               className={`w-full h-full p-8 text-[9px] text-[#111] leading-normal bg-white overflow-y-auto relative flex flex-col min-h-full ${
+                 selectedTemplate === "minimal" 
+                   ? "font-sans px-10 py-10" 
+                   : selectedTemplate === "technical" 
+                   ? "font-sans px-6 py-6 text-[8.5px]" 
+                   : "font-sans px-8 py-8"
+               } ${!isPaid ? "select-none" : "select-text"}`}>
+              
+              {/* Subtle repeating watermark pattern over the sheet if not paid */}
+              {!isPaid && (
+                <div 
+                  className="absolute inset-0 pointer-events-none select-none z-10" 
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='120' viewBox='0 0 160 120'><text x='50%' y='50%' fill='%23000000' font-family='monospace' font-weight='bold' font-size='7.5' opacity='0.04' transform='rotate(-25 80 60)' text-anchor='middle'>BOOSTCV PREVIEW</text></svg>")`,
+                    backgroundRepeat: "repeat",
+                  }}
+                />
+              )}
+
+              {/* Header */}
+              <div className={`mb-4 flex flex-col ${
+                selectedTemplate === "minimal" 
+                  ? "items-start text-left mb-6" 
+                  : "items-center text-center"
+              }`}>
+                <h2 className={`font-bold text-black ${
+                  selectedTemplate === "minimal"
+                    ? "text-2xl text-[#1F5C4A] mb-1 tracking-tight"
+                    : selectedTemplate === "technical"
+                    ? "text-lg mb-0.5"
+                    : "text-xl mb-1"
+                }`}>{resumeData.personal.fullName || "Your Full Name"}</h2>
+                <div className={`flex flex-wrap gap-2 text-zinc-600 text-[8px] ${
+                  selectedTemplate === "minimal" 
+                    ? "justify-start" 
+                    : "justify-center"
+                }`}>
+                  {resumeData.personal.phone && <span>{resumeData.personal.phone}</span>}
+                  {resumeData.personal.phone && resumeData.personal.email && <span className="text-[#6B7280]">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+                  {resumeData.personal.email && <span>{resumeData.personal.email}</span>}
+                  {resumeData.personal.email && resumeData.personal.linkedin && <span className="text-[#6B7280]">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+                  {resumeData.personal.linkedin && <span>{resumeData.personal.linkedin}</span>}
+                  {resumeData.personal.linkedin && resumeData.personal.github && <span className="text-[#6B7280]">{selectedTemplate === "technical" ? "|" : "•"}</span>}
+                  {resumeData.personal.github && <span>{resumeData.personal.github}</span>}
+                </div>
+              </div>
+
+              {/* Education - Unprotected / Crisp and visible */}
+              {resumeData.education.length > 0 && (
+                <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
+                  <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                    selectedTemplate === "minimal"
+                      ? "text-[#1F5C4A] border-none mb-1 mt-2"
+                      : "text-black border-b border-stone-200 mb-1.5"
+                  }`}>
+                    Education
+                  </h3>
+                  {resumeData.education.map((edu, idx) => (
+                    <div key={idx} className={selectedTemplate === "technical" ? "mb-1" : "mb-2"}>
+                      <div className="flex justify-between font-bold">
+                        <span>{edu.institution || "Institution Name"}</span>
+                        <span>{edu.year || "2022 - 2026"}</span>
+                      </div>
+                      <div className="flex justify-between text-[#6B7280] italic">
+                        <span>{edu.degree || "B.Tech"}</span>
+                        <span>{edu.gpa || "9.0 CGPA"}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Technical Skills - Unprotected / Crisp and visible */}
+              <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
+                <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                  selectedTemplate === "minimal"
+                    ? "text-[#1F5C4A] border-none mb-1 mt-2"
+                    : "text-black border-b border-stone-200 mb-1.5"
+                }`}>
+                  Technical Skills
+                </h3>
+                <div className={`text-zinc-850 ${
+                  selectedTemplate === "technical" ? "space-y-0.5 text-[8px]" : "space-y-1 text-[8.5px]"
+                }`}>
+                  {resumeData.skills.languages.length > 0 && (
+                    <div>
+                      <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-[#1F5C4A]" : "text-black"}`}>Languages: </strong>
+                      <span>{resumeData.skills.languages.join(", ")}</span>
+                    </div>
+                  )}
+                  {resumeData.skills.frameworks.length > 0 && (
+                    <div>
+                      <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-[#1F5C4A]" : "text-black"}`}>Frameworks: </strong>
+                      <span>{resumeData.skills.frameworks.join(", ")}</span>
+                    </div>
+                  )}
+                  {resumeData.skills.tools.length > 0 && (
+                    <div>
+                      <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-[#1F5C4A]" : "text-black"}`}>Developer Tools: </strong>
+                      <span>{resumeData.skills.tools.join(", ")}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Certifications - Unprotected / Crisp and visible */}
+              {resumeData.certifications && resumeData.certifications.length > 0 && (
+                <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
+                  <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                    selectedTemplate === "minimal"
+                      ? "text-[#1F5C4A] border-none mb-1 mt-2"
+                      : "text-black border-b border-stone-200 mb-1.5"
+                  }`}>
+                    Certifications
+                  </h3>
+                  <ul className={`list-disc pl-4 text-zinc-800 ${
+                    selectedTemplate === "minimal"
+                      ? "space-y-1 text-[8.5px]"
+                      : selectedTemplate === "technical"
+                      ? "space-y-0.5 text-[8.2px]"
+                      : "space-y-0.5 text-[8.5px]"
+                  }`}>
+                    {resumeData.certifications.map((cert, idx) => (
+                      cert.trim().length > 0 && (
+                        <li key={idx} className={selectedTemplate === "minimal" ? "marker:text-[#1F5C4A]" : ""}>{cert}</li>
+                      )
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+               {/* Experience and Projects Gated Container */}
+               {((resumeData.experience.length > 0) || (resumeData.projects.length > 0)) && (
+                 <div className={!isPaid ? "relative overflow-hidden max-h-[220px] select-none pointer-events-none blur-[1.5px] border-b border-zinc-200" : ""}>
+                   
+                   {/* Experience */}
+                   {resumeData.experience.length > 0 && (
+                     <div className={selectedTemplate === "technical" ? "mb-2.5 relative" : "mb-4 relative"}>
+                       <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                         selectedTemplate === "minimal"
+                           ? "text-[#1F5C4A] border-none mb-1 mt-2"
+                           : "text-black border-b border-stone-200 mb-1.5"
+                       }`}>
+                         Experience
+                       </h3>
+                       {resumeData.experience.map((exp, idx) => (
+                         <div key={idx} className={selectedTemplate === "technical" ? "mb-2" : "mb-3"}>
+                           <div className="flex justify-between font-bold text-black">
+                             <span>{exp.company || "Company Name"}</span>
+                             <span className="text-[#6B7280] font-normal">{exp.duration || "Duration"}</span>
+                           </div>
+                           <div className={`italic text-zinc-600 mb-1 ${selectedTemplate === "technical" ? "font-bold text-black" : ""}`}>{exp.role || "Role"}</div>
+                           
+                           <ul className={`list-disc pl-4 text-zinc-800 ${
+                             selectedTemplate === "minimal"
+                               ? "space-y-1.5 text-[8.5px]"
+                               : selectedTemplate === "technical"
+                               ? "space-y-0.5 text-[8.2px]"
+                               : "space-y-1 text-[8.5px]"
+                           }`}>
+                             {exp.bullets.map((bullet, bIdx) => (
+                               bullet.trim().length > 0 && (
+                                 <li key={bIdx} className={selectedTemplate === "minimal" ? "marker:text-[#1F5C4A]" : ""}>{bullet}</li>
+                               )
+                             ))}
+                           </ul>
+                         </div>
+                       ))}
+                     </div>
+                   )}
+ 
+                   {/* Projects */}
+                   {resumeData.projects.length > 0 && (
+                     <div className={selectedTemplate === "technical" ? "mb-2.5 relative" : "mb-4 relative"}>
+                       <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                         selectedTemplate === "minimal"
+                           ? "text-[#1F5C4A] border-none mb-1 mt-2"
+                           : "text-black border-b border-stone-200 mb-1.5"
+                       }`}>
+                         Projects
+                       </h3>
+                       {resumeData.projects.map((proj, idx) => (
+                         <div key={idx} className={selectedTemplate === "technical" ? "mb-1.5" : "mb-2"}>
+                           <div className="flex justify-between font-bold text-black">
+                             <span>{proj.title || "Project Title"}</span>
+                             <span className="text-[#6B7280] text-[8px] font-normal">Tech: {proj.techStack || "Tech Stack"}</span>
+                           </div>
+                           
+                           <ul className={`list-disc pl-4 text-zinc-800 mt-1 ${
+                             selectedTemplate === "minimal"
+                               ? "space-y-1.5 text-[8.5px]"
+                               : selectedTemplate === "technical"
+                               ? "space-y-0.5 text-[8.2px]"
+                               : "space-y-0.5 text-[8.5px]"
+                           }`}>
+                             {proj.description.split("\n").map((line, lIdx) => (
+                               line.trim().length > 0 && (
+                                 <li key={lIdx} className={selectedTemplate === "minimal" ? "marker:text-[#1F5C4A]" : ""}>{line}</li>
+                               )
+                             ))}
+                           </ul>
+                         </div>
+                       ))}
+                     </div>
+                   )}
+                   
+                 </div>
+               )}
+ 
+             </div>
+
+            {/* Paywall Bottom Fade Mask Overlay & Floating glassmorphic CTA */}
+            {!isPaid && (
+              <>
+                {/* Premium Soft Fade Fade blending the white page into dark dashboard background */}
+                <div className="absolute bottom-0 left-0 right-0 h-64 pointer-events-none z-20" />
+
+                {/* Floating premium Glassmorphism Checkout CTA */}
+                <div className="absolute bottom-4 left-4 right-4 z-30 flex flex-col items-center">
+                  <div className="w-full max-w-md p-5 rounded-xl border border-stone-200 bg-white backdrop-blur-md shadow-sm space-y-4 ">
+                    
+                    {/* Header cyber lock emblem */}
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="h-6 w-6 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center shadow-sm">
+                        <Lock className="h-3 w-3 text-[#1F5C4A] animate-pulse" />
+                      </div>
+                      <span className="text-[10px] font-black font-sans tracking-widest text-[#1F5C4A] uppercase">
+                        PREMIUM PRO FORMAT LOCKED
+                      </span>
+                    </div>
+
+                    {/* Sales Copy */}
+                    <div className="text-center space-y-1">
+                      <h4 className="text-sm font-extrabold text-[#1C1C1C] leading-tight">
+                        Unlock Final Recruiter-Ready PDF
+                      </h4>
+                      <p className="text-[10px] text-[#6B7280] font-medium">
+                        Secure your 100% clean selectable-text PDF. Fully verified against placements review guidelines.
+                      </p>
+                    </div>
+
+                    {/* Quick Trust Checks */}
+                    <div className="grid grid-cols-2 gap-2 border-y border-stone-200 py-2.5 text-[9px] text-[#6B7280] font-bold font-sans">
+                      <div className="flex items-center space-x-1.5">
+                        <span className="text-[#1F5C4A]">✓</span>
+                        <span>98%+ Interview Guaranteed</span>
+                      </div>
+                      <div className="flex items-center space-x-1.5">
+                        <span className="text-[#1F5C4A]">✓</span>
+                        <span>Standard Single-Column</span>
+                      </div>
+                      <div className="flex items-center space-x-1.5">
+                        <span className="text-[#1F5C4A]">✓</span>
+                        <span>100% Editable Selection Text</span>
+                      </div>
+                      <div className="flex items-center space-x-1.5">
+                        <span className="text-[#1F5C4A]">✓</span>
+                        <span>Lifetime Free AI Re-tuner</span>
+                      </div>
+                    </div>
+
+                    {/* Razorpay Standard Instant Unlock Button */}
+                    <button
+                      onClick={triggerRazorpayCheckout}
+                      className="w-full py-2.5 rounded-lg hover: hover: text-white font-black text-xs shadow-sm transition-all transform active:scale-98 flex items-center justify-center space-x-1.5"
+                    >
+                      <Zap className="h-4 w-4 text-white fill-zinc-950 stroke-[2.5]" />
+                      <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 80}</span>
+                    </button>
+
+                    {/* Classmate referral share widget for free access */}
+                    <div className="border-t border-stone-200 pt-3 space-y-2">
+                      <div className="flex justify-between items-center text-[10px] font-bold">
+                        <span className="text-[#6B7280]">B.Tech Referral Scheme (Unlock Free)</span>
+                        <span className="text-[#1F5C4A] font-sans">{referralCount} / 3 Classmates Joined</span>
+                      </div>
+                      <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-[#1F5C4A] h-full transition-all duration-500" 
+                          style={{ width: `${(referralCount / 3) * 100}%` }}
+                        />
+                      </div>
+                      
+                      <div className="flex items-center space-x-1.5 pt-1">
+                        <input
+                          type="text"
+                          readOnly
+                          value={referralLink}
+                          className="bg-stone-50 border border-stone-200 text-[9px] p-2 rounded flex-1 text-[#6B7280] outline-none select-all font-sans"
+                        />
+                        <button
+                          onClick={copyReferral}
+                          className="px-3 py-2 rounded bg-stone-50 border border-stone-200 text-[#1F5C4A] hover:bg-[#18483A] transition-colors font-bold text-[9px]"
+                        >
+                          {copied ? "Copied!" : "Copy Link"}
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </>
+            )}
+
+                    {/* Diagnostic Stats Header */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-white border border-stone-200 rounded-2xl p-4 md:p-6 shadow-sm">
             <div className="md:col-span-4 flex justify-center">
               <AtsScoreGauge score={atsScore} size={130} />
             </div>
@@ -2647,7 +3006,7 @@ export default function DashboardPage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[9px] font-bold font-sans border-b border-stone-200 pb-3">
                         <div className="space-y-1">
                           <div className="flex justify-between text-[#6B7280]">
-                            <span>Structure completeness:</span>
+                            <span>Structure</span>
                             <span className="text-[#1F5C4A]">{structureVal}%</span>
                           </div>
                           <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
@@ -2657,7 +3016,7 @@ export default function DashboardPage() {
 
                         <div className="space-y-1">
                           <div className="flex justify-between text-[#6B7280]">
-                            <span>Formatting & symbols:</span>
+                            <span>Formatting</span>
                             <span className="text-[#1F5C4A]">{formattingVal}%</span>
                           </div>
                           <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
@@ -2667,7 +3026,7 @@ export default function DashboardPage() {
 
                         <div className="space-y-1">
                           <div className="flex justify-between text-[#6B7280]">
-                            <span>Recruiter readability:</span>
+                            <span>Readability</span>
                             <span className="text-[#1F5C4A]">{readabilityVal}%</span>
                           </div>
                           <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
@@ -2677,7 +3036,7 @@ export default function DashboardPage() {
 
                         <div className="space-y-1">
                           <div className="flex justify-between text-[#6B7280]">
-                            <span>Target skills:</span>
+                            <span>Skills</span>
                             <span className="text-[#1F5C4A]">{skillsVal}%</span>
                           </div>
                           <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
@@ -2687,7 +3046,7 @@ export default function DashboardPage() {
 
                         <div className="space-y-1">
                           <div className="flex justify-between text-[#6B7280]">
-                            <span>Project depth:</span>
+                            <span>Projects</span>
                             <span className="text-[#1F5C4A]">{projectsVal}%</span>
                           </div>
                           <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
@@ -2697,7 +3056,7 @@ export default function DashboardPage() {
 
                         <div className="space-y-1">
                           <div className="flex justify-between text-[#6B7280]">
-                            <span>Achievements quality:</span>
+                            <span>Achievements</span>
                             <span className="text-[#1F5C4A]">{achievementsVal}%</span>
                           </div>
                           <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
@@ -2782,25 +3141,31 @@ export default function DashboardPage() {
                      userEmail={user.email} 
                      template={selectedTemplate} 
                      resumeId={resumeId}
-                     onDownloadConsumed={() => {
-                       setIsPaid(false);
-                       const localData = localStorage.getItem(`cv_boost_resume_${resumeId}`);
-                       if (localData) {
-                         try {
-                           const parsed = JSON.parse(localData);
-                           parsed.paymentStatus = "unpaid";
-                           if (parsed.exportSession) {
-                             parsed.exportSession.downloaded = true;
-                           }
-                           localStorage.setItem(`cv_boost_resume_${resumeId}`, JSON.stringify(parsed));
-                         } catch (_) {}
-                       }
-                     }}
+                     onDownloadConsumed={(remaining) => {
+                        setDownloadsRemaining(remaining);
+                        if (remaining <= 0) {
+                          setIsPaid(false);
+                        }
+                        const localData = localStorage.getItem(`cv_boost_resume_${resumeId}`);
+                        if (localData) {
+                          try {
+                            const parsed = JSON.parse(localData);
+                            parsed.downloadsRemaining = remaining;
+                            if (remaining <= 0) {
+                              parsed.paymentStatus = "unpaid";
+                            }
+                            if (parsed.exportSession) {
+                              parsed.exportSession.downloaded = remaining <= 0;
+                            }
+                            localStorage.setItem(`cv_boost_resume_${resumeId}`, JSON.stringify(parsed));
+                          } catch (_) {}
+                        }
+                      }}
                    />
                  ) : (
                   <button
                     onClick={triggerRazorpayCheckout}
-                    className="px-6 py-3 text-xs font-black rounded-lg text-white hover:brightness-110 active:scale-98 transition-all shadow-[0_0_15px_rgba(6,182,212,0.35)] flex items-center space-x-2 cursor-pointer"
+                    className="px-6 py-3 text-xs font-black rounded-lg text-white hover:brightness-110 active:scale-98 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
                   >
                     <Download className="h-4 w-4 text-white" />
                     <span>Unlock Selection PDF (₹{tailorApplied ? 149 : 80})</span>
@@ -2809,339 +3174,6 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-
-          {/* Dynamic HTML Document Live Preview Panel */}
-          <div className="flex-1 bg-white rounded-xl border border-stone-200 overflow-hidden relative min-h-[450px] shadow-lg flex flex-col">
-            
-            {/* Template Selector Bar */}
-            <div className="bg-stone-50 border-b border-stone-200 px-4 py-2.5 flex items-center justify-between flex-shrink-0">
-              <span className="text-[10px] font-black font-sans tracking-wider text-[#6B7280] uppercase">
-                Placement Template Compiler
-              </span>
-              <div className="flex items-center space-x-1.5 p-0.5 bg-white border border-stone-200 rounded-lg">
-                {(["classic", "minimal", "technical"] as const).map((temp) => (
-                  <button
-                    key={temp}
-                    onClick={() => setSelectedTemplate(temp)}
-                    className={`px-2.5 py-1 text-[9px] font-bold font-sans tracking-wide rounded-md transition-all uppercase cursor-pointer ${
-                      selectedTemplate === temp
-                        ? "bg-cyan-500 text-white shadow-sm font-black"
-                        : "text-[#6B7280] hover:text-zinc-200"
-                    }`}
-                  >
-                    {temp}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Resume HTML-layout replica (Simulated Preview) */}
-            <div 
-               onContextMenu={!isPaid ? (e) => e.preventDefault() : undefined}
-               className={`w-full h-full p-8 text-[9px] text-[#111] leading-normal bg-white overflow-y-auto relative flex flex-col min-h-full ${
-                 selectedTemplate === "minimal" 
-                   ? "font-sans px-10 py-10" 
-                   : selectedTemplate === "technical" 
-                   ? "font-sans px-6 py-6 text-[8.5px]" 
-                   : "font-sans px-8 py-8"
-               } ${!isPaid ? "select-none" : "select-text"}`}>
-              
-              {/* Subtle repeating watermark pattern over the sheet if not paid */}
-              {!isPaid && (
-                <div 
-                  className="absolute inset-0 pointer-events-none select-none z-10" 
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='120' viewBox='0 0 160 120'><text x='50%' y='50%' fill='%23000000' font-family='monospace' font-weight='bold' font-size='7.5' opacity='0.04' transform='rotate(-25 80 60)' text-anchor='middle'>BOOSTCV PREVIEW</text></svg>")`,
-                    backgroundRepeat: "repeat",
-                  }}
-                />
-              )}
-
-              {/* Header */}
-              <div className={`mb-4 flex flex-col ${
-                selectedTemplate === "minimal" 
-                  ? "items-start text-left mb-6" 
-                  : "items-center text-center"
-              }`}>
-                <h2 className={`font-bold text-black ${
-                  selectedTemplate === "minimal"
-                    ? "text-2xl text-cyan-600 mb-1 tracking-tight"
-                    : selectedTemplate === "technical"
-                    ? "text-lg mb-0.5"
-                    : "text-xl mb-1"
-                }`}>{resumeData.personal.fullName || "Your Full Name"}</h2>
-                <div className={`flex flex-wrap gap-2 text-zinc-600 text-[8px] ${
-                  selectedTemplate === "minimal" 
-                    ? "justify-start" 
-                    : "justify-center"
-                }`}>
-                  {resumeData.personal.phone && <span>{resumeData.personal.phone}</span>}
-                  {resumeData.personal.phone && resumeData.personal.email && <span className="text-[#6B7280]">{selectedTemplate === "technical" ? "|" : "•"}</span>}
-                  {resumeData.personal.email && <span>{resumeData.personal.email}</span>}
-                  {resumeData.personal.email && resumeData.personal.linkedin && <span className="text-[#6B7280]">{selectedTemplate === "technical" ? "|" : "•"}</span>}
-                  {resumeData.personal.linkedin && <span>{resumeData.personal.linkedin}</span>}
-                  {resumeData.personal.linkedin && resumeData.personal.github && <span className="text-[#6B7280]">{selectedTemplate === "technical" ? "|" : "•"}</span>}
-                  {resumeData.personal.github && <span>{resumeData.personal.github}</span>}
-                </div>
-              </div>
-
-              {/* Education - Unprotected / Crisp and visible */}
-              {resumeData.education.length > 0 && (
-                <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
-                  <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
-                    selectedTemplate === "minimal"
-                      ? "text-cyan-600 border-none mb-1 mt-2"
-                      : "text-black border-b border-stone-200 mb-1.5"
-                  }`}>
-                    Education
-                  </h3>
-                  {resumeData.education.map((edu, idx) => (
-                    <div key={idx} className={selectedTemplate === "technical" ? "mb-1" : "mb-2"}>
-                      <div className="flex justify-between font-bold">
-                        <span>{edu.institution || "Institution Name"}</span>
-                        <span>{edu.year || "2022 - 2026"}</span>
-                      </div>
-                      <div className="flex justify-between text-[#6B7280] italic">
-                        <span>{edu.degree || "B.Tech"}</span>
-                        <span>{edu.gpa || "9.0 CGPA"}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Technical Skills - Unprotected / Crisp and visible */}
-              <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
-                <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
-                  selectedTemplate === "minimal"
-                    ? "text-cyan-600 border-none mb-1 mt-2"
-                    : "text-black border-b border-stone-200 mb-1.5"
-                }`}>
-                  Technical Skills
-                </h3>
-                <div className={`text-zinc-850 ${
-                  selectedTemplate === "technical" ? "space-y-0.5 text-[8px]" : "space-y-1 text-[8.5px]"
-                }`}>
-                  {resumeData.skills.languages.length > 0 && (
-                    <div>
-                      <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-cyan-600" : "text-black"}`}>Languages: </strong>
-                      <span>{resumeData.skills.languages.join(", ")}</span>
-                    </div>
-                  )}
-                  {resumeData.skills.frameworks.length > 0 && (
-                    <div>
-                      <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-cyan-600" : "text-black"}`}>Frameworks: </strong>
-                      <span>{resumeData.skills.frameworks.join(", ")}</span>
-                    </div>
-                  )}
-                  {resumeData.skills.tools.length > 0 && (
-                    <div>
-                      <strong className={`font-bold ${selectedTemplate === "minimal" ? "text-cyan-600" : "text-black"}`}>Developer Tools: </strong>
-                      <span>{resumeData.skills.tools.join(", ")}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Certifications - Unprotected / Crisp and visible */}
-              {resumeData.certifications && resumeData.certifications.length > 0 && (
-                <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
-                  <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
-                    selectedTemplate === "minimal"
-                      ? "text-cyan-600 border-none mb-1 mt-2"
-                      : "text-black border-b border-stone-200 mb-1.5"
-                  }`}>
-                    Certifications
-                  </h3>
-                  <ul className={`list-disc pl-4 text-zinc-800 ${
-                    selectedTemplate === "minimal"
-                      ? "space-y-1 text-[8.5px]"
-                      : selectedTemplate === "technical"
-                      ? "space-y-0.5 text-[8.2px]"
-                      : "space-y-0.5 text-[8.5px]"
-                  }`}>
-                    {resumeData.certifications.map((cert, idx) => (
-                      cert.trim().length > 0 && (
-                        <li key={idx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{cert}</li>
-                      )
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-               {/* Experience and Projects Gated Container */}
-               {((resumeData.experience.length > 0) || (resumeData.projects.length > 0)) && (
-                 <div className={!isPaid ? "relative overflow-hidden max-h-[220px] select-none pointer-events-none blur-[1.5px] border-b border-zinc-200" : ""}>
-                   
-                   {/* Experience */}
-                   {resumeData.experience.length > 0 && (
-                     <div className={selectedTemplate === "technical" ? "mb-2.5 relative" : "mb-4 relative"}>
-                       <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
-                         selectedTemplate === "minimal"
-                           ? "text-cyan-600 border-none mb-1 mt-2"
-                           : "text-black border-b border-stone-200 mb-1.5"
-                       }`}>
-                         Experience
-                       </h3>
-                       {resumeData.experience.map((exp, idx) => (
-                         <div key={idx} className={selectedTemplate === "technical" ? "mb-2" : "mb-3"}>
-                           <div className="flex justify-between font-bold text-black">
-                             <span>{exp.company || "Company Name"}</span>
-                             <span className="text-[#6B7280] font-normal">{exp.duration || "Duration"}</span>
-                           </div>
-                           <div className={`italic text-zinc-600 mb-1 ${selectedTemplate === "technical" ? "font-bold text-black" : ""}`}>{exp.role || "Role"}</div>
-                           
-                           <ul className={`list-disc pl-4 text-zinc-800 ${
-                             selectedTemplate === "minimal"
-                               ? "space-y-1.5 text-[8.5px]"
-                               : selectedTemplate === "technical"
-                               ? "space-y-0.5 text-[8.2px]"
-                               : "space-y-1 text-[8.5px]"
-                           }`}>
-                             {exp.bullets.map((bullet, bIdx) => (
-                               bullet.trim().length > 0 && (
-                                 <li key={bIdx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{bullet}</li>
-                               )
-                             ))}
-                           </ul>
-                         </div>
-                       ))}
-                     </div>
-                   )}
- 
-                   {/* Projects */}
-                   {resumeData.projects.length > 0 && (
-                     <div className={selectedTemplate === "technical" ? "mb-2.5 relative" : "mb-4 relative"}>
-                       <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
-                         selectedTemplate === "minimal"
-                           ? "text-cyan-600 border-none mb-1 mt-2"
-                           : "text-black border-b border-stone-200 mb-1.5"
-                       }`}>
-                         Projects
-                       </h3>
-                       {resumeData.projects.map((proj, idx) => (
-                         <div key={idx} className={selectedTemplate === "technical" ? "mb-1.5" : "mb-2"}>
-                           <div className="flex justify-between font-bold text-black">
-                             <span>{proj.title || "Project Title"}</span>
-                             <span className="text-[#6B7280] text-[8px] font-normal">Tech: {proj.techStack || "Tech Stack"}</span>
-                           </div>
-                           
-                           <ul className={`list-disc pl-4 text-zinc-800 mt-1 ${
-                             selectedTemplate === "minimal"
-                               ? "space-y-1.5 text-[8.5px]"
-                               : selectedTemplate === "technical"
-                               ? "space-y-0.5 text-[8.2px]"
-                               : "space-y-0.5 text-[8.5px]"
-                           }`}>
-                             {proj.description.split("\n").map((line, lIdx) => (
-                               line.trim().length > 0 && (
-                                 <li key={lIdx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{line}</li>
-                               )
-                             ))}
-                           </ul>
-                         </div>
-                       ))}
-                     </div>
-                   )}
-                   
-                 </div>
-               )}
- 
-             </div>
-
-            {/* Paywall Bottom Fade Mask Overlay & Floating glassmorphic CTA */}
-            {!isPaid && (
-              <>
-                {/* Premium Soft Fade Fade blending the white page into dark dashboard background */}
-                <div className="absolute bottom-0 left-0 right-0 h-64 pointer-events-none z-20" />
-
-                {/* Floating premium Glassmorphism Checkout CTA */}
-                <div className="absolute bottom-4 left-4 right-4 z-30 flex flex-col items-center">
-                  <div className="w-full max-w-md p-5 rounded-xl border border-stone-200 bg-white backdrop-blur-md shadow-[0_0_30px_rgba(6,182,212,0.15)] space-y-4 animate-neon-pulse">
-                    
-                    {/* Header cyber lock emblem */}
-                    <div className="flex items-center justify-center space-x-2">
-                      <div className="h-6 w-6 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center shadow-sm">
-                        <Lock className="h-3 w-3 text-[#1F5C4A] animate-pulse" />
-                      </div>
-                      <span className="text-[10px] font-black font-sans tracking-widest text-[#1F5C4A] uppercase">
-                        PREMIUM PRO FORMAT LOCKED
-                      </span>
-                    </div>
-
-                    {/* Sales Copy */}
-                    <div className="text-center space-y-1">
-                      <h4 className="text-sm font-extrabold text-[#1C1C1C] leading-tight">
-                        Unlock Final Recruiter-Ready PDF
-                      </h4>
-                      <p className="text-[10px] text-[#6B7280] font-medium">
-                        Secure your 100% clean selectable-text PDF. Fully verified against placements review guidelines.
-                      </p>
-                    </div>
-
-                    {/* Quick Trust Checks */}
-                    <div className="grid grid-cols-2 gap-2 border-y border-stone-200 py-2.5 text-[9px] text-[#6B7280] font-bold font-sans">
-                      <div className="flex items-center space-x-1.5">
-                        <span className="text-[#1F5C4A]">✓</span>
-                        <span>98%+ Interview Guaranteed</span>
-                      </div>
-                      <div className="flex items-center space-x-1.5">
-                        <span className="text-[#1F5C4A]">✓</span>
-                        <span>Standard Single-Column</span>
-                      </div>
-                      <div className="flex items-center space-x-1.5">
-                        <span className="text-[#1F5C4A]">✓</span>
-                        <span>100% Editable Selection Text</span>
-                      </div>
-                      <div className="flex items-center space-x-1.5">
-                        <span className="text-[#1F5C4A]">✓</span>
-                        <span>Lifetime Free AI Re-tuner</span>
-                      </div>
-                    </div>
-
-                    {/* Razorpay Standard Instant Unlock Button */}
-                    <button
-                      onClick={triggerRazorpayCheckout}
-                      className="w-full py-2.5 rounded-lg hover: hover: text-white font-black text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all transform active:scale-98 flex items-center justify-center space-x-1.5"
-                    >
-                      <Zap className="h-4 w-4 text-white fill-zinc-950 stroke-[2.5]" />
-                      <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 80}</span>
-                    </button>
-
-                    {/* Classmate referral share widget for free access */}
-                    <div className="border-t border-stone-200 pt-3 space-y-2">
-                      <div className="flex justify-between items-center text-[10px] font-bold">
-                        <span className="text-[#6B7280]">B.Tech Referral Scheme (Unlock Free)</span>
-                        <span className="text-[#1F5C4A] font-sans">{referralCount} / 3 Classmates Joined</span>
-                      </div>
-                      <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-[#1F5C4A] h-full transition-all duration-500" 
-                          style={{ width: `${(referralCount / 3) * 100}%` }}
-                        />
-                      </div>
-                      
-                      <div className="flex items-center space-x-1.5 pt-1">
-                        <input
-                          type="text"
-                          readOnly
-                          value={referralLink}
-                          className="bg-stone-50 border border-stone-200 text-[9px] p-2 rounded flex-1 text-[#6B7280] outline-none select-all font-sans"
-                        />
-                        <button
-                          onClick={copyReferral}
-                          className="px-3 py-2 rounded bg-stone-50 border border-stone-200 text-[#1F5C4A] hover:bg-[#18483A] transition-colors font-bold text-[9px]"
-                        >
-                          {copied ? "Copied!" : "Copy Link"}
-                        </button>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              </>
-            )}
-
         </div>
       </div>
       )}
@@ -3151,11 +3183,11 @@ export default function DashboardPage() {
       {/* Simulated Payment Sandbox Modal Overlay */}
       {showMockModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md border border-stone-200 rounded-2xl bg-white backdrop-blur-md p-6 space-y-6 shadow-[0_0_50px_rgba(6,182,212,0.25)] animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-md border border-stone-200 rounded-2xl bg-white backdrop-blur-md p-6 space-y-6 shadow-sm animate-in fade-in zoom-in-95 duration-200">
             
             {/* Header branding */}
             <div className="flex items-center space-x-3 border-b border-stone-200 pb-4">
-              <div className="h-10 w-10 rounded-xl to-electric-blue flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+              <div className="h-10 w-10 rounded-xl bg-[#1F5C4A] flex items-center justify-center shadow-sm">
                 <Zap className="h-5.5 w-5.5 text-white stroke-[2.5]" />
               </div>
               <div className="text-left">
@@ -3195,7 +3227,7 @@ export default function DashboardPage() {
             {/* Information Callout */}
             <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200 text-[#6B7280] text-[10px] leading-relaxed space-y-1 text-left">
               <div className="flex items-center space-x-1 text-[#1F5C4A] font-black">
-                <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-ping mr-1" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#1F5C4A] animate-ping mr-1" />
                 <span>DEVELOPER INFO</span>
               </div>
               <p>

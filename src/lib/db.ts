@@ -84,6 +84,69 @@ export async function saveResume(
   analysisHistory?: any,
   companyAnalysisHistory?: CompanyAnalysisHistoryItem[]
 ): Promise<void> {
+  let paymentStatus = "unpaid";
+  let downloadsRemaining = 0;
+  let downloadsUsed = 0;
+  let paymentDate = null;
+  let exportSession = null;
+  let isTailored = false;
+  let existingReport = null;
+  let existingHistory: any[] = [];
+  let existingCompanyHistory: any[] = [];
+
+  // Try to load existing data from Firestore
+  try {
+    const resumeRef = doc(db, "resumes", resumeId);
+    const docSnap = await getDoc(resumeRef);
+    if (docSnap.exists()) {
+      const existingData = docSnap.data();
+      paymentStatus = existingData.paymentStatus || "unpaid";
+      downloadsRemaining = existingData.downloadsRemaining !== undefined ? existingData.downloadsRemaining : 0;
+      downloadsUsed = existingData.downloadsUsed !== undefined ? existingData.downloadsUsed : 0;
+      paymentDate = existingData.paymentDate || null;
+      exportSession = existingData.exportSession || null;
+      isTailored = existingData.usedAITailor || false;
+      existingReport = existingData.parsedReport || null;
+      existingHistory = existingData.analysisHistory || [];
+      existingCompanyHistory = existingData.companyAnalysisHistory || [];
+    }
+  } catch (_) {}
+
+  // Also check local storage for offline continuity
+  const existing = typeof window !== "undefined" ? localStorage.getItem(`cv_boost_resume_${resumeId}`) : null;
+  if (existing) {
+    try {
+      const parsed = JSON.parse(existing);
+      if (parsed.paymentStatus && paymentStatus === "unpaid") {
+        paymentStatus = parsed.paymentStatus;
+      }
+      if (parsed.downloadsRemaining !== undefined && downloadsRemaining === 0) {
+        downloadsRemaining = parsed.downloadsRemaining;
+      }
+      if (parsed.downloadsUsed !== undefined && downloadsUsed === 0) {
+        downloadsUsed = parsed.downloadsUsed;
+      }
+      if (parsed.paymentDate && !paymentDate) {
+        paymentDate = parsed.paymentDate;
+      }
+      if (parsed.exportSession && !exportSession) {
+        exportSession = parsed.exportSession;
+      }
+      if (parsed.usedAITailor && !isTailored) {
+        isTailored = parsed.usedAITailor;
+      }
+      if (parsed.parsedReport && !existingReport) {
+        existingReport = parsed.parsedReport;
+      }
+      if (parsed.analysisHistory && existingHistory.length === 0) {
+        existingHistory = parsed.analysisHistory;
+      }
+      if (parsed.companyAnalysisHistory && existingCompanyHistory.length === 0) {
+        existingCompanyHistory = parsed.companyAnalysisHistory;
+      }
+    } catch (_) {}
+  }
+
   try {
     const resumeRef = doc(db, "resumes", resumeId);
     const payload: any = {
@@ -91,40 +154,40 @@ export async function saveResume(
       userId,
       atsScore,
       data,
-      paymentStatus: "unpaid",
+      paymentStatus,
+      downloadsRemaining,
+      downloadsUsed,
       updatedAt: serverTimestamp(),
     };
+    if (paymentDate) payload.paymentDate = paymentDate;
+    if (exportSession) payload.exportSession = exportSession;
     if (usedAITailor !== undefined) {
       payload.usedAITailor = usedAITailor;
+    } else {
+      payload.usedAITailor = isTailored;
     }
     if (parsedReport !== undefined) {
       payload.parsedReport = parsedReport;
+    } else {
+      payload.parsedReport = existingReport;
     }
     if (analysisHistory !== undefined) {
       payload.analysisHistory = analysisHistory;
+    } else {
+      payload.analysisHistory = existingHistory;
     }
     if (companyAnalysisHistory !== undefined) {
       payload.companyAnalysisHistory = companyAnalysisHistory;
+    } else {
+      payload.companyAnalysisHistory = existingCompanyHistory;
     }
     await setDoc(resumeRef, payload, { merge: true });
   } catch (error) {
     console.warn("Firestore saveResume failed, falling back to localStorage:", error);
-    let paymentStatus = "unpaid";
-    let isTailored = false;
-    let existingReport = null;
-    let existingHistory: any[] = [];
-    let existingCompanyHistory: any[] = [];
-    const existing = localStorage.getItem(`cv_boost_resume_${resumeId}`);
-    if (existing) {
-      try {
-        const parsed = JSON.parse(existing);
-        paymentStatus = parsed.paymentStatus || "unpaid";
-        isTailored = parsed.usedAITailor || false;
-        existingReport = parsed.parsedReport || null;
-        existingHistory = parsed.analysisHistory || [];
-        existingCompanyHistory = parsed.companyAnalysisHistory || [];
-      } catch (_) {}
-    }
+  }
+
+  // Always write to local storage to keep state in perfect sync
+  if (typeof window !== "undefined") {
     localStorage.setItem(
       `cv_boost_resume_${resumeId}`,
       JSON.stringify({
@@ -133,6 +196,10 @@ export async function saveResume(
         atsScore,
         data,
         paymentStatus,
+        downloadsRemaining,
+        downloadsUsed,
+        paymentDate,
+        exportSession,
         usedAITailor: usedAITailor !== undefined ? usedAITailor : isTailored,
         parsedReport: parsedReport !== undefined ? parsedReport : existingReport,
         analysisHistory: analysisHistory !== undefined ? analysisHistory : existingHistory,
@@ -209,6 +276,9 @@ export async function getPaymentStatus(
     const docSnap = await getDoc(resumeRef);
     if (docSnap.exists()) {
       const data = docSnap.data();
+      if (data.downloadsRemaining !== undefined) {
+        return data.downloadsRemaining > 0;
+      }
       if (data.exportSession) {
         const { downloaded, expiresAt } = data.exportSession;
         return downloaded === false && new Date(expiresAt) > new Date();
@@ -221,6 +291,9 @@ export async function getPaymentStatus(
     if (localData) {
       try {
         const parsed = JSON.parse(localData);
+        if (parsed.downloadsRemaining !== undefined) {
+          return parsed.downloadsRemaining > 0;
+        }
         if (parsed.exportSession) {
           const { downloaded, expiresAt } = parsed.exportSession;
           return downloaded === false && new Date(expiresAt) > new Date();
@@ -236,13 +309,17 @@ export async function getPaymentStatus(
 export async function setPaymentStatusPaid(
   resumeId: string
 ): Promise<void> {
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 min expiry
+  const paymentDate = new Date().toISOString();
   try {
     const resumeRef = doc(db, "resumes", resumeId);
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 min expiry
     await setDoc(
       resumeRef,
       {
         paymentStatus: "paid",
+        downloadsRemaining: 2,
+        downloadsUsed: 0,
+        paymentDate,
         exportSession: {
           token: "mock-local-" + Math.random().toString(36).substring(2, 10),
           expiresAt,
@@ -253,7 +330,10 @@ export async function setPaymentStatusPaid(
     );
   } catch (error) {
     console.warn("Firestore setPaymentStatusPaid failed, falling back to localStorage:", error);
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  }
+
+  // Always sync to local storage fallbacks
+  if (typeof window !== "undefined") {
     const localData = localStorage.getItem(`cv_boost_resume_${resumeId}`);
     let parsed: any = {};
     if (localData) {
@@ -263,6 +343,9 @@ export async function setPaymentStatusPaid(
     }
     parsed.id = resumeId;
     parsed.paymentStatus = "paid";
+    parsed.downloadsRemaining = 2;
+    parsed.downloadsUsed = 0;
+    parsed.paymentDate = paymentDate;
     parsed.exportSession = {
       token: "mock-local-" + Math.random().toString(36).substring(2, 10),
       expiresAt,

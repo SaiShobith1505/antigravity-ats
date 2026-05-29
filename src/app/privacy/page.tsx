@@ -7,13 +7,13 @@ import { Footer } from "@/components/Footer";
 
 export default function PrivacyPage() {
   return (
-    <div className="bg-grid-pattern min-h-screen flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="bg-grid-pattern min-h-screen flex flex-col font-sans selection:bg-[#1F5C4A]/30 selection:text-[#2F7A62]/30">
       
       {/* Top Header Navbar */}
       <header className="sticky top-0 z-50 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <div className="h-9 w-9 rounded-lg bg-gradient-to-tr from-cyan-500 to-electric-blue flex items-center justify-center shadow-md">
+            <div className="h-9 w-9 rounded-lg bg-gradient-to-tr from-[#1F5C4A] to-[#2F7A62] flex items-center justify-center shadow-md">
               <Zap className="h-5 w-5 text-zinc-950 stroke-[2.5]" />
             </div>
             <span className="text-xl font-black tracking-tight text-white font-mono">
@@ -35,13 +35,13 @@ export default function PrivacyPage() {
       <main className="flex-grow max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16 relative z-10">
         
         {/* Glow behind header */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-72 h-72 bg-cyan-500/5 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-72 h-72 bg-[#1F5C4A]/5 rounded-full blur-[80px] pointer-events-none" />
 
         <div className="space-y-8">
           
           {/* Header Title */}
           <div className="space-y-3 text-center sm:text-left">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-800/30 text-cyan-400 text-[10px] font-bold font-mono tracking-wider uppercase">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#1F5C4A]/10/40 border border-[#1F5C4A]/20/30 text-[#1F5C4A] text-[10px] font-bold font-mono tracking-wider uppercase">
               <Shield className="h-3.5 w-3.5" />
               <span>Security & Trust System</span>
             </div>
@@ -57,7 +57,7 @@ export default function PrivacyPage() {
             
             <section className="space-y-3">
               <h2 className="text-base font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-2 flex items-center space-x-2">
-                <span className="text-cyan-400 font-bold">01 /</span>
+                <span className="text-[#1F5C4A] font-bold">01 /</span>
                 <span>Information We Collect</span>
               </h2>
               <p>
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
 
             <section className="space-y-3">
               <h2 className="text-base font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-2 flex items-center space-x-2">
-                <span className="text-cyan-400 font-bold">02 /</span>
+                <span className="text-[#1F5C4A] font-bold">02 /</span>
                 <span>How We Use Your Data</span>
               </h2>
               <p>
@@ -88,7 +88,7 @@ export default function PrivacyPage() {
 
             <section className="space-y-3">
               <h2 className="text-base font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-2 flex items-center space-x-2">
-                <span className="text-cyan-400 font-bold">03 /</span>
+                <span className="text-[#1F5C4A] font-bold">03 /</span>
                 <span>Security Controls</span>
               </h2>
               <p>
@@ -100,7 +100,7 @@ export default function PrivacyPage() {
 
             <section className="space-y-3">
               <h2 className="text-base font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-2 flex items-center space-x-2">
-                <span className="text-cyan-400 font-bold">04 /</span>
+                <span className="text-[#1F5C4A] font-bold">04 /</span>
                 <span>Undergrad Network Cookies</span>
               </h2>
               <p>
@@ -111,7 +111,7 @@ export default function PrivacyPage() {
 
             <section className="space-y-3">
               <h2 className="text-base font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-2 flex items-center space-x-2">
-                <span className="text-cyan-400 font-bold">05 /</span>
+                <span className="text-[#1F5C4A] font-bold">05 /</span>
                 <span>Legal Disclosures</span>
               </h2>
               <p>
