@@ -1,17 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://boostcv.in"),
@@ -58,9 +47,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased light`}
+      className="h-full antialiased light"
     >
-      <body className="min-h-full flex flex-col bg-[#B8E3E9] text-[#1E1E1E]">
+      <body className="min-h-full flex flex-col bg-[#F8F7F4] text-[#1C1C1C]">
         <AuthProvider>
           {children}
         </AuthProvider>

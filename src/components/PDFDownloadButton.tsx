@@ -46,7 +46,7 @@ export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({
 
   if (!isPaid && !isAdmin) {
     return (
-      <div className="p-3.5 bg-red-950/20 border border-red-800/40 text-red-400 rounded-xl text-xs font-bold font-mono tracking-wide uppercase flex items-center space-x-2">
+      <div className="p-3.5 bg-[#C0392B]/10 border border-[#C0392B]/20 text-[#C0392B] rounded-xl text-xs font-bold font-sans tracking-wide uppercase flex items-center space-x-2">
         <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
         <span>Bypass Scan Error: Unpaid PDF compilation blocked.</span>
       </div>
@@ -56,7 +56,7 @@ export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({
     <div className="inline-block">
       <PDFDownloadLink
         document={<ResumeTemplatePdf data={data} template={template} />}
-        fileName={`${data.personal.fullName.replace(/\s+/g, "_")}_ATS_Resume.pdf`}
+        fileName={`${data.personal.fullName.replace(/\s+/g, "_")}_BOOSTCV_Resume.pdf`}
       >
         {({ loading }) => (
           <button

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { Zap, Mail, Lock, AlertCircle, ArrowRight } from "lucide-react";
+import { Mail, Lock, AlertCircle, ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -14,7 +14,6 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Redirect if user is already logged in
   useEffect(() => {
     if (user) {
       router.push("/dashboard");
@@ -24,137 +23,134 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      setErrorMsg("Please enter your email or username");
+      setErrorMsg("Please enter your email or username.");
       return;
     }
+
     setErrorMsg("");
     setSubmitting(true);
     try {
       await signInWithEmail(email, password);
-    } catch (err: any) {
-      setErrorMsg(err.message || "Sign-In failure. Try again.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Sign-in failed. Try again.";
+      setErrorMsg(message);
       setSubmitting(false);
     }
   };
 
-
-
   if (loading || user) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <div className="h-8 w-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-[#F8F7F4]">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#1F5C4A] border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 bg-grid-pattern flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      
-      {/* Decorative Neon background glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-64 h-64 bg-electric-blue/5 rounded-full blur-[100px] pointer-events-none" />
+    <main className="min-h-screen bg-[#F8F7F4] px-4 py-10 text-[#1C1C1C] sm:px-6 lg:px-8">
+      <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-12">
+        <section className="lg:col-span-6">
+          <Link href="/" className="inline-flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1F5C4A] text-white shadow-sm">
+              <Sparkles className="h-4.5 w-4.5" />
+            </div>
+            <span className="text-sm font-semibold tracking-tight">BOOSTCV</span>
+          </Link>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md z-10 text-center">
-        <Link href="/" className="inline-flex items-center space-x-2.5 mx-auto">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-electric-blue flex items-center justify-center shadow-lg shadow-cyan-500/20">
-            <Zap className="h-5.5 w-5.5 text-zinc-950 stroke-[2.5]" />
+          <div className="mt-12 max-w-xl">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-medium text-[#1F5C4A] shadow-sm">
+              <ShieldCheck className="h-3.5 w-3.5" />
+              Secure career workspace
+            </div>
+            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+              Sign in to improve your resume with confidence.
+            </h1>
+            <p className="mt-5 text-base leading-7 text-[#6B7280]">
+              Continue to your Resume Health report, job matcher, recruiter gaps, and clean PDF export flow.
+            </p>
           </div>
-          <span className="text-xl font-black tracking-tight text-white font-mono">
-            BOOSTCV
-          </span>
-        </Link>
-        <h2 className="mt-6 text-center text-2xl sm:text-3xl font-black tracking-tight text-white">
-          Sign In to Your Workspace
-        </h2>
-        <p className="mt-2 text-center text-xs sm:text-sm text-zinc-400 font-medium">
-          Optimize B.Tech resumes to land high-yield interview shortlists.
-        </p>
-      </div>
+        </section>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10 px-4 sm:px-0">
-        <div className="glass-panel border border-zinc-900 rounded-2xl py-8 px-6 sm:px-10 shadow-2xl space-y-6">
-          
-          {errorMsg && (
-            <div className="p-3.5 rounded-xl bg-red-950/30 border border-red-800/40 text-red-400 text-xs font-bold flex items-start space-x-2">
-              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
-                Email or Username
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-4 w-4 text-zinc-600" />
-                </div>
-                <input
-                  id="email"
-                  type="text"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@college.edu"
-                  className="bg-zinc-900/40 border border-zinc-800/80 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-xl pl-10 pr-3 py-3 w-full text-sm outline-none transition-all"
-                />
-              </div>
+        <section className="lg:col-span-6">
+          <div className="mx-auto max-w-md rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-[0_18px_60px_rgba(28,28,28,0.08)] sm:p-8">
+            <div className="mb-7">
+              <h2 className="text-2xl font-semibold tracking-tight">Welcome back</h2>
+              <p className="mt-2 text-sm leading-6 text-[#6B7280]">Access your BOOSTCV workspace.</p>
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-xs font-extrabold uppercase tracking-widest text-zinc-500 mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-4 w-4 text-zinc-600" />
-                </div>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="bg-zinc-900/40 border border-zinc-800/80 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-xl pl-10 pr-3 py-3 w-full text-sm outline-none transition-all"
-                />
+            {errorMsg && (
+              <div className="mb-5 flex items-start gap-2 rounded-xl border border-[#C0392B]/20 bg-[#C0392B]/10 p-3.5 text-sm font-medium text-[#C0392B]">
+                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <span>{errorMsg}</span>
               </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label htmlFor="email" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.12em] text-[#6B7280]">
+                  Email or username
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                  <input
+                    id="email"
+                    type="text"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="name@college.edu"
+                    className="w-full rounded-lg border border-[#E5E7EB] bg-[#F8F7F4] py-3 pl-10 pr-3 text-sm text-[#1C1C1C] outline-none transition placeholder:text-[#9CA3AF] focus:border-[#1F5C4A] focus:ring-1 focus:ring-[#1F5C4A]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="password" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.12em] text-[#6B7280]">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                  <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    className="w-full rounded-lg border border-[#E5E7EB] bg-[#F8F7F4] py-3 pl-10 pr-3 text-sm text-[#1C1C1C] outline-none transition placeholder:text-[#9CA3AF] focus:border-[#1F5C4A] focus:ring-1 focus:ring-[#1F5C4A]"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#1F5C4A] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#18483A] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                <span>{submitting ? "Signing in..." : "Sign in to workspace"}</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </form>
+
+            <div className="my-6 flex items-center gap-3">
+              <div className="h-px flex-1 bg-[#E5E7EB]" />
+              <span className="text-xs font-medium text-[#6B7280]">or</span>
+              <div className="h-px flex-1 bg-[#E5E7EB]" />
             </div>
 
             <button
-              type="submit"
-              disabled={submitting}
-              className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-zinc-950 font-black text-sm transition-all transform active:scale-98 shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-2"
+              onClick={signInWithGoogle}
+              className="inline-flex w-full items-center justify-center rounded-lg border border-[#E5E7EB] bg-white px-4 py-3 text-sm font-semibold text-[#1C1C1C] shadow-sm transition hover:border-[#D6C5A4]"
             >
-              <span>{submitting ? "Processing..." : "Sign In & Access Sandbox"}</span>
-              <ArrowRight className="h-4 w-4 text-zinc-950" />
+              Continue with Google
             </button>
-          </form>
 
-          {/* Social Sign-In */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
-              <div className="w-full border-t border-zinc-900"></div>
-            </div>
-            <div className="relative flex justify-center text-xs font-mono uppercase tracking-wider">
-              <span className="bg-zinc-950 px-3 text-zinc-600 font-bold font-mono">Or continue with Google</span>
+            <div className="pt-6 text-center">
+              <Link href="/" className="text-sm font-medium text-[#6B7280] transition hover:text-[#1F5C4A]">
+                Return to landing page
+              </Link>
             </div>
           </div>
-
-          <button
-            onClick={signInWithGoogle}
-            className="w-full py-3.5 px-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-slate-200 font-extrabold text-sm transition-all flex items-center justify-center space-x-2 shadow-sm"
-          >
-            <span>Continue with Google Account</span>
-          </button>
-
-          <div className="text-center pt-2">
-            <Link href="/" className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
-              ← Return to Landing Page
-            </Link>
-          </div>
-
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

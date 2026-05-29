@@ -1,19 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-green: #0B2E33;
-  --color-premium-gold: #4F7C82;
-  --color-warm-bg: #B8E3E9;
-  --color-card-bg: #93B1B5;
-  --color-text-primary: #1E1E1E;
-  --color-text-secondary: #666666;
-  --font-sans: var(--font-geist-sans), Inter, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --color-primary-green: #1F5C4A;
+  --color-muted-sage: #6B8F71;
+  --color-premium-sand: #D6C5A4;
+  --color-warm-bg: #F8F7F4;
+  --color-card-bg: #FFFFFF;
+  --color-text-primary: #1C1C1C;
+  --color-text-secondary: #6B7280;
+  --font-sans: Inter, Geist, Manrope, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: Inter, Geist, Manrope, ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
-  --background: #B8E3E9;
-  --foreground: #1E1E1E;
+  --background: #F8F7F4;
+  --foreground: #1C1C1C;
 }
 
 body {
@@ -24,33 +25,33 @@ body {
 
 /* Premium Light Theme Card Panels */
 .glass-panel {
-  background: #93B1B5;
-  border: 1px solid #93B1B5; /* stone-200 */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.01);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(28, 28, 28, 0.04);
 }
 
 .glass-panel-glow {
-  background: #93B1B5;
-  border: 1px solid rgba(198, 167, 105, 0.25); /* Premium gold border */
-  box-shadow: 0 4px 12px rgba(198, 167, 105, 0.06);
+  background: #ffffff;
+  border: 1px solid rgba(214, 197, 164, 0.7);
+  box-shadow: 0 10px 30px rgba(28, 28, 28, 0.06);
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #0B2E33 0%, #4F7C82 100%);
+  background: linear-gradient(135deg, #1F5C4A 0%, #6B8F71 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .gradient-glow-text {
-  background: linear-gradient(135deg, #0B2E33 0%, #4F7C82 100%);
+  background: linear-gradient(135deg, #1F5C4A 0%, #6B8F71 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Dots and Grid backgrounds mimicking high-end Stripe/Rolex landing pages */
+/* Low-noise page texture */
 .bg-grid-pattern {
-  background-image: radial-gradient(rgba(0, 0, 0, 0.018) 1.2px, transparent 0);
-  background-size: 24px 24px;
+  background-image: radial-gradient(rgba(31, 92, 74, 0.045) 1px, transparent 0);
+  background-size: 28px 28px;
 }
 
 /* Watermark Blur overlay */
@@ -67,16 +68,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #B8E3E9;
+  background: #F8F7F4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #93B1B5;
+  background: #D6C5A4;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #93B1B5;
+  background: #6B8F71;
 }
 
 /* Premium SaaS UX Animations & Utilities */
@@ -86,16 +87,16 @@ body {
 }
 
 .skeleton-loading {
-  background: linear-gradient(90deg, #f5f5f4 25%, #93B1B5 50%, #f5f5f4 75%);
+  background: linear-gradient(90deg, #f5f5f4 25%, #ffffff 50%, #f5f5f4 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite linear;
 }
 
 /* Notion-like soft badges */
 .badge-cyan {
-  background: rgba(0, 96, 57, 0.06);
-  border: 1px solid rgba(0, 96, 57, 0.15);
-  color: #0B2E33;
+  background: rgba(31, 92, 74, 0.08);
+  border: 1px solid rgba(31, 92, 74, 0.16);
+  color: #1F5C4A;
 }
 
 .badge-emerald {
@@ -105,9 +106,9 @@ body {
 }
 
 .badge-amber {
-  background: rgba(198, 167, 105, 0.06);
-  border: 1px solid rgba(198, 167, 105, 0.25);
-  color: #4F7C82;
+  background: rgba(214, 197, 164, 0.24);
+  border: 1px solid rgba(214, 197, 164, 0.6);
+  color: #715d35;
 }
 
 .badge-red {
@@ -126,7 +127,7 @@ body {
 }
 
 .hover-card-premium:hover {
-  border-color: rgba(0, 96, 57, 0.15);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  border-color: rgba(31, 92, 74, 0.18);
+  box-shadow: 0 8px 24px rgba(28, 28, 28, 0.06);
   transform: translateY(-1px);
 }

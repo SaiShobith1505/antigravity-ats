@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useMemo, useState } from "react";
 
 interface AtsScoreGaugeProps {
   score: number;
@@ -9,115 +8,127 @@ interface AtsScoreGaugeProps {
   interactive?: boolean;
 }
 
-export const AtsScoreGauge: React.FC<AtsScoreGaugeProps> = ({ 
-  score, 
+const categoryWeights = [
+  { label: "Structure", offset: 8 },
+  { label: "Formatting", offset: 2 },
+  { label: "Readability", offset: -4 },
+  { label: "Skills", offset: -10 },
+  { label: "Projects", offset: -6 },
+  { label: "Achievements", offset: -12 },
+];
+
+export const AtsScoreGauge: React.FC<AtsScoreGaugeProps> = ({
+  score,
   size = 160,
-  interactive = false
 }) => {
   const [displayScore, setDisplayScore] = useState(0);
+  const compact = size < 110;
 
   useEffect(() => {
-    let start = 0;
     const end = Math.min(100, Math.max(0, score));
-    if (start === end) {
-      setDisplayScore(end);
-      return;
-    }
-
-    const duration = 1.2; // seconds
-    const stepTime = Math.abs(Math.floor((duration * 1000) / end));
-    
-    const timer = setInterval(() => {
-      start += 1;
-      setDisplayScore(start);
-      if (start >= end) {
-        clearInterval(timer);
+    let frame = 0;
+    const steps = 28;
+    const timer = window.setInterval(() => {
+      frame += 1;
+      setDisplayScore(Math.round((end * frame) / steps));
+      if (frame >= steps) {
+        window.clearInterval(timer);
       }
-    }, stepTime);
+    }, 18);
 
-    return () => clearInterval(timer);
+    return () => window.clearInterval(timer);
   }, [score]);
 
-  const strokeWidth = 10;
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (displayScore / 100) * circumference;
+  const status = useMemo(() => {
+    if (displayScore < 45) {
+      return {
+        label: "Needs attention",
+        color: "#C0392B",
+        bg: "bg-[#C0392B]/10",
+        text: "text-[#C0392B]",
+      };
+    }
 
-  // Outcome-based theme color mapping matching rebrand palette
-  const getScoreColor = (val: number) => {
-    if (val < 45) {
-      return { 
-        color: "#D32F2F", // Error Red
-        text: "NEEDS WORK", 
-        textClass: "text-[#D32F2F] bg-[#D32F2F]/6 border-[#D32F2F]/15", 
+    if (displayScore < 75) {
+      return {
+        label: "Improving",
+        color: "#C58B00",
+        bg: "bg-[#C58B00]/10",
+        text: "text-[#8A6400]",
       };
     }
-    if (val < 75) {
-      return { 
-        color: "#E6A700", // Warning Gold/Amber
-        text: "IMPROVING", 
-        textClass: "text-[#E6A700] bg-[#E6A700]/6 border-[#E6A700]/15", 
-      };
-    }
-    return { 
-      color: "#0B2E33", // Brand Green
-      text: "EXCELLENT", 
-      textClass: "text-[#0B2E33] bg-[#0B2E33]/6 border-[#0B2E33]/15", 
+
+    return {
+      label: "Strong",
+      color: "#1F5C4A",
+      bg: "bg-[#1F5C4A]/10",
+      text: "text-[#1F5C4A]",
     };
-  };
+  }, [displayScore]);
 
-  const currentTheme = getScoreColor(displayScore);
+  const categories = categoryWeights.map((category) => ({
+    ...category,
+    value: Math.min(99, Math.max(28, displayScore + category.offset)),
+  }));
 
-  return (
-    <div className="flex flex-col items-center justify-center relative select-none" style={{ width: size, height: size + 35 }}>
-      
-      {/* 1. Circle container with clean gray base track */}
-      <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} className="transform -rotate-90">
-          {/* Base Circle */}
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            fill="transparent"
-            stroke="#f1f5f9" // slate-100 base
-            strokeWidth={strokeWidth}
-          />
-          {/* Active progress arc */}
-          <motion.circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            fill="transparent"
-            stroke={currentTheme.color}
-            strokeWidth={strokeWidth}
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            strokeLinecap="round"
-            style={{ transition: "stroke-dashoffset 0.1s ease-out" }}
-          />
-        </svg>
-
-        {/* Counter Overlay (Premium Inter font) */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <motion.span 
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            className="text-3xl font-black tracking-tight text-[#1E1E1E] font-sans"
-          >
-            {displayScore}%
-          </motion.span>
-          <span className="text-[9px] tracking-wider text-zinc-400 font-extrabold uppercase mt-0.5 font-sans">
-            Resume Health
+  if (compact) {
+    return (
+      <div className="w-full rounded-xl border border-[#E5E7EB] bg-white p-3 shadow-sm">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#6B7280]">
+              Resume Health
+            </p>
+            <p className="mt-1 text-2xl font-semibold tracking-tight text-[#1C1C1C]">
+              {displayScore}%
+            </p>
+          </div>
+          <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${status.bg} ${status.text}`}>
+            {status.label}
           </span>
         </div>
+        <div className="mt-3 h-2 rounded-full bg-[#F1F2EF]">
+          <div
+            className="h-full rounded-full transition-all duration-300"
+            style={{ width: `${displayScore}%`, backgroundColor: status.color }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-[360px] rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
+      <div className="flex items-start justify-between gap-4 border-b border-[#E5E7EB] pb-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6B8F71]">
+            Resume Health
+          </p>
+          <p className="mt-2 text-4xl font-semibold tracking-tight text-[#1C1C1C]">
+            {displayScore}%
+          </p>
+        </div>
+        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${status.bg} ${status.text}`}>
+          {status.label}
+        </span>
       </div>
 
-      {/* 2. Elegant status badge */}
-      <div className={`mt-3.5 px-3 py-0.5 rounded-full border text-[9px] font-black tracking-wider uppercase font-sans ${currentTheme.textClass}`}>
-        {currentTheme.text}
+      <div className="mt-4 space-y-3">
+        {categories.map((category) => (
+          <div key={category.label}>
+            <div className="mb-1.5 flex items-center justify-between text-xs">
+              <span className="font-medium text-[#1C1C1C]">{category.label}</span>
+              <span className="text-[#6B7280]">{category.value}%</span>
+            </div>
+            <div className="h-1.5 rounded-full bg-[#F1F2EF]">
+              <div
+                className="h-full rounded-full bg-[#1F5C4A] transition-all duration-300"
+                style={{ width: `${category.value}%` }}
+              />
+            </div>
+          </div>
+        ))}
       </div>
-
     </div>
   );
 };
