@@ -11,7 +11,9 @@ export async function POST(req: Request) {
       razorpay_order_id, 
       razorpay_payment_id, 
       razorpay_signature,
-      resumeId 
+      resumeId,
+      userId,
+      planId
     } = await req.json();
 
     if (!razorpay_order_id || !razorpay_payment_id) {
@@ -37,31 +39,52 @@ export async function POST(req: Request) {
       }
     }
 
-    // 1. Create a secure, temporary 10-minute export session on the server
+    // 1. Check if the purchase is for the BOOSTCV Pro plan subscription
     const sessionToken = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
 
-    try {
-      const resumeRef = doc(db, "resumes", resumeId);
-      await setDoc(
-        resumeRef,
-        {
-          paymentStatus: "paid",
-          downloadsRemaining: 2,
-          downloadsUsed: 0,
-          paymentDate: new Date().toISOString(),
-          exportSession: {
-            token: sessionToken,
-            expiresAt,
-            downloaded: false
+    if (planId === "pro") {
+      try {
+        const userRef = doc(db, "users", userId);
+        await setDoc(
+          userRef,
+          {
+            isPro: true,
+            proExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            exportsRemaining: 10,
+            atsScansRemaining: 9999,
+            updatedAt: new Date().toISOString(),
           },
-          updatedAt: new Date().toISOString(),
-        },
-        { merge: true }
-      );
-      console.log(`[PAYMENT VERIFY] Successfully created secure temporary export session (2 allowance) for resume ${resumeId}.`);
-    } catch (dbErr) {
-      console.warn("[PAYMENT VERIFY] Firestore update failed, relying on client-side sync fallback:", dbErr);
+          { merge: true }
+        );
+        console.log(`[PAYMENT VERIFY] Successfully upgraded user ${userId} to BOOSTCV Pro (10 exports, unlimited scans).`);
+      } catch (dbErr) {
+        console.warn("[PAYMENT VERIFY] Firestore update failed for Pro profile:", dbErr);
+      }
+    } else {
+      // 2. Single resume export flow (remains exactly as it is)
+      try {
+        const resumeRef = doc(db, "resumes", resumeId);
+        await setDoc(
+          resumeRef,
+          {
+            paymentStatus: "paid",
+            downloadsRemaining: 2,
+            downloadsUsed: 0,
+            paymentDate: new Date().toISOString(),
+            exportSession: {
+              token: sessionToken,
+              expiresAt,
+              downloaded: false
+            },
+            updatedAt: new Date().toISOString(),
+          },
+          { merge: true }
+        );
+        console.log(`[PAYMENT VERIFY] Successfully created secure temporary export session (2 allowance) for resume ${resumeId}.`);
+      } catch (dbErr) {
+        console.warn("[PAYMENT VERIFY] Firestore update failed, relying on client-side sync fallback:", dbErr);
+      }
     }
 
     // Verification successful (or skipped in local mock run)

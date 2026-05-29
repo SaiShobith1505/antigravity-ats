@@ -11,7 +11,9 @@ import {
   saveResume, 
   getResume, 
   getPaymentStatus, 
-  setPaymentStatusPaid 
+  setPaymentStatusPaid,
+  getUserProfile,
+  updateUserProfile
 } from "@/lib/db";
 import { 
   Zap, 
@@ -36,7 +38,10 @@ import {
   BarChart3,
   ListChecks,
   Building2,
-  User
+  User,
+  ShieldCheck,
+  Upload,
+  RefreshCw
 } from "lucide-react";
 import Link from "next/link";
 
@@ -55,6 +60,16 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [downloadsRemaining, setDownloadsRemaining] = useState<number>(0);
   
+  // Trial, User profile, and checkoutType pricing states
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [checkoutType, setCheckoutType] = useState<"export" | "pro">("export");
+
+  // New Standalone ATS Resume Checker states
+  const [checkerFile, setCheckerFile] = useState<File | null>(null);
+  const [checkerScanning, setCheckerScanning] = useState(false);
+  const [checkerProgress, setCheckerProgress] = useState(0);
+  const [checkerReport, setCheckerReport] = useState<any | null>(null);
+
   // Referral Viral growth states
   const [referralCount, setReferralCount] = useState(0);
   const [referralLink, setReferralLink] = useState("");
@@ -64,10 +79,10 @@ export default function DashboardPage() {
   // Simulated Payment Sandbox Modal States
   const [showMockModal, setShowMockModal] = useState(false);
   const [mockOrderId, setMockOrderId] = useState("");
-  const [mockAmount, setMockAmount] = useState(8000);
+  const [mockAmount, setMockAmount] = useState(9900);
 
   // AI JD Matcher & Optimizer states
-  const [activeTab, setActiveTab] = useState<"edit" | "ats" | "matcher" | "company" | "history" | "account">("edit");
+  const [activeTab, setActiveTab] = useState<"edit" | "ats" | "matcher" | "company" | "history" | "account" | "ats-checker">("edit");
   const [previewTab, setPreviewTab] = useState<"preview" | "insights">("preview");
   
   // Company Intelligence Engine States
@@ -513,6 +528,21 @@ export default function DashboardPage() {
             setDownloadsRemaining(2);
           }
         }
+        
+        // Load User Profile details (Trial scans & subscription plan)
+        try {
+          const profile = await getUserProfile(user.uid, user.email);
+          setUserProfile(profile);
+          if (profile.isPro) {
+            setIsPaid(true);
+            if (profile.exportsRemaining !== undefined) {
+              setDownloadsRemaining(profile.exportsRemaining);
+            }
+          }
+        } catch (profileErr) {
+          console.warn("Failed to load user profile:", profileErr);
+        }
+
         setLoading(false);
       };
       load();
@@ -719,21 +749,42 @@ export default function DashboardPage() {
   const handleMockPaymentSuccess = async () => {
     setPaymentError("");
     try {
+      const verifyPayload: any = {
+        razorpay_order_id: mockOrderId,
+        razorpay_payment_id: `pay_mock_${Math.random().toString(36).substring(2, 12)}`,
+        razorpay_signature: "mock_signature_bypass",
+        resumeId
+      };
+      if (checkoutType === "pro") {
+        verifyPayload.planId = "pro";
+        verifyPayload.userId = user?.uid;
+      }
+
       const verifyRes = await fetch("/api/payment/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          razorpay_order_id: mockOrderId,
-          razorpay_payment_id: `pay_mock_${Math.random().toString(36).substring(2, 12)}`,
-          razorpay_signature: "mock_signature_bypass",
-          resumeId
-        }),
+        body: JSON.stringify(verifyPayload),
       });
 
       if (verifyRes.ok) {
-        setIsPaid(true);
-        setDownloadsRemaining(2);
-        await setPaymentStatusPaid(resumeId);
+        if (checkoutType === "pro" && user) {
+          setIsPaid(true);
+          setDownloadsRemaining(10);
+          const newProfile = {
+            ...userProfile,
+            isPro: true,
+            proExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            exportsRemaining: 10,
+            atsScansRemaining: 9999
+          };
+          setUserProfile(newProfile);
+          await updateUserProfile(user.uid, newProfile);
+          alert("Congratulations! You are now upgraded to BOOSTCV Pro.");
+        } else {
+          setIsPaid(true);
+          setDownloadsRemaining(2);
+          await setPaymentStatusPaid(resumeId);
+        }
         setPaymentError("");
         setShowMockModal(false);
       } else {
@@ -767,10 +818,11 @@ export default function DashboardPage() {
     });
   };
 
-  // Razorpay Checkout Endpoint
+  // Razorpay Checkout Endpoint for Single Exports (₹99)
   const triggerRazorpayCheckout = async () => {
     if (!user) return;
     setPaymentError("");
+    setCheckoutType("export");
 
     const sdkLoaded = await loadRazorpayScript();
     if (!sdkLoaded) {
@@ -828,7 +880,7 @@ export default function DashboardPage() {
               setPaymentError("");
             } else {
               const errData = await verifyRes.json();
-              setPaymentError(errData.error || "Cryptographic verification verification failed.");
+              setPaymentError(errData.error || "Cryptographic verification failed.");
             }
           } catch (verifyErr) {
             setPaymentError("Network verification error occurred.");
@@ -839,7 +891,7 @@ export default function DashboardPage() {
           email: user.email || "",
         },
         theme: {
-          color: "#06b6d4",
+          color: "#1F5C4A",
         },
         modal: {
           ondismiss: function () {
@@ -862,6 +914,109 @@ export default function DashboardPage() {
     } catch (err: any) {
       console.error("Razorpay setup/execution failed:", err);
       setPaymentError(err.message || "Failed to initialize secure checkout. Please try again.");
+    }
+  };
+
+  // Razorpay Checkout Endpoint for Pro Plans (₹299)
+  const triggerProCheckout = async () => {
+    if (!user) return;
+    setPaymentError("");
+    setCheckoutType("pro");
+
+    const sdkLoaded = await loadRazorpayScript();
+    if (!sdkLoaded) {
+      setPaymentError("Razorpay SDK failed to load. Please check your internet connection or disable adblockers.");
+      return;
+    }
+ 
+    try {
+      const response = await fetch("/api/payment/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resumeId, userId: user.uid, planId: "pro" }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to initialize checkout.");
+      }
+      
+      const order = await response.json();
+ 
+      // Test Mode Offline Sandbox Bypass
+      if (order.isMock) {
+        console.log("[TEST MODE] Mock order detected. Triggering Mock Pro Payment Sandbox Modal...");
+        setMockOrderId(order.id);
+        setMockAmount(order.amount);
+        setShowMockModal(true);
+        return;
+      }
+      // Configure Razorpay client options
+      const options = {
+        key: order.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: "INR",
+        name: "BOOSTCV Pro Plan",
+        description: "10 Exports & Unlimited Scans Pro Subscription",
+        order_id: order.id,
+        handler: async function (res: any) {
+          try {
+            // Payment success callback
+            const verifyRes = await fetch("/api/payment/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: res.razorpay_order_id,
+                razorpay_payment_id: res.razorpay_payment_id,
+                razorpay_signature: res.razorpay_signature,
+                resumeId,
+                userId: user.uid,
+                planId: "pro"
+              }),
+            });
+            
+            if (verifyRes.ok) {
+              setIsPaid(true);
+              setDownloadsRemaining(10);
+              const newProfile = {
+                ...userProfile,
+                isPro: true,
+                proExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                exportsRemaining: 10,
+                atsScansRemaining: 9999
+              };
+              setUserProfile(newProfile);
+              await updateUserProfile(user.uid, newProfile);
+              setPaymentError("");
+              alert("Congratulations! You are now upgraded to BOOSTCV Pro.");
+            } else {
+              const errData = await verifyRes.json();
+              setPaymentError(errData.error || "Cryptographic verification failed.");
+            }
+          } catch (verifyErr) {
+            setPaymentError("Network verification error occurred.");
+          }
+        },
+        prefill: {
+          name: user.displayName || "",
+          email: user.email || "",
+        },
+        theme: {
+          color: "#1F5C4A",
+        },
+        modal: {
+          ondismiss: function () {
+            console.warn("Razorpay Pro checkout modal closed by user.");
+            setPaymentError("Pro checkout cancelled.");
+          }
+        }
+      };
+ 
+      // Load client-side Razorpay library
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (err: any) {
+      console.error("Razorpay Pro setup failed:", err);
+      setPaymentError(err.message || "Failed to initialize Pro checkout.");
     }
   };
 
@@ -1177,6 +1332,424 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
+      </div>
+    );
+  };
+
+  const renderProUpgradePlansTable = () => {
+    return (
+      <div className="bg-white border border-stone-200 rounded-3xl p-6 md:p-8 max-w-2xl mx-auto shadow-sm space-y-6 text-left animate-in fade-in duration-300">
+        <div className="text-center space-y-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D6C5A4]/25 border border-[#D6C5A4]/40 text-[#1F5C4A] text-[10px] font-black tracking-wider uppercase font-sans">Limited Launch Offer</span>
+          <h3 className="text-xl font-black text-[#1C1C1C] uppercase font-sans">Upgrade to BOOSTCV Pro</h3>
+          <p className="text-xs text-[#6B7280] font-semibold leading-relaxed max-w-md mx-auto">
+            Unlock unlimited scans, dynamic recruiter analysis, and continuous placement optimizations.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+          {/* Free / Basic Plan */}
+          <div className="border border-stone-200 rounded-2xl p-5 space-y-4 bg-stone-50 flex flex-col justify-between">
+            <div className="space-y-2">
+              <span className="text-[9px] font-black text-[#6B7280] uppercase tracking-wider block">Free Trial Plan</span>
+              <h4 className="text-base font-black text-[#1C1C1C]">Basic Access</h4>
+              <div className="text-2xl font-black text-[#1C1C1C]">₹0 <span className="text-xs font-semibold text-[#6B7280] lowercase">/ forever</span></div>
+              <ul className="space-y-2.5 text-[10px] text-[#6B7280] font-bold">
+                <li className="flex items-center space-x-2">
+                  <span className="text-[#1F5C4A] font-extrabold">✓</span>
+                  <span>1 Free ATS Checker Scan</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="text-red-500 font-extrabold">✗</span>
+                  <span className="line-through text-stone-400">Premium Exports (₹99 / each)</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="text-red-500 font-extrabold">✗</span>
+                  <span className="line-through text-stone-400">Unlimited ATS Checks</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="text-red-500 font-extrabold">✗</span>
+                  <span className="line-through text-stone-400">Advanced Job Match Diagnostics</span>
+                </li>
+              </ul>
+            </div>
+            <div className="pt-4">
+              <span className="w-full py-2 px-3 rounded-lg border border-stone-300 bg-stone-200/50 text-[#6B7280] font-black text-[10px] block text-center">
+                Current Plan
+              </span>
+            </div>
+          </div>
+          
+          {/* BOOSTCV Pro Plan */}
+          <div className="border-2 border-[#1F5C4A] rounded-2xl p-5 space-y-4 bg-white flex flex-col justify-between shadow-md relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-[#1F5C4A] text-white text-[7.5px] font-black tracking-widest px-3 py-1 uppercase rounded-bl">RECOMMENDED</div>
+            <div className="space-y-2">
+              <span className="text-[9px] font-black text-[#1F5C4A] uppercase tracking-wider block">Professional Upgrade</span>
+              <h4 className="text-base font-black text-[#1C1C1C]">BOOSTCV Pro</h4>
+              <div className="text-2xl font-black text-[#1F5C4A]">₹299 <span className="text-xs font-semibold text-[#6B7280] lowercase">/ month</span></div>
+              <ul className="space-y-2.5 text-[10px] text-[#1C1C1C] font-extrabold">
+                <li className="flex items-center space-x-2">
+                  <span className="text-[#1F5C4A] font-extrabold">✓</span>
+                  <span>10 Premium Resume Exports</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="text-[#1F5C4A] font-extrabold">✓</span>
+                  <span>Unlimited ATS Deep Checks</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="text-[#1F5C4A] font-extrabold">✓</span>
+                  <span>Full Resume Health Reports</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="text-[#1F5C4A] font-extrabold">✓</span>
+                  <span>Real Job Match Analysis</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="text-[#1F5C4A] font-extrabold">✓</span>
+                  <span>Firestore Scan History Log</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="text-[#1F5C4A] font-extrabold">✓</span>
+                  <span>All Future Premium Features</span>
+                </li>
+              </ul>
+            </div>
+            <div className="pt-4">
+              <button
+                onClick={triggerProCheckout}
+                className="w-full py-2.5 rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white font-black text-[10px] shadow-sm transition-all transform active:scale-98 cursor-pointer uppercase tracking-wider text-center"
+              >
+                Upgrade to Pro
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const triggerCheckerScan = async (uploadedFile: File) => {
+    if (!user || !userProfile) {
+      alert("Please ensure you are authenticated to scan resumes.");
+      return;
+    }
+    
+    // Check trial limit
+    const isPro = userProfile.isPro === true;
+    const scansRemaining = userProfile.atsScansRemaining !== undefined ? userProfile.atsScansRemaining : 1;
+    if (!isPro && scansRemaining <= 0) {
+      alert("Your Free Trial Scan is depleted. Please upgrade to BOOSTCV Pro to run unlimited scans.");
+      return;
+    }
+
+    setCheckerFile(uploadedFile);
+    setCheckerScanning(true);
+    setCheckerProgress(15);
+    setCheckerReport(null);
+
+    // Mock progress sweeps
+    const interval = setInterval(() => {
+      setCheckerProgress((prev) => {
+        if (prev >= 85) {
+          clearInterval(interval);
+          return 85;
+        }
+        return prev + 10;
+      });
+    }, 200);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", uploadedFile);
+
+      const response = await fetch("/api/ats/check", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCheckerProgress(100);
+        setCheckerReport(data);
+
+        // Decrement free scans trial count in Firestore if basic user
+        if (!isPro) {
+          const nextScans = Math.max(0, scansRemaining - 1);
+          const updatedProfile = { ...userProfile, atsScansRemaining: nextScans };
+          setUserProfile(updatedProfile);
+          await updateUserProfile(user.uid, { atsScansRemaining: nextScans });
+        }
+      } else {
+        const errData = await response.json();
+        alert(errData.error || "Failed to scan resume.");
+        setCheckerFile(null);
+      }
+    } catch (err) {
+      console.error("Checker Scan failed:", err);
+      alert("Network or parse error during checker run.");
+      setCheckerFile(null);
+    } finally {
+      clearInterval(interval);
+      setCheckerScanning(false);
+    }
+  };
+
+  const renderAtsCheckerWorkspace = () => {
+    if (!userProfile) {
+      return (
+        <div className="py-12 text-center text-[#6B7280] text-xs font-semibold">
+          Loading your trial profile...
+        </div>
+      );
+    }
+
+    const isPro = userProfile.isPro === true;
+    const scansRemaining = userProfile.atsScansRemaining !== undefined ? userProfile.atsScansRemaining : 1;
+
+    // Entitlement trial limit lock screen
+    if (!isPro && scansRemaining <= 0 && !checkerReport) {
+      return (
+        <div className="space-y-8 animate-in fade-in duration-300">
+          <div className="bg-[#C0392B]/10 border border-[#C0392B]/20 rounded-3xl p-6 text-center max-w-xl mx-auto space-y-3">
+            <div className="h-10 w-10 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto shadow-sm">
+              <ShieldAlert className="h-5 w-5 text-[#C0392B]" />
+            </div>
+            <h3 className="text-sm font-black text-[#1C1C1C] uppercase font-sans tracking-wide">Trial Scan Depleted</h3>
+            <p className="text-xs text-[#6B7280] font-semibold leading-relaxed">
+              Your account has used its 1 free trial ATS scan. Upgrade to BOOSTCV Pro to unlock unlimited parsing scans, full diagnostics, and recruiter-approved optimizations.
+            </p>
+          </div>
+
+          {/* Comparison Table */}
+          {renderProUpgradePlansTable()}
+        </div>
+      );
+    }
+
+    if (checkerReport) {
+      const bd = checkerReport.breakdown || {};
+      const structureVal = bd.structure !== undefined ? bd.structure : 80;
+      const formattingVal = bd.formatting !== undefined ? bd.formatting : 95;
+      const readabilityVal = bd.readability !== undefined ? bd.readability : 85;
+      const skillsVal = bd.skills !== undefined ? bd.skills : bd.keywords !== undefined ? bd.keywords : 70;
+      const projectsVal = bd.projects !== undefined ? bd.projects : 75;
+      const achievementsVal = bd.achievements !== undefined ? bd.achievements : 60;
+
+      return (
+        <div className="space-y-6 text-left animate-in fade-in duration-300">
+          <div className="flex justify-between items-center bg-white border border-stone-200 p-4 rounded-2xl shadow-sm">
+            <div className="flex items-center space-x-3">
+              <div className="h-9 w-9 rounded-xl bg-[#1F5C4A]/10 border border-[#1F5C4A]/25 flex items-center justify-center shadow-sm">
+                <ShieldCheck className="h-5 w-5 text-[#1F5C4A]" />
+              </div>
+              <div className="text-left">
+                <h4 className="text-xs font-black text-[#1C1C1C] font-sans uppercase">ATS Scanner Report</h4>
+                <p className="text-[9.5px] text-[#6B7280] font-semibold">{checkerFile?.name || "Uploaded Resume"}</p>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => {
+                setCheckerFile(null);
+                setCheckerReport(null);
+              }}
+              className="px-3.5 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-[#1F5C4A] hover:text-[#18483A] font-black text-[10px] uppercase transition-all transform active:scale-98 cursor-pointer flex items-center space-x-1"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              <span>Scan Another Resume</span>
+            </button>
+          </div>
+
+          {/* Restored Resume Health Report inside card */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center bg-white border border-stone-200 rounded-3xl p-6 shadow-sm">
+            <div className="md:col-span-4 flex justify-center">
+              <AtsScoreGauge score={checkerReport.atsScore} size={140} />
+            </div>
+            
+            <div className="md:col-span-8 space-y-3 text-left">
+              <h3 className="text-sm font-black text-[#1C1C1C] uppercase tracking-wider font-sans border-b border-stone-200 pb-2">
+                Resume Health Diagnosis
+              </h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[9px] font-bold font-sans">
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[#6B7280]">
+                    <span>Structure</span>
+                    <span className="text-[#1F5C4A]">{structureVal}%</span>
+                  </div>
+                  <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-[#1F5C4A] h-full transition-all duration-500" style={{ width: `${structureVal}%` }} />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[#6B7280]">
+                    <span>Formatting</span>
+                    <span className="text-[#1F5C4A]">{formattingVal}%</span>
+                  </div>
+                  <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-[#1F5C4A] h-full transition-all duration-500" style={{ width: `${formattingVal}%` }} />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[#6B7280]">
+                    <span>Readability</span>
+                    <span className="text-[#1F5C4A]">{readabilityVal}%</span>
+                  </div>
+                  <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-[#1F5C4A] h-full transition-all duration-500" style={{ width: `${readabilityVal}%` }} />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[#6B7280]">
+                    <span>Skills</span>
+                    <span className="text-[#1F5C4A]">{skillsVal}%</span>
+                  </div>
+                  <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-[#1F5C4A] h-full transition-all duration-500" style={{ width: `${skillsVal}%` }} />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[#6B7280]">
+                    <span>Projects</span>
+                    <span className="text-[#1F5C4A]">{projectsVal}%</span>
+                  </div>
+                  <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-[#1F5C4A] h-full transition-all duration-500" style={{ width: `${projectsVal}%` }} />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[#6B7280]">
+                    <span>Achievements</span>
+                    <span className="text-[#1F5C4A]">{achievementsVal}%</span>
+                  </div>
+                  <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-[#1F5C4A] h-full transition-all duration-500" style={{ width: `${achievementsVal}%` }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Parser formatting warnings */}
+            <div className="bg-white border border-stone-200 rounded-3xl p-6 space-y-4 shadow-sm">
+              <h4 className="text-xs font-black text-[#1C1C1C] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
+                <AlertCircle className="h-4 w-4 text-[#C0392B]" />
+                <span>Parser Formatting Warnings ({checkerReport.warnings?.length || 0})</span>
+              </h4>
+              <ul className="space-y-2 text-[10px] font-bold font-sans max-h-56 overflow-y-auto pr-1">
+                {checkerReport.warnings?.map((warn: string, idx: number) => (
+                  <li key={idx} className="flex items-start space-x-2 text-[#6B7280] leading-relaxed">
+                    <span className="h-3.5 w-3.5 rounded-full bg-red-500/10 text-[#C0392B] flex items-center justify-center font-bold text-[8px] mt-0.5 flex-shrink-0">!</span>
+                    <span>{warn}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* suggestions checklist */}
+            <div className="bg-white border border-stone-200 rounded-3xl p-6 space-y-4 shadow-sm">
+              <h4 className="text-xs font-black text-[#1C1C1C] font-sans uppercase tracking-wider border-b border-stone-200 pb-3 flex items-center space-x-1.5">
+                <ListChecks className="h-4 w-4 text-[#1F5C4A]" />
+                <span>Urgent Recruiter Suggestions</span>
+              </h4>
+              <ul className="space-y-2.5 text-[10px] font-bold font-sans max-h-56 overflow-y-auto pr-1">
+                {checkerReport.metricEnhancements?.map((enh: string, idx: number) => (
+                  <li key={idx} className="flex items-start space-x-2 text-[#6B7280]">
+                    <span className="text-[#1F5C4A] font-extrabold mt-0.5">•</span>
+                    <span>{enh}</span>
+                  </li>
+                ))}
+                {checkerReport.keywordGaps?.length > 0 && (
+                  <div className="border-t border-stone-200 pt-3 mt-1 space-y-2 text-left">
+                    <span className="text-[9px] font-black text-[#1C1C1C] uppercase tracking-wider block">Missing Tech Keywords</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {checkerReport.keywordGaps.map((word: string, idx: number) => (
+                        <span key={idx} className="px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-[8.5px] text-amber-600 font-extrabold font-mono">
+                          {word}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </ul>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="max-w-xl mx-auto space-y-8 animate-in fade-in duration-300 text-left">
+        
+        {/* Urgent limited launch offer banner */}
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D6C5A4]/25 border border-[#D6C5A4]/40 text-[#1F5C4A] text-[9px] font-black tracking-wider uppercase font-sans">
+          Trial Mode: {isPro ? "Unlimited Scans" : `${scansRemaining} Free Scan Remaining`}
+        </div>
+
+        <div className="text-left space-y-3">
+          <h2 className="text-xl font-black text-[#1C1C1C] uppercase font-sans tracking-wide">ATS Resume Checker</h2>
+          <p className="text-xs text-[#6B7280] font-semibold leading-relaxed max-w-sm">
+            Upload your existing PDF or Word resume. We will run a structural parsing diagnostic to test keyword matching, formats, and achievements metrics.
+          </p>
+        </div>
+
+        {!checkerScanning ? (
+          <div className="bg-white border border-stone-200 rounded-3xl p-8 shadow-sm text-center space-y-6">
+            <div className="border-2 border-dashed border-stone-200 hover:border-[#1F5C4A]/40 rounded-2xl p-8 hover:bg-stone-50/50 transition-all cursor-pointer flex flex-col items-center justify-center space-y-4">
+              <input
+                type="file"
+                id="checker-file-upload"
+                accept=".pdf,.docx,.txt"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    triggerCheckerScan(e.target.files[0]);
+                  }
+                }}
+                className="hidden"
+              />
+              <label htmlFor="checker-file-upload" className="cursor-pointer flex flex-col items-center space-y-4">
+                <div className="h-12 w-12 rounded-xl bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-400 shadow-sm">
+                  <Upload className="h-5 w-5 text-[#1F5C4A]" />
+                </div>
+                <div className="space-y-1.5">
+                  <span className="text-xs font-black text-[#1C1C1C] block uppercase font-sans tracking-wide">
+                    Select or drag & drop resume file
+                  </span>
+                  <span className="text-[10px] text-[#6B7280] font-semibold block">
+                    Supports PDF, DOCX, TXT (Max 5MB)
+                  </span>
+                </div>
+              </label>
+            </div>
+          </div>
+        ) : (
+          /* SCANNING OVERLAY */
+          <div className="bg-white border border-stone-200 rounded-3xl p-12 shadow-sm text-center space-y-6">
+            <div className="relative w-24 h-24 mx-auto rounded-full border border-stone-200 bg-stone-50 flex items-center justify-center overflow-hidden shadow-md">
+              <div className="absolute inset-x-0 h-0.5 bg-[#1F5C4A] shadow-[0_0_12px_rgba(31,92,74,0.7)] animate-bounce" />
+              <FileText className="h-8 w-8 text-[#1F5C4A]" />
+            </div>
+            
+            <div className="space-y-2 max-w-xs mx-auto">
+              <span className="text-[10px] font-sans font-black tracking-widest text-[#1F5C4A] uppercase block">
+                Parsing Resume Text...
+              </span>
+              <div className="w-full bg-stone-50 h-1.5 rounded-full overflow-hidden">
+                <div 
+                  className="bg-[#1F5C4A] h-full transition-all duration-300"
+                  style={{ width: `${checkerProgress}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     );
   };
@@ -2021,7 +2594,7 @@ export default function DashboardPage() {
             </div>
             <div className="p-3 bg-stone-50 border border-stone-200 rounded-xl space-y-0.5">
               <span className="text-[#6B7280] uppercase tracking-wider block">EXPORT CHARGES:</span>
-              <span className="text-[#1C1C1C]">₹80.00 / resume download session</span>
+              <span className="text-[#1C1C1C]">₹99.00 / resume download session</span>
             </div>
           </div>
         </div>
@@ -2414,6 +2987,9 @@ export default function DashboardPage() {
 
                 {/* Sales Copy */}
                 <div className="text-center space-y-1">
+                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#D6C5A4]/20 border border-[#D6C5A4]/35 text-[#1F5C4A] text-[8.5px] font-black uppercase tracking-wider mb-2">
+                    Offer Ends Soon • Limited Launch Offer
+                  </div>
                   <h4 className="text-xs font-extrabold text-[#1C1C1C] leading-tight">
                     Unlock Final Recruiter-Ready PDF
                   </h4>
@@ -2448,7 +3024,7 @@ export default function DashboardPage() {
                   className="w-full py-2.5 rounded-lg hover: hover: text-white font-black text-xs shadow-sm transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
                 >
                   <Zap className="h-4 w-4 text-white fill-white stroke-[2.5]" />
-                  <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 80}</span>
+                  <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 99}</span>
                 </button>
 
                 {/* Classmate referral share widget for free access */}
@@ -2516,6 +3092,15 @@ export default function DashboardPage() {
           >
             <FileText className="h-4 w-4" />
             <span>Resume Builder</span>
+          </button>
+          
+          <button
+            onClick={() => setActiveTab("ats-checker")}
+            className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer hover:bg-stone-50 relative ${activeTab === "ats-checker" ? "bg-[#1F5C4A] text-white shadow-sm" : "text-[#6B7280] hover:text-[#1C1C1C]"}`}
+          >
+            <ShieldCheck className="h-4 w-4" />
+            <span>ATS Resume Checker</span>
+            <span className="absolute right-3 text-[7.5px] font-black px-1.5 py-0.25 rounded bg-[#D6C5A4] text-[#1F5C4A]">NEW</span>
           </button>
           
           <button
@@ -2596,6 +3181,7 @@ export default function DashboardPage() {
             <span className="text-xs font-extrabold text-[#1C1C1C] tracking-wider uppercase font-sans">
               {activeTab === "edit" && "Resume Builder Workspace"}
               {activeTab === "ats" && "Resume Health Report"}
+              {activeTab === "ats-checker" && "ATS Resume Checker"}
               {activeTab === "matcher" && "Job Match Review"}
               {activeTab === "company" && "Company Fit Review"}
               {activeTab === "history" && "Analysis Scans Log History"}
@@ -2633,6 +3219,8 @@ export default function DashboardPage() {
             )}
 
             {activeTab === "ats" && renderAtsDeepScanWorkspace()}
+
+            {activeTab === "ats-checker" && renderAtsCheckerWorkspace()}
 
             {activeTab === "matcher" && renderJobMatcherWorkspace()}
 
@@ -2908,6 +3496,9 @@ export default function DashboardPage() {
 
                     {/* Sales Copy */}
                     <div className="text-center space-y-1">
+                      <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#D6C5A4]/20 border border-[#D6C5A4]/35 text-[#1F5C4A] text-[8.5px] font-black uppercase tracking-wider mb-2">
+                        Offer Ends Soon • Limited Launch Offer
+                      </div>
                       <h4 className="text-sm font-extrabold text-[#1C1C1C] leading-tight">
                         Unlock Final Recruiter-Ready PDF
                       </h4>
@@ -2942,7 +3533,7 @@ export default function DashboardPage() {
                       className="w-full py-2.5 rounded-lg hover: hover: text-white font-black text-xs shadow-sm transition-all transform active:scale-98 flex items-center justify-center space-x-1.5"
                     >
                       <Zap className="h-4 w-4 text-white fill-zinc-950 stroke-[2.5]" />
-                      <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 80}</span>
+                      <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 99}</span>
                     </button>
 
                     {/* Classmate referral share widget for free access */}
@@ -3168,7 +3759,7 @@ export default function DashboardPage() {
                     className="px-6 py-3 text-xs font-black rounded-lg text-white hover:brightness-110 active:scale-98 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
                   >
                     <Download className="h-4 w-4 text-white" />
-                    <span>Unlock Selection PDF (₹{tailorApplied ? 149 : 80})</span>
+                    <span>Unlock Selection PDF (₹{tailorApplied ? 149 : 99})</span>
                   </button>
                 )}
               </div>

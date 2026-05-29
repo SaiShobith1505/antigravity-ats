@@ -428,3 +428,91 @@ export const defaultResumeData: ResumeData = {
     "React Advanced Developer Certification",
   ],
 };
+
+export interface UserProfile {
+  uid: string;
+  email: string | null;
+  atsScansRemaining: number;
+  isPro: boolean;
+  proExpiresAt?: string | null;
+  exportsRemaining?: number;
+}
+
+// Get or Create User Profile for trial tracking
+export async function getUserProfile(
+  uid: string,
+  email: string | null
+): Promise<UserProfile> {
+  try {
+    const userRef = doc(db, "users", uid);
+    const docSnap = await getDoc(userRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      return {
+        uid,
+        email: data.email || email,
+        atsScansRemaining: data.atsScansRemaining !== undefined ? data.atsScansRemaining : 1,
+        isPro: data.isPro || false,
+        proExpiresAt: data.proExpiresAt || null,
+        exportsRemaining: data.exportsRemaining !== undefined ? data.exportsRemaining : 0
+      };
+    }
+  } catch (err) {
+    console.warn("Firestore getUserProfile failed:", err);
+  }
+
+  // Local storage fallback for sandboxing robustness
+  if (typeof window !== "undefined") {
+    const cached = localStorage.getItem(`cv_boost_profile_${uid}`);
+    if (cached) {
+      try {
+        return JSON.parse(cached);
+      } catch (_) {}
+    }
+  }
+
+  const newProfile: UserProfile = {
+    uid,
+    email,
+    atsScansRemaining: 1,
+    isPro: false,
+    proExpiresAt: null,
+    exportsRemaining: 0
+  };
+
+  try {
+    const userRef = doc(db, "users", uid);
+    await setDoc(userRef, newProfile, { merge: true });
+  } catch (_) {}
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem(`cv_boost_profile_${uid}`, JSON.stringify(newProfile));
+  }
+
+  return newProfile;
+}
+
+// Update User Profile (e.g. decrement scan count or upgrade to Pro)
+export async function updateUserProfile(
+  uid: string,
+  updates: Partial<UserProfile>
+): Promise<void> {
+  try {
+    const userRef = doc(db, "users", uid);
+    await setDoc(userRef, updates, { merge: true });
+  } catch (err) {
+    console.warn("Firestore updateUserProfile failed:", err);
+  }
+
+  if (typeof window !== "undefined") {
+    const cached = localStorage.getItem(`cv_boost_profile_${uid}`);
+    let parsed: any = {};
+    if (cached) {
+      try {
+        parsed = JSON.parse(cached);
+      } catch (_) {}
+    }
+    const updated = { ...parsed, ...updates };
+    localStorage.setItem(`cv_boost_profile_${uid}`, JSON.stringify(updated));
+  }
+}

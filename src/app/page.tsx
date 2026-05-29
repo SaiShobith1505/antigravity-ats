@@ -138,7 +138,7 @@ export default function LandingPage() {
                   <p className="mt-1 text-xs font-medium text-[#6B7280]">health categories</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-semibold">₹80</p>
+                  <p className="text-2xl font-semibold">₹99</p>
                   <p className="mt-1 text-xs font-medium text-[#6B7280]">one-time export</p>
                 </div>
                 <div>
@@ -243,9 +243,12 @@ export default function LandingPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#6B8F71]">Simple pricing</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight">One focused export package.</h2>
             <div className="mt-8 rounded-2xl border border-[#E5E7EB] bg-[#F8F7F4] p-8 shadow-sm">
+              <div className="mb-6 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D6C5A4]/25 border border-[#D6C5A4]/40 text-[#1F5C4A] text-[10px] font-black tracking-wider uppercase font-sans">
+                Offer Ends Soon • Limited Launch Offer
+              </div>
               <div className="flex items-center justify-center gap-3">
                 <span className="text-lg font-medium text-[#6B7280] line-through">₹149</span>
-                <span className="text-5xl font-semibold tracking-tight">₹80</span>
+                <span className="text-5xl font-semibold tracking-tight">₹99</span>
                 <span className="text-sm font-medium text-[#6B7280]">one-time</span>
               </div>
               <p className="mx-auto mt-5 max-w-sm text-sm leading-6 text-[#6B7280]">

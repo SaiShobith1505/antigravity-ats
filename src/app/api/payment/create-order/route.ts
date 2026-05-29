@@ -13,27 +13,32 @@ const razorpay = keyId && keySecret ? new Razorpay({
 
 export async function POST(req: Request) {
   try {
-    const { resumeId, userId, usedAITailor } = await req.json();
+    const { resumeId, userId, usedAITailor, planId } = await req.json();
 
-    let amount = 8000; // Default ₹80 in paise
+    let amount = 9900; // Default ₹99 in paise
 
-    // Verify tailored status directly from Firestore for secure billing check
-    try {
-      const resumeRef = doc(db, "resumes", resumeId);
-      const resumeSnap = await getDoc(resumeRef);
-      if (resumeSnap.exists()) {
-        const resumeData = resumeSnap.data();
-        if (resumeData.usedAITailor === true) {
-          amount = 14900; // ₹149 in paise
-          console.log(`[CREATE ORDER] Confirmed tailored status for ${resumeId}. Upgraded price to ₹149.`);
+    if (planId === "pro") {
+      amount = 29900; // ₹299 for BOOSTCV Pro in paise
+      console.log(`[CREATE ORDER] Creating Pro plan subscription order of ₹299 for user ${userId}.`);
+    } else {
+      // Verify tailored status directly from Firestore for secure billing check
+      try {
+        const resumeRef = doc(db, "resumes", resumeId);
+        const resumeSnap = await getDoc(resumeRef);
+        if (resumeSnap.exists()) {
+          const resumeData = resumeSnap.data();
+          if (resumeData.usedAITailor === true) {
+            amount = 14900; // ₹149 in paise
+            console.log(`[CREATE ORDER] Confirmed tailored status for ${resumeId}. Upgraded price to ₹149.`);
+          }
+        } else if (usedAITailor === true) {
+          amount = 14900; // Mock fallback
         }
-      } else if (usedAITailor === true) {
-        amount = 14900; // Mock fallback
-      }
-    } catch (dbErr) {
-      console.warn("[CREATE ORDER] Firestore read failed, relying on request context parameter fallback:", dbErr);
-      if (usedAITailor === true) {
-        amount = 14900;
+      } catch (dbErr) {
+        console.warn("[CREATE ORDER] Firestore read failed, relying on request context parameter fallback:", dbErr);
+        if (usedAITailor === true) {
+          amount = 14900;
+        }
       }
     }
 
