@@ -11,8 +11,7 @@ import {
   ArrowRight,
   TrendingDown,
   X,
-  RefreshCw,
-  Zap
+  RefreshCw
 } from "lucide-react";
 import { AtsScoreGauge } from "@/components/AtsScoreGauge";
 
@@ -97,12 +96,12 @@ export default function SandboxPage() {
       {/* Header navbar */}
       <header className="sticky top-0 z-50 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded bg-gradient-to-tr from-[#1F5C4A] to-[#2F7A62] flex items-center justify-center">
-              <Zap className="h-4.5 w-4.5 text-zinc-950 stroke-[2.5]" />
+          <Link href="/" className="flex items-center space-x-2.5">
+            <div className="h-8 w-8 rounded overflow-hidden flex items-center justify-center shadow-sm">
+              <img src="/logo.png" alt="BOOSTCV Logo" className="h-full w-full object-cover" />
             </div>
             <span className="text-base font-black tracking-tight text-white font-mono">
-              CV⚡BOOST
+              BOOSTCV
             </span>
           </Link>
 

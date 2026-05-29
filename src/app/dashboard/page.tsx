@@ -2499,8 +2499,8 @@ export default function DashboardPage() {
         
         {/* Brand header */}
         <Link href="/" className="flex items-center space-x-2.5 px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-2xl shadow-sm hover:border-[#1F5C4A]/40 hover:bg-stone-100/50 transition-all cursor-pointer">
-          <div className="h-7 w-7 rounded-lg bg-[#1F5C4A] flex items-center justify-center shadow-sm">
-            <Zap className="h-4 w-4 text-white stroke-[2.5]" />
+          <div className="h-7 w-7 rounded-lg overflow-hidden flex items-center justify-center shadow-sm">
+            <img src="/logo.png" alt="BOOSTCV Logo" className="h-full w-full object-cover" />
           </div>
           <div className="flex flex-col text-left">
             <span className="text-xs font-black text-[#1C1C1C] font-sans tracking-wide uppercase leading-none">BOOSTCV</span>

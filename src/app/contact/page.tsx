@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Zap, ChevronLeft, Mail, Phone, MapPin, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, Mail, Phone, MapPin, CheckCircle2 } from "lucide-react";
 import { Footer } from "@/components/Footer";
 
 export default function ContactPage() {
@@ -27,9 +27,9 @@ export default function ContactPage() {
       {/* Top Header Navbar */}
       <header className="sticky top-0 z-50 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="h-9 w-9 rounded-lg bg-gradient-to-tr from-[#1F5C4A] to-[#2F7A62] flex items-center justify-center shadow-md">
-              <Zap className="h-5 w-5 text-zinc-950 stroke-[2.5]" />
+          <Link href="/" className="flex items-center space-x-2.5">
+            <div className="h-9 w-9 rounded-lg overflow-hidden flex items-center justify-center shadow-md">
+              <img src="/logo.png" alt="BOOSTCV Logo" className="h-full w-full object-cover" />
             </div>
             <span className="text-xl font-black tracking-tight text-white font-mono">
               BOOSTCV

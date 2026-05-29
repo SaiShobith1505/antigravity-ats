@@ -17,8 +17,8 @@ export function Footer() {
           {/* Brand & Tagline Column (Left) */}
           <div className="md:col-span-5 space-y-4">
             <Link href="/" className="inline-flex items-center space-x-2.5 group">
-              <div className="h-9 w-9 rounded-lg bg-[#1F5C4A] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300">
-                <Zap className="h-5 w-5 text-white stroke-[2.5]" />
+              <div className="h-9 w-9 rounded-lg overflow-hidden flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300">
+                <img src="/logo.png" alt="BOOSTCV Logo" className="h-full w-full object-cover" />
               </div>
               <span className="text-xl font-black tracking-tight text-[#1C1C1C] font-sans">
                 BOOSTCV

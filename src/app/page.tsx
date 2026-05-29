@@ -75,8 +75,8 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 border-b border-[#E5E7EB] bg-[#F8F7F4]/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1F5C4A] text-white shadow-sm">
-              <Sparkles className="h-4 w-4" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden shadow-sm">
+              <img src="/logo.png" alt="BOOSTCV Logo" className="h-full w-full object-cover" />
             </div>
             <span className="text-sm font-semibold tracking-tight">BOOSTCV</span>
           </Link>
