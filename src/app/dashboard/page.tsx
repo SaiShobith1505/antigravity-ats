@@ -1837,7 +1837,7 @@ export default function DashboardPage() {
           <button
             onClick={handleOptimizeResume}
             disabled={isAnalyzing || !jobDescription.trim()}
-            className="w-full py-3.5 px-4 rounded-xl hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-white font-black text-xs shadow-sm flex items-center justify-center space-x-2 cursor-pointer"
+            className="w-full py-3.5 px-4 rounded-xl bg-[#1F5C4A] hover:bg-[#18483A] text-white font-black text-xs shadow-sm transition-all transform active:scale-98 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center space-x-2 cursor-pointer"
           >
             {isAnalyzing ? (
               <>
@@ -2181,7 +2181,7 @@ export default function DashboardPage() {
           <button
             onClick={handleCompanyAnalysis}
             disabled={isAnalyzingCompany || !roleSelection.trim()}
-            className="w-full py-3.5 px-4 rounded-xl hover:brightness-110 active:scale-98 transition-all disabled:opacity-50 disabled:pointer-events-none text-white font-black text-xs shadow-sm flex items-center justify-center space-x-2 cursor-pointer"
+            className="w-full py-3.5 px-4 rounded-xl bg-[#1F5C4A] hover:bg-[#18483A] text-white font-black text-xs shadow-sm transition-all transform active:scale-98 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center space-x-2 cursor-pointer"
           >
             {isAnalyzingCompany ? (
               <>
