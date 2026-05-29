@@ -84,11 +84,12 @@ export default function DashboardPage() {
     keywordGaps: string[];
     metricEnhancements: string[];
     breakdown: {
+      structure: number;
       formatting: number;
-      keywords: number;
-      experienceQuality: number;
-      technicalSkills: number;
       readability: number;
+      keywords: number;
+      projects: number;
+      achievements: number;
     };
   } | null>(null);
 
@@ -141,12 +142,19 @@ export default function DashboardPage() {
   const handleUndoTailoring = () => {
     if (originalResumeDraft) {
       setResumeData(originalResumeDraft);
-      const prevScore = calculateHeuristicAtsScore(originalResumeDraft);
+      const { score: prevScore, breakdown } = calculateHeuristicAtsScore(originalResumeDraft);
       setAtsScore(prevScore);
       setTailorApplied(false);
       setMatchResult(null);
+      const updatedReport = {
+        warnings: parsedReport?.warnings || ["Your resume matches standard recruiter formatting guidelines beautifully. Good structure."],
+        keywordGaps: parsedReport?.keywordGaps || ["No severe keyword gaps detected."],
+        metricEnhancements: parsedReport?.metricEnhancements || ["Incorporate Google XYZ metrics: 'Accomplished X, as measured by Y, by doing Z'."],
+        breakdown
+      };
+      setParsedReport(updatedReport);
       if (user) {
-        saveResume(user.uid, resumeId, originalResumeDraft, prevScore, false, parsedReport);
+        saveResume(user.uid, resumeId, originalResumeDraft, prevScore, false, updatedReport);
       }
     }
   };
@@ -367,50 +375,177 @@ export default function DashboardPage() {
     }
   }, [isPaid, user, resumeId]);
 
-  // Real-time heuristic scoring analyzer
+  // Real-time content-quality heuristic scoring analyzer
   const calculateHeuristicAtsScore = (data: typeof defaultResumeData) => {
-    let score = 50;
+    // 1. Structure Check (20% of final score)
+    let structureScore = 0;
+    if (data.education && data.education.length > 0) structureScore += 20;
+    if (data.experience && data.experience.length > 0) structureScore += 20;
+    if (data.projects && data.projects.length > 0) structureScore += 20;
+    if (data.skills && (data.skills.languages.length > 0 || data.skills.frameworks.length > 0 || data.skills.tools.length > 0)) structureScore += 20;
+    if (data.certifications && data.certifications.length > 0) structureScore += 20;
+    structureScore = Math.max(10, structureScore);
 
-    // Contact checks
-    if (data.personal.fullName) score += 5;
-    if (data.personal.email && data.personal.phone) score += 5;
-    if (data.personal.linkedin) score += 5;
-    if (data.personal.github) score += 5;
+    // 2. Formatting Check (20% of final score)
+    // BOOSTCV baseline template is pristine (100%). Deducts points only if emojis or graphics are manually introduced in text.
+    let formattingScore = 100;
+    const allText = JSON.stringify(data);
+    const emojiRegex = /[\u{1F300}-\u{1F9FF}]/gu;
+    if (emojiRegex.test(allText)) {
+      formattingScore -= 20;
+    }
+    if (allText.includes("★") || allText.includes("●") || allText.includes("■") || allText.includes("◆")) {
+      formattingScore -= 20;
+    }
+    formattingScore = Math.max(10, formattingScore);
 
-    // Education check
-    if (data.education.length > 0) score += 5;
+    // 3. Readability Check (15% of final score)
+    let readabilityScore = 40; // baseline for pre-optimized BOOSTCV layout flow
+    let contactPoints = 0;
+    if (data.personal.email) contactPoints += 15;
+    if (data.personal.phone) contactPoints += 15;
+    if (data.personal.linkedin) contactPoints += 15;
+    if (data.personal.github) contactPoints += 15;
+    readabilityScore += contactPoints;
+    readabilityScore += 20; // flow sorted standard
+    readabilityScore = Math.min(100, Math.max(10, readabilityScore));
 
-    // Skills check
-    if (data.skills.languages.length > 0) score += 5;
-    if (data.skills.frameworks.length > 0) score += 5;
+    // 4. Keywords Check (15% of final score)
+    const standardKeywords = ["react", "next.js", "nodejs", "typescript", "docker", "git", "sql", "nosql", "aws", "gcp", "rest api"];
+    let matchedKeywords = 0;
+    const lowerAllText = allText.toLowerCase();
+    standardKeywords.forEach(kw => {
+      if (lowerAllText.includes(kw)) matchedKeywords++;
+    });
+    const matchRatio = matchedKeywords / standardKeywords.length;
+    let baseKeywordsScore = Math.round(matchRatio * 100);
 
-    // Experience checks (Google XYZ rule metrics scan)
-    let experienceBonus = 0;
+    // Buzzword penalty
+    const buzzwords = ["synergy", "dynamic", "motivated", "detail-oriented", "results-driven", "innovative", "passionate", "team-player"];
+    let buzzwordPenalties = 0;
+    buzzwords.forEach(word => {
+      const occurrences = (lowerAllText.match(new RegExp(`\\b${word}\\b`, "g")) || []).length;
+      if (occurrences > 2) {
+        buzzwordPenalties += 5;
+      }
+    });
+    const keywordsScore = Math.max(10, baseKeywordsScore - buzzwordPenalties);
+
+    // 5. Projects Depth Check (15% of final score)
+    let projectsScore = 10;
+    let projectCountScore = 0;
+    if (data.projects.length >= 3) projectCountScore = 80;
+    else if (data.projects.length === 2) projectCountScore = 65;
+    else if (data.projects.length === 1) projectCountScore = 50;
+
+    let projectLinksBonus = 0;
+    data.projects.forEach(p => {
+      if (p.techStack && (p.techStack.toLowerCase().includes("github") || p.techStack.toLowerCase().includes("http") || p.techStack.toLowerCase().includes("www"))) {
+        projectLinksBonus = 10;
+      }
+      if (p.description && (p.description.toLowerCase().includes("github") || p.description.toLowerCase().includes("http") || p.description.toLowerCase().includes("www"))) {
+        projectLinksBonus = 10;
+      }
+    });
+
+    let descriptionsBonus = 0;
+    let totalDescLength = 0;
+    data.projects.forEach(p => {
+      totalDescLength += (p.description || "").length;
+    });
+    if (data.projects.length > 0 && (totalDescLength / data.projects.length) > 50) {
+      descriptionsBonus = 10;
+    }
+    projectsScore = Math.min(100, projectCountScore + projectLinksBonus + descriptionsBonus);
+
+    // 6. Achievements Check (15% of final score)
+    const actionVerbs = [
+      "spearheaded", "led", "developed", "optimized", "designed", "built", "implemented",
+      "increased", "reduced", "managed", "created", "executed", "formulated", "engineered",
+      "boosted", "drove", "improved", "scaled", "automated", "streamlined", "accelerated",
+      "pioneered", "coordinated", "launched", "established", "architected", "analyzed"
+    ];
+    let actionVerbScore = 5;
+    let foundVerbs = 0;
+    actionVerbs.forEach(v => {
+      if (lowerAllText.includes(v)) foundVerbs++;
+    });
+    if (foundVerbs >= 4) actionVerbScore = 30;
+    else if (foundVerbs >= 2) actionVerbScore = 15;
+
+    // Quantification (Google XYZ metrics)
+    let quantificationScore = 5;
+    let totalBullets = 0;
+    let quantifiedBullets = 0;
     data.experience.forEach(exp => {
       exp.bullets.forEach(bullet => {
-        if (/\d+%?|\b(percent|CGPA|CGPA\b)\b/.test(bullet)) {
-          experienceBonus += 5; // Reward quantified bullets
+        totalBullets++;
+        if (/\d+%?|\b(percent|CGPA|CGPA\b|INR|USD|GB|MB|ms)\b/.test(bullet)) {
+          quantifiedBullets++;
         }
       });
     });
-    score += Math.min(15, experienceBonus);
+    const bulletMetricsRatio = totalBullets > 0 ? quantifiedBullets / totalBullets : 0;
+    if (bulletMetricsRatio >= 0.35) quantificationScore = 40;
+    else if (bulletMetricsRatio >= 0.15) quantificationScore = 20;
 
-    // Certifications checks
-    if (data.certifications && data.certifications.length > 0) score += 10;
+    let bulletQualityScore = 15;
+    let totalBulletLength = 0;
+    let bulletCount = 0;
+    data.experience.forEach(exp => {
+      exp.bullets.forEach(b => {
+        totalBulletLength += b.length;
+        bulletCount++;
+      });
+    });
+    if (bulletCount > 0) {
+      const avgLen = totalBulletLength / bulletCount;
+      if (avgLen >= 40 && avgLen <= 150) bulletQualityScore = 30;
+    }
+    const achievementsScore = Math.min(100, actionVerbScore + quantificationScore + bulletQualityScore);
 
-    // Limit maximum bounds to 99%
-    return Math.min(99, score);
+    // Derive the final ATS score based on 6 weights
+    const derivedScore = Math.round(
+      structureScore * 0.20 +
+      formattingScore * 0.20 +
+      readabilityScore * 0.15 +
+      keywordsScore * 0.15 +
+      projectsScore * 0.15 +
+      achievementsScore * 0.15
+    );
+
+    const score = Math.min(99, Math.max(35, derivedScore));
+
+    const breakdown = {
+      structure: Math.max(10, structureScore),
+      formatting: Math.max(10, formattingScore),
+      readability: Math.max(10, readabilityScore),
+      keywords: Math.max(10, keywordsScore),
+      projects: Math.max(10, projectsScore),
+      achievements: Math.max(10, achievementsScore)
+    };
+
+    return { score, breakdown };
   };
 
   // Sync state modifications in form
   const handleFormChange = (newData: typeof defaultResumeData) => {
     setResumeData(newData);
-    const newScore = calculateHeuristicAtsScore(newData);
+    const { score: newScore, breakdown } = calculateHeuristicAtsScore(newData);
     setAtsScore(newScore);
+
+    // Live update breakdown bars
+    const updatedReport = {
+      warnings: parsedReport?.warnings || ["Your resume matches standard recruiter formatting guidelines beautifully. Good structure."],
+      keywordGaps: parsedReport?.keywordGaps || ["No severe keyword gaps detected."],
+      metricEnhancements: parsedReport?.metricEnhancements || ["Incorporate Google XYZ metrics: 'Accomplished X, as measured by Y, by doing Z'."],
+      breakdown
+    };
+    setParsedReport(updatedReport);
 
     // Persistent cache
     if (user) {
-      saveResume(user.uid, resumeId, newData, newScore, tailorApplied, parsedReport);
+      saveResume(user.uid, resumeId, newData, newScore, tailorApplied, updatedReport);
     }
   };
 
@@ -912,47 +1047,79 @@ export default function DashboardPage() {
               {parsedReport ? (
                 <div className="space-y-4">
                   {/* Visual Score Breakdown Progress Bars */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[9px] font-bold font-mono border-b border-zinc-900 pb-3">
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-zinc-400">
-                        <span>Formatting & Grid:</span>
-                        <span className="text-cyan-400">{parsedReport.breakdown.formatting}%</span>
-                      </div>
-                      <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                        <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${parsedReport.breakdown.formatting}%` }} />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-zinc-400">
-                        <span>Keyword Density:</span>
-                        <span className="text-cyan-400">{parsedReport.breakdown.keywords}%</span>
-                      </div>
-                      <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                        <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${parsedReport.breakdown.keywords}%` }} />
-                      </div>
-                    </div>
+                  {(() => {
+                    const bd = parsedReport.breakdown || {};
+                    const structureVal = bd.structure !== undefined ? bd.structure : 80;
+                    const formattingVal = bd.formatting !== undefined ? bd.formatting : 95;
+                    const readabilityVal = bd.readability !== undefined ? bd.readability : 85;
+                    const keywordsVal = bd.keywords !== undefined ? bd.keywords : 70;
+                    const projectsVal = bd.projects !== undefined ? bd.projects : 75;
+                    const achievementsVal = bd.achievements !== undefined ? bd.achievements : 60;
 
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-zinc-400">
-                        <span>Experience Metrics:</span>
-                        <span className="text-cyan-400">{parsedReport.breakdown.experienceQuality}%</span>
-                      </div>
-                      <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                        <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${parsedReport.breakdown.experienceQuality}%` }} />
-                      </div>
-                    </div>
+                    return (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[9px] font-bold font-mono border-b border-zinc-900 pb-3">
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-zinc-400">
+                            <span>Structure completeness:</span>
+                            <span className="text-cyan-400">{structureVal}%</span>
+                          </div>
+                          <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${structureVal}%` }} />
+                          </div>
+                        </div>
 
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-zinc-400">
-                        <span>Skills Completeness:</span>
-                        <span className="text-cyan-400">{parsedReport.breakdown.technicalSkills}%</span>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-zinc-400">
+                            <span>Formatting & symbols:</span>
+                            <span className="text-cyan-400">{formattingVal}%</span>
+                          </div>
+                          <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${formattingVal}%` }} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-zinc-400">
+                            <span>Recruiter readability:</span>
+                            <span className="text-cyan-400">{readabilityVal}%</span>
+                          </div>
+                          <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${readabilityVal}%` }} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-zinc-400">
+                            <span>Target keywords:</span>
+                            <span className="text-cyan-400">{keywordsVal}%</span>
+                          </div>
+                          <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${keywordsVal}%` }} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-zinc-400">
+                            <span>Project depth:</span>
+                            <span className="text-cyan-400">{projectsVal}%</span>
+                          </div>
+                          <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${projectsVal}%` }} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-zinc-400">
+                            <span>Achievements quality:</span>
+                            <span className="text-cyan-400">{achievementsVal}%</span>
+                          </div>
+                          <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${achievementsVal}%` }} />
+                          </div>
+                        </div>
                       </div>
-                      <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                        <div className="bg-cyan-500 h-full transition-all duration-500" style={{ width: `${parsedReport.breakdown.technicalSkills}%` }} />
-                      </div>
-                    </div>
-                  </div>
+                    );
+                  })()}
 
                   {/* Format & Checklist diagnostics */}
                   <div className="space-y-2">
