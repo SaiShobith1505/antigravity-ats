@@ -48,6 +48,31 @@ export interface ResumeData {
   certifications?: string[];
 }
 
+export interface CompanyAnalysisHistoryItem {
+  id: string;
+  timestamp: string;
+  companyName: string;
+  roleName: string;
+  matchScore: number;
+  technicalMatch: number;
+  experienceMatch: number;
+  skillsMatch: number;
+  projectMatch: number;
+  missingSkills: string[];
+  suggestions: string[];
+  focusMode: string;
+  recruiterPerspective: {
+    strengths: string[];
+    weaknesses: string[];
+    opportunities: string[];
+  };
+  gapAnalysis: {
+    expected: string[];
+    contains: string[];
+    missing: string[];
+  };
+}
+
 // Save Resume
 export async function saveResume(
   userId: string,
@@ -56,7 +81,8 @@ export async function saveResume(
   atsScore: number,
   usedAITailor?: boolean,
   parsedReport?: any,
-  analysisHistory?: any
+  analysisHistory?: any,
+  companyAnalysisHistory?: CompanyAnalysisHistoryItem[]
 ): Promise<void> {
   try {
     const resumeRef = doc(db, "resumes", resumeId);
@@ -77,6 +103,9 @@ export async function saveResume(
     if (analysisHistory !== undefined) {
       payload.analysisHistory = analysisHistory;
     }
+    if (companyAnalysisHistory !== undefined) {
+      payload.companyAnalysisHistory = companyAnalysisHistory;
+    }
     await setDoc(resumeRef, payload, { merge: true });
   } catch (error) {
     console.warn("Firestore saveResume failed, falling back to localStorage:", error);
@@ -84,6 +113,7 @@ export async function saveResume(
     let isTailored = false;
     let existingReport = null;
     let existingHistory: any[] = [];
+    let existingCompanyHistory: any[] = [];
     const existing = localStorage.getItem(`cv_boost_resume_${resumeId}`);
     if (existing) {
       try {
@@ -92,6 +122,7 @@ export async function saveResume(
         isTailored = parsed.usedAITailor || false;
         existingReport = parsed.parsedReport || null;
         existingHistory = parsed.analysisHistory || [];
+        existingCompanyHistory = parsed.companyAnalysisHistory || [];
       } catch (_) {}
     }
     localStorage.setItem(
@@ -105,6 +136,7 @@ export async function saveResume(
         usedAITailor: usedAITailor !== undefined ? usedAITailor : isTailored,
         parsedReport: parsedReport !== undefined ? parsedReport : existingReport,
         analysisHistory: analysisHistory !== undefined ? analysisHistory : existingHistory,
+        companyAnalysisHistory: companyAnalysisHistory !== undefined ? companyAnalysisHistory : existingCompanyHistory,
         updatedAt: new Date().toISOString(),
       })
     );
