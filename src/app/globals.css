@@ -5,8 +5,8 @@
   --color-electric-blue: #00d2ff;
   --color-dark-bg: #030303;
   --color-dark-card: #0a0a0c;
-  --shadow-neon: 0 0 15px rgba(6, 182, 212, 0.2);
-  --shadow-neon-strong: 0 0 30px rgba(6, 182, 212, 0.4);
+  --shadow-neon: 0 0 6px rgba(6, 182, 212, 0.08);
+  --shadow-neon-strong: 0 0 12px rgba(6, 182, 212, 0.12);
   --font-sans: var(--font-geist-sans), Inter, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 }
@@ -34,7 +34,7 @@ body {
   background: rgba(10, 10, 12, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(6, 182, 212, 0.25);
+  border: 1px solid rgba(6, 182, 212, 0.12);
   box-shadow: var(--shadow-neon);
 }
 
@@ -63,12 +63,12 @@ body {
 /* Keyframes for glow animations */
 @keyframes neonPulse {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
-    border-color: rgba(6, 182, 212, 0.25);
+    box-shadow: 0 0 6px rgba(6, 182, 212, 0.08);
+    border-color: rgba(6, 182, 212, 0.12);
   }
   50% {
-    box-shadow: 0 0 25px rgba(6, 182, 212, 0.35);
-    border-color: rgba(6, 182, 212, 0.45);
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
+    border-color: rgba(6, 182, 212, 0.22);
   }
 }
 

@@ -777,7 +777,7 @@ export default function DashboardPage() {
         amount: order.amount,
         currency: "INR",
         name: "BOOSTCV",
-        description: "ATS Standard Selectable Text PDF Unlock",
+        description: "Placement Resume Package PDF Unlock",
         order_id: order.id,
         handler: async function (res: any) {
           try {
@@ -873,7 +873,7 @@ export default function DashboardPage() {
           <div className="space-y-2">
             <h2 className="text-2xl font-black text-white">Unlock BOOSTCV Dashboard</h2>
             <p className="text-zinc-400 text-sm">
-              We sync your resume progress and real-time ATS scores to your student profile automatically.
+              We sync your resume progress and real-time shortlisting readiness to your student profile automatically.
             </p>
           </div>
           <button
@@ -949,7 +949,7 @@ export default function DashboardPage() {
           className="flex flex-col items-center space-y-1 cursor-pointer focus:outline-none"
         >
           <div className={`h-1.5 w-full rounded-full transition-all ${isStep2Done ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : activeTab === "ats" ? "bg-cyan-400 animate-pulse" : "bg-zinc-800"}`} />
-          <span className={`text-[8px] font-mono font-black uppercase tracking-wider ${activeTab === "ats" ? "text-cyan-400" : isStep2Done ? "text-zinc-400" : "text-zinc-655"}`}>2. ATS Scan</span>
+          <span className={`text-[8px] font-mono font-black uppercase tracking-wider ${activeTab === "ats" ? "text-cyan-400" : isStep2Done ? "text-zinc-400" : "text-zinc-655"}`}>2. Shortlist Scan</span>
         </button>
         <button 
           onClick={() => setActiveTab("matcher")}
@@ -995,16 +995,16 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row gap-6 items-center justify-between bg-zinc-900/10 border border-zinc-900 rounded-3xl p-6 text-left hover-card-premium">
           <div className="flex flex-col justify-center items-center flex-shrink-0">
             <AtsScoreGauge score={atsScore} size={140} />
-            <span className="text-[9px] font-black font-mono text-zinc-500 uppercase tracking-widest mt-2.5">ATS Suitability</span>
+            <span className="text-[9px] font-black font-mono text-zinc-500 uppercase tracking-widest mt-2.5">Shortlist Readiness</span>
           </div>
           <div className="flex-grow space-y-2">
             <div className="flex items-center space-x-2">
-              <span className="text-[9px] font-mono font-black text-cyan-400 uppercase tracking-wider">⚡ COMPATIBILITY REPORT</span>
-              <span className="text-[8px] font-mono font-bold text-emerald-455 bg-emerald-955/20 border border-emerald-900/50 px-2 py-0.5 rounded uppercase">Verified ATS Compatibility</span>
+              <span className="text-[9px] font-mono font-black text-cyan-400 uppercase tracking-wider">⚡ SHORTLIST READY REPORT</span>
+              <span className="text-[8px] font-mono font-bold text-emerald-455 bg-emerald-955/20 border border-emerald-900/50 px-2 py-0.5 rounded uppercase">Verified Shortlisting Format</span>
             </div>
             <h3 className="text-base font-black text-white leading-tight uppercase font-mono">Dynamic Content-Quality Assessment</h3>
             <p className="text-xs text-zinc-450 leading-relaxed font-medium">
-              Your overall score of {atsScore}% is derived from structure completeness, typography layout formatting, parser readability scores, keyword density checks, project complexity, and action verbs achievement quality metrics.
+              Your overall score of {atsScore}% represents your shortlisting readiness, derived from structure completeness, typography layout formatting, parser readability scores, keyword density checks, project complexity, and action verbs achievement quality metrics.
             </p>
           </div>
         </div>
@@ -2070,7 +2070,7 @@ export default function DashboardPage() {
         <div className="flex items-center space-x-4 bg-zinc-900/30 p-4 rounded-2xl border border-zinc-900">
           <AtsScoreGauge score={atsScore} size={85} />
           <div className="space-y-1">
-            <span className="text-[9px] font-black font-mono text-cyan-400 uppercase tracking-wider block">ATS COMPATIBILITY SCORE</span>
+            <span className="text-[9px] font-black font-mono text-cyan-400 uppercase tracking-wider block">SHORTLISTING READINESS SCORE</span>
             <p className="text-[10px] text-zinc-400 font-semibold font-sans leading-relaxed">
               Your resume layout matches {atsScore}% of corporate standards. Switch tabs below to optimize warnings.
             </p>
@@ -2379,7 +2379,7 @@ export default function DashboardPage() {
                     <Lock className="h-3 w-3 text-cyan-400 animate-pulse" />
                   </div>
                   <span className="text-[10px] font-black font-mono tracking-widest text-cyan-400 uppercase">
-                    PREMIUM ATS FORMAT LOCKED
+                    PREMIUM PRO FORMAT LOCKED
                   </span>
                 </div>
 
@@ -2397,7 +2397,7 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-2 gap-2 border-y border-zinc-900 py-2.5 text-[8.5px] text-zinc-300 font-bold font-mono">
                   <div className="flex items-center space-x-1.5">
                     <span className="text-cyan-400">✓</span>
-                    <span>98%+ ATS Pass Guaranteed</span>
+                    <span>98%+ Shortlist Guaranteed</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
                     <span className="text-cyan-400">✓</span>
@@ -2494,7 +2494,7 @@ export default function DashboardPage() {
             className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl font-bold font-mono text-xs transition-all cursor-pointer hover:bg-zinc-900/35 relative ${activeTab === "ats" ? "bg-zinc-900 text-cyan-400 border border-zinc-850" : "text-zinc-400 hover:text-zinc-200"}`}
           >
             <BarChart3 className="h-4 w-4" />
-            <span>ATS Deep Scan</span>
+            <span>Shortlisting Scan</span>
             {atsScore > 0 && (
               <span className="absolute right-3 text-[8.5px] font-black bg-zinc-900 border border-zinc-800 px-1.5 py-0.25 rounded text-cyan-400">{atsScore}%</span>
             )}
@@ -2566,7 +2566,7 @@ export default function DashboardPage() {
           <div className="flex items-center space-x-3">
             <span className="text-xs font-black font-mono text-white tracking-widest uppercase">
               {activeTab === "edit" && "Resume Builder Workspace"}
-              {activeTab === "ats" && "ATS Compatibility deep scan"}
+              {activeTab === "ats" && "Shortlisting Diagnostics Scan"}
               {activeTab === "matcher" && "AI Job Matcher Dashboard"}
               {activeTab === "company" && "Target Placements Optimization"}
               {activeTab === "history" && "Analysis Scans Log History"}
@@ -2627,7 +2627,7 @@ export default function DashboardPage() {
             
             <div className="md:col-span-8 space-y-3 text-left">
               <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-mono">
-                ATS Compatibility Report
+                Shortlisting Readiness Report
               </h3>
               
               {parsedReport ? (
@@ -2815,7 +2815,7 @@ export default function DashboardPage() {
             {/* Template Selector Bar */}
             <div className="bg-zinc-900 border-b border-zinc-800 px-4 py-2.5 flex items-center justify-between flex-shrink-0">
               <span className="text-[10px] font-black font-mono tracking-wider text-zinc-400 uppercase">
-                ATS Template Compiler
+                Placement Template Compiler
               </span>
               <div className="flex items-center space-x-1.5 p-0.5 bg-zinc-950 border border-zinc-850 rounded-lg">
                 {(["classic", "minimal", "technical"] as const).map((temp) => (
@@ -3064,7 +3064,7 @@ export default function DashboardPage() {
                         <Lock className="h-3 w-3 text-cyan-400 animate-pulse" />
                       </div>
                       <span className="text-[10px] font-black font-mono tracking-widest text-cyan-400 uppercase">
-                        PREMIUM ATS FORMAT LOCKED
+                        PREMIUM PRO FORMAT LOCKED
                       </span>
                     </div>
 
@@ -3082,7 +3082,7 @@ export default function DashboardPage() {
                     <div className="grid grid-cols-2 gap-2 border-y border-zinc-900 py-2.5 text-[9px] text-zinc-300 font-bold font-mono">
                       <div className="flex items-center space-x-1.5">
                         <span className="text-cyan-400">✓</span>
-                        <span>98%+ ATS Pass Guaranteed</span>
+                        <span>98%+ Shortlist Guaranteed</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
                         <span className="text-cyan-400">✓</span>

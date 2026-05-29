@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://boostcv.in"),
-  title: "BOOSTCV — ATS Resume Optimizer",
-  description: "Stop getting rejected by HR scripts. Build a single-column, recruiter-approved, highly optimized ATS resume in 5 minutes.",
+  title: "BOOSTCV — Get More Interview Calls & Placement Offers",
+  description: "Analyze your resume, match it against real jobs, identify missing skills, and generate a recruiter-approved version built for placements and internships.",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
     ]
   },
   openGraph: {
-    title: "BOOSTCV — ATS Resume Optimizer",
-    description: "Stop getting rejected by HR scripts. Build a single-column, recruiter-approved, highly optimized ATS resume in 5 minutes.",
+    title: "BOOSTCV — Get More Interview Calls & Placement Offers",
+    description: "Analyze your resume, match it against real jobs, identify missing skills, and generate a recruiter-approved version built for placements and internships.",
     url: "https://boostcv.in",
     siteName: "BOOSTCV",
     images: [
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "BOOSTCV — ATS Resume Optimizer"
+        alt: "BOOSTCV — Get More Interview Calls & Placement Offers"
       }
     ],
     locale: "en_US",
@@ -44,8 +44,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "BOOSTCV — ATS Resume Optimizer",
-    description: "Stop getting rejected by HR scripts. Build a single-column, recruiter-approved, highly optimized ATS resume in 5 minutes.",
+    title: "BOOSTCV — Get More Interview Calls & Placement Offers",
+    description: "Analyze your resume, match it against real jobs, identify missing skills, and generate a recruiter-approved version built for placements and internships.",
     images: ["/twitter-image.png"],
   }
 };
