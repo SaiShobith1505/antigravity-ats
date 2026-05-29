@@ -277,8 +277,8 @@ Do not include any markdown wrappers (no \`\`\`json), comments, or commentary. O
     return NextResponse.json({
       atsScore: heuristicScore,
       warnings: warnings.length > 0 ? warnings : ["Your resume matches standard recruiter formatting guidelines beautifully. Good structure."],
-      keywordGaps: keywordGaps.length > 0 ? keywordGaps.slice(0, 6) : ["TypeScript", "Docker", "AWS"],
-      metricEnhancements: metricEnhancements.length > 0 ? metricEnhancements.slice(0, 3) : ["Rewrite accomplishments: 'Assisted in React layouts' -> 'Designed 8 responsive React dashboards, decreasing customer latency by 24%.'"],
+      keywordGaps: keywordGaps.length > 0 ? keywordGaps.slice(0, 6) : ["No severe keyword gaps detected."],
+      metricEnhancements: metricEnhancements.length > 0 ? metricEnhancements.slice(0, 3) : ["Incorporate Google XYZ metrics: 'Accomplished X, as measured by Y, by doing Z'."],
       breakdown,
     });
 

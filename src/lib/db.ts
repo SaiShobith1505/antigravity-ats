@@ -45,6 +45,7 @@ export interface ResumeData {
     frameworks: string[];
     tools: string[];
   };
+  certifications?: string[];
 }
 
 // Save Resume
@@ -53,7 +54,8 @@ export async function saveResume(
   resumeId: string,
   data: ResumeData,
   atsScore: number,
-  usedAITailor?: boolean
+  usedAITailor?: boolean,
+  parsedReport?: any
 ): Promise<void> {
   try {
     const resumeRef = doc(db, "resumes", resumeId);
@@ -68,17 +70,22 @@ export async function saveResume(
     if (usedAITailor !== undefined) {
       payload.usedAITailor = usedAITailor;
     }
+    if (parsedReport !== undefined) {
+      payload.parsedReport = parsedReport;
+    }
     await setDoc(resumeRef, payload, { merge: true });
   } catch (error) {
     console.warn("Firestore saveResume failed, falling back to localStorage:", error);
     let paymentStatus = "unpaid";
     let isTailored = false;
+    let existingReport = null;
     const existing = localStorage.getItem(`cv_boost_resume_${resumeId}`);
     if (existing) {
       try {
         const parsed = JSON.parse(existing);
         paymentStatus = parsed.paymentStatus || "unpaid";
         isTailored = parsed.usedAITailor || false;
+        existingReport = parsed.parsedReport || null;
       } catch (_) {}
     }
     localStorage.setItem(
@@ -90,6 +97,7 @@ export async function saveResume(
         data,
         paymentStatus,
         usedAITailor: usedAITailor !== undefined ? usedAITailor : isTailored,
+        parsedReport: parsedReport !== undefined ? parsedReport : existingReport,
         updatedAt: new Date().toISOString(),
       })
     );
@@ -292,4 +300,9 @@ export const defaultResumeData: ResumeData = {
       "Firebase",
     ],
   },
+  certifications: [
+    "AWS Certified Solutions Architect - Associate",
+    "Google Summer of Code (GSoC) Contributor",
+    "React Advanced Developer Certification",
+  ],
 };

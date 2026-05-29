@@ -128,7 +128,7 @@ export default function DashboardPage() {
 
       // Save to cache securely
       if (user) {
-        saveResume(user.uid, resumeId, data.tailoredResume, data.scoreImprovement, true);
+        saveResume(user.uid, resumeId, data.tailoredResume, data.scoreImprovement, true, parsedReport);
       }
     } catch (err: any) {
       console.error("Tailoring action failed:", err);
@@ -146,7 +146,7 @@ export default function DashboardPage() {
       setTailorApplied(false);
       setMatchResult(null);
       if (user) {
-        saveResume(user.uid, resumeId, originalResumeDraft, prevScore, false);
+        saveResume(user.uid, resumeId, originalResumeDraft, prevScore, false, parsedReport);
       }
     }
   };
@@ -273,7 +273,12 @@ export default function DashboardPage() {
 
       // Save to cache securely
       if (user) {
-        saveResume(user.uid, resumeId, data.parsedResume, data.atsScore);
+        saveResume(user.uid, resumeId, data.parsedResume, data.atsScore, false, {
+          warnings: data.warnings,
+          keywordGaps: data.keywordGaps,
+          metricEnhancements: data.metricEnhancements,
+          breakdown: data.breakdown
+        });
       }
     } catch (err: any) {
       console.error("AI Upload parsing failed:", err);
@@ -322,6 +327,7 @@ export default function DashboardPage() {
             education: res.data.education || defaultResumeData.education,
             experience: res.data.experience || defaultResumeData.experience,
             projects: res.data.projects || defaultResumeData.projects,
+            certifications: res.data.certifications || defaultResumeData.certifications || [],
           };
           setResumeData(merged);
           if (res.atsScore !== undefined && res.atsScore !== null) {
@@ -329,6 +335,9 @@ export default function DashboardPage() {
           }
           if (res.usedAITailor !== undefined && res.usedAITailor !== null) {
             setTailorApplied(res.usedAITailor);
+          }
+          if (res.parsedReport) {
+            setParsedReport(res.parsedReport);
           }
         }
         if (user.email === "admin@cvboost.co") {
@@ -386,6 +395,9 @@ export default function DashboardPage() {
     });
     score += Math.min(15, experienceBonus);
 
+    // Certifications checks
+    if (data.certifications && data.certifications.length > 0) score += 10;
+
     // Limit maximum bounds to 99%
     return Math.min(99, score);
   };
@@ -398,7 +410,7 @@ export default function DashboardPage() {
 
     // Persistent cache
     if (user) {
-      saveResume(user.uid, resumeId, newData, newScore, tailorApplied);
+      saveResume(user.uid, resumeId, newData, newScore, tailorApplied, parsedReport);
     }
   };
 
@@ -1176,6 +1188,32 @@ export default function DashboardPage() {
                   )}
                 </div>
               </div>
+
+              {/* Certifications - Unprotected / Crisp and visible */}
+              {resumeData.certifications && resumeData.certifications.length > 0 && (
+                <div className={selectedTemplate === "technical" ? "mb-2.5" : "mb-4"}>
+                  <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                    selectedTemplate === "minimal"
+                      ? "text-cyan-600 border-none mb-1 mt-2"
+                      : "text-black border-b border-zinc-800 mb-1.5"
+                  }`}>
+                    Certifications
+                  </h3>
+                  <ul className={`list-disc pl-4 text-zinc-800 ${
+                    selectedTemplate === "minimal"
+                      ? "space-y-1 text-[8.5px]"
+                      : selectedTemplate === "technical"
+                      ? "space-y-0.5 text-[8.2px]"
+                      : "space-y-0.5 text-[8.5px]"
+                  }`}>
+                    {resumeData.certifications.map((cert, idx) => (
+                      cert.trim().length > 0 && (
+                        <li key={idx} className={selectedTemplate === "minimal" ? "marker:text-cyan-500" : ""}>{cert}</li>
+                      )
+                    ))}
+                  </ul>
+                </div>
+              )}
 
                {/* Experience and Projects Gated Container */}
                {((resumeData.experience.length > 0) || (resumeData.projects.length > 0)) && (

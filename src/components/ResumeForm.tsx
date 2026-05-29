@@ -13,7 +13,8 @@ import {
   Layers,
   ArrowRight,
   Lightbulb,
-  AlertTriangle
+  AlertTriangle,
+  Award
 } from "lucide-react";
 
 interface ResumeFormProps {
@@ -22,7 +23,7 @@ interface ResumeFormProps {
 }
 
 export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
-  const [activeTab, setActiveTab] = useState<"personal" | "education" | "experience" | "projects" | "skills">("personal");
+  const [activeTab, setActiveTab] = useState<"personal" | "education" | "experience" | "projects" | "skills" | "certifications">("personal");
   const [aiLoadingIdx, setAiLoadingIdx] = useState<number | null>(null);
   const [aiMessyText, setAiMessyText] = useState("");
   const [activeAiBox, setActiveAiBox] = useState<number | null>(null);
@@ -128,6 +129,25 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
     });
   };
 
+  // Certifications Helpers
+  const updateCertification = (index: number, value: string) => {
+    const updated = [...(data.certifications || [])];
+    updated[index] = value;
+    onChange({ ...data, certifications: updated });
+  };
+
+  const addCertification = () => {
+    onChange({
+      ...data,
+      certifications: [...(data.certifications || []), ""]
+    });
+  };
+
+  const removeCertification = (index: number) => {
+    const updated = (data.certifications || []).filter((_, idx) => idx !== index);
+    onChange({ ...data, certifications: updated });
+  };
+
   // Local helper to scan for lack of numbers/metrics (Fear Psychology reminder)
   const lacksNumbers = (text: string) => {
     if (!text) return true;
@@ -170,6 +190,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
           { id: "experience", label: "Experience", icon: Briefcase },
           { id: "projects", label: "Projects", icon: FolderGit2 },
           { id: "skills", label: "Skills", icon: Layers },
+          { id: "certifications", label: "Certifications", icon: Award },
         ].map((tab) => {
           const Icon = tab.icon;
           return (
@@ -618,6 +639,57 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 placeholder="Git, GitHub Actions, Docker, Firebase, AWS"
                 className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 w-full text-sm outline-none transition-all"
               />
+            </div>
+          </div>
+        )}
+
+        {/* CERTIFICATIONS FORM */}
+        {activeTab === "certifications" && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-mono">
+                  Certifications & Accomplishments
+                </h3>
+                <p className="text-xs text-zinc-500 font-medium">
+                  Add professional licenses, certifications, awards, or key credentials.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={addCertification}
+                className="py-2 px-4 rounded-lg bg-cyan-950 border border-cyan-800 text-cyan-400 hover:bg-cyan-900 transition-colors font-bold text-xs flex items-center space-x-1 cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Add Certification</span>
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {!(data.certifications && data.certifications.length > 0) ? (
+                <div className="text-center py-6 border border-dashed border-zinc-900 rounded-xl text-zinc-500 font-medium text-xs">
+                  No certifications added yet. Click above to add!
+                </div>
+              ) : (
+                (data.certifications || []).map((cert, idx) => (
+                  <div key={idx} className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      value={cert}
+                      onChange={(e) => updateCertification(idx, e.target.value)}
+                      placeholder="e.g. AWS Certified Solutions Architect - Associate"
+                      className="bg-zinc-900/50 border border-zinc-800 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-slate-100 placeholder-zinc-600 rounded-lg p-3 flex-1 text-sm outline-none transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeCertification(idx)}
+                      className="p-3 text-zinc-500 hover:text-red-400 border border-zinc-900 hover:border-red-950 rounded-lg bg-zinc-900/20 hover:bg-red-950/10 transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}

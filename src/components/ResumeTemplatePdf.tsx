@@ -298,7 +298,7 @@ interface ResumeTemplatePdfProps {
 }
 
 export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data, template = "classic" }) => {
-  const { personal, education, experience, projects, skills } = data;
+  const { personal, education, experience, projects, skills, certifications } = data;
 
   // Dynamically select styles
   const styles = template === "minimal" 
@@ -430,6 +430,23 @@ export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data, temp
                 <Text style={styles.skillsText}>{skills.tools.join(", ")}</Text>
               </View>
             )}
+          </View>
+        )}
+
+        {/* Certifications Section */}
+        {certifications && certifications.length > 0 && (
+          <View style={{ marginTop: template === "technical" ? 3 : 5 }}>
+            <Text style={styles.sectionTitle}>Certifications</Text>
+            <View style={styles.bulletList}>
+              {certifications.map((cert, idx) => (
+                cert.trim().length > 0 && (
+                  <View key={idx} style={styles.bulletItem}>
+                    <Text style={styles.bulletMarker}>•</Text>
+                    <Text style={styles.bulletText}>{cert.trim()}</Text>
+                  </View>
+                )
+              ))}
+            </View>
           </View>
         )}
 
