@@ -531,7 +531,17 @@ export default function DashboardPage() {
         
         // Load User Profile details (Trial scans & subscription plan)
         try {
-          const profile = await getUserProfile(user.uid, user.email);
+          let profile = await getUserProfile(user.uid, user.email);
+          if (user.email === "admin@cvboost.co") {
+            profile = {
+              uid: user.uid,
+              email: "admin@cvboost.co",
+              atsScansRemaining: 9999,
+              isPro: true,
+              proExpiresAt: null,
+              exportsRemaining: 999
+            };
+          }
           setUserProfile(profile);
           if (profile.isPro) {
             setIsPaid(true);

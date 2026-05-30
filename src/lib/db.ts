@@ -443,11 +443,34 @@ export async function getUserProfile(
   uid: string,
   email: string | null
 ): Promise<UserProfile> {
+  // Always return a full Pro super-user profile for the admin
+  if (email === "admin@cvboost.co") {
+    return {
+      uid,
+      email,
+      atsScansRemaining: 9999,
+      isPro: true,
+      proExpiresAt: null,
+      exportsRemaining: 999
+    };
+  }
+
   try {
     const userRef = doc(db, "users", uid);
     const docSnap = await getDoc(userRef);
     if (docSnap.exists()) {
       const data = docSnap.data();
+      const isUserAdmin = data.email === "admin@cvboost.co" || email === "admin@cvboost.co";
+      if (isUserAdmin) {
+        return {
+          uid,
+          email: "admin@cvboost.co",
+          atsScansRemaining: 9999,
+          isPro: true,
+          proExpiresAt: null,
+          exportsRemaining: 999
+        };
+      }
       return {
         uid,
         email: data.email || email,
@@ -466,7 +489,18 @@ export async function getUserProfile(
     const cached = localStorage.getItem(`cv_boost_profile_${uid}`);
     if (cached) {
       try {
-        return JSON.parse(cached);
+        const parsed = JSON.parse(cached);
+        if (parsed.email === "admin@cvboost.co") {
+          return {
+            uid,
+            email: "admin@cvboost.co",
+            atsScansRemaining: 9999,
+            isPro: true,
+            proExpiresAt: null,
+            exportsRemaining: 999
+          };
+        }
+        return parsed;
       } catch (_) {}
     }
   }
