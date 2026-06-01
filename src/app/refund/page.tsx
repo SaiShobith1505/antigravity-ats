@@ -61,7 +61,7 @@ export default function RefundPage() {
                 <span>General Refund Principles</span>
               </h2>
               <p>
-                BOOSTCV operates under strict undergraduate micro-payment guidelines (₹80 campaign). Since downloading 
+                BOOSTCV operates under strict undergraduate micro-payment guidelines (₹99 campaign). Since downloading 
                 a resume PDF constitutes immediate consumption of digital data services, we operate a 
                 <strong className="text-white"> no-questions-asked refund policy under specific technical conditions</strong>.
               </p>
@@ -73,7 +73,7 @@ export default function RefundPage() {
                 <span>Eligible Technical Claims</span>
               </h2>
               <p>
-                You are fully eligible for a 100% refund of your ₹80 payment if:
+                You are fully eligible for a 100% refund of your ₹99 payment if:
               </p>
               <ul className="list-disc pl-5 space-y-1.5 text-zinc-400 text-xs">
                 <li>Your payment was successfully charged by Razorpay but our Next.js compiler crashed and failed to unlock your PDF document within 30 minutes.</li>

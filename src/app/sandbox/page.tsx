@@ -291,7 +291,7 @@ export default function SandboxPage() {
                   href="/dashboard"
                   className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#1F5C4A] to-[#2F7A62] text-zinc-950 font-black text-xs shadow-md hover:brightness-110 active:scale-98 transition-all flex items-center justify-center space-x-1.5"
                 >
-                  <span>Build ATS-Safe Resume (₹80)</span>
+                  <span>Build ATS-Safe Resume (₹99)</span>
                   <ArrowRight className="h-3.5 w-3.5 stroke-[2.5]" />
                 </Link>
               </div>

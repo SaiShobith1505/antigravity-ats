@@ -89,7 +89,7 @@ export default function TermsPage() {
                 <span>Micro-Payments & Commercial Purchases</span>
               </h2>
               <p>
-                BOOSTCV charges a one-time placement campaign fee of ₹80 (inclusive of relevant taxes) to unlock 
+                BOOSTCV charges a one-time placement campaign fee of ₹99 (inclusive of relevant taxes) to unlock 
                 the downloadable, high-fidelity selectable text PDF of your custom resume layout. All transactions 
                 are securely routed via Razorpay Checkout protocols. Verification states are saved cryptographically.
               </p>
