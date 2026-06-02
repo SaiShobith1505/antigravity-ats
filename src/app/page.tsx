@@ -21,7 +21,9 @@ import {
   detectUserCountryAndCurrency, 
   LOCALIZED_PRICING, 
   formatPrice,
-  CurrencyCode
+  CurrencyCode,
+  CountryCode,
+  COUNTRY_TO_CURRENCY
 } from "@/lib/currency";
 
 const reportMetrics = [
@@ -73,12 +75,45 @@ const faqs = [
 export default function LandingPage() {
   const { user } = useAuth();
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [country, setCountry] = useState<CountryCode>("IN");
   const [currency, setCurrency] = useState<CurrencyCode>("INR");
+  const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
 
   useEffect(() => {
-    const { currency: detectedCurrency } = detectUserCountryAndCurrency();
+    // 1. Detect using browser sniff / manual selector localStorage cache
+    const { country: detectedCountry, currency: detectedCurrency } = detectUserCountryAndCurrency();
+    setCountry(detectedCountry);
     setCurrency(detectedCurrency);
+
+    // 2. Fetch server-detected Next.js Edge Geolocation header fallback
+    const fetchServerCountry = async () => {
+      try {
+        const res = await fetch("/api/payment/detect-country");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.country) {
+            const hasManualOverride = localStorage.getItem("cv_boost_selected_country");
+            if (!hasManualOverride) {
+              setCountry(data.country);
+              setCurrency(data.currency);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Server edge country resolver failed, relying on browser sniffing:", err);
+      }
+    };
+    fetchServerCountry();
   }, []);
+
+  const handleCountryChange = (selectedCountry: CountryCode) => {
+    const selectedCurrency = COUNTRY_TO_CURRENCY[selectedCountry];
+    setCountry(selectedCountry);
+    setCurrency(selectedCurrency);
+    localStorage.setItem("cv_boost_selected_country", selectedCountry);
+    localStorage.setItem("cv_boost_selected_currency", selectedCurrency);
+    setCurrencyDropdownOpen(false);
+  };
 
   const appHref = user ? "/dashboard" : "/login";
 
@@ -101,6 +136,50 @@ export default function LandingPage() {
           </nav>
 
           <div className="flex items-center gap-3">
+            {/* Localized Country/Currency Selector Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setCurrencyDropdownOpen(!currencyDropdownOpen)}
+                className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-[10px] font-bold font-sans transition-colors cursor-pointer shadow-sm text-[#1C1C1C]"
+              >
+                <span>{
+                  country === "IN" ? "🇮🇳" :
+                  country === "US" ? "🇺🇸" :
+                  country === "GB" ? "🇬🇧" :
+                  country === "EU" ? "🇪🇺" :
+                  country === "AU" ? "🇦🇺" :
+                  country === "CA" ? "🇨🇦" : "🇺🇸"
+                }</span>
+                <span className="uppercase">{currency}</span>
+                <ChevronDown className="h-3 w-3 text-[#6B7280]" />
+              </button>
+
+              {currencyDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setCurrencyDropdownOpen(false)} />
+                  <div className="absolute right-0 mt-1.5 w-44 bg-white border border-stone-200 rounded-xl shadow-lg z-50 py-1.5 animate-in fade-in slide-in-from-top-1 duration-150 text-left">
+                    {[
+                      { code: "IN", flag: "🇮🇳", name: "India (₹)", currency: "INR" },
+                      { code: "US", flag: "🇺🇸", name: "United States ($)", currency: "USD" },
+                      { code: "GB", flag: "🇬🇧", name: "United Kingdom (£)", currency: "GBP" },
+                      { code: "EU", flag: "🇪🇺", name: "Europe (€)", currency: "EUR" },
+                      { code: "AU", flag: "🇦🇺", name: "Australia (A$)", currency: "AUD" },
+                      { code: "CA", flag: "🇨🇦", name: "Canada (C$)", currency: "CAD" },
+                    ].map((c) => (
+                      <button
+                        key={c.code}
+                        onClick={() => handleCountryChange(c.code as CountryCode)}
+                        className={`w-full flex items-center space-x-2.5 px-3 py-2 text-[10px] font-bold font-sans hover:bg-stone-50 transition-colors ${country === c.code ? "text-[#1F5C4A] bg-[#1F5C4A]/5" : "text-[#6B7280] hover:text-[#1C1C1C]"}`}
+                      >
+                        <span className="text-sm leading-none">{c.flag}</span>
+                        <span>{c.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
             <Link href={appHref} className="hidden rounded-lg px-3 py-2 text-sm font-medium text-[#6B7280] hover:text-[#1C1C1C] sm:block">
               {user ? "Dashboard" : "Sign in"}
             </Link>
