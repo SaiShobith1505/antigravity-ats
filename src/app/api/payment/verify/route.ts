@@ -3,6 +3,8 @@ import crypto from "crypto";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { trackPurchaseAnalytics } from "@/lib/db";
+import { getLatestExchangeRates } from "@/lib/pricing-server";
+import { CurrencyCode } from "@/lib/pricing";
 
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
@@ -98,7 +100,8 @@ export async function POST(req: Request) {
       const finalCountry = country || "US";
       const finalCurrency = currency || "USD";
       const finalLocal = revenueLocal || (planId === "pro" ? 9.99 : 3.99);
-      const finalConversion = conversionRate || 83.5;
+      const rates = await getLatestExchangeRates();
+      const finalConversion = conversionRate || rates[finalCurrency as CurrencyCode] || 83.5;
       const finalINR = revenueINR || (finalLocal * finalConversion);
 
       await trackPurchaseAnalytics(

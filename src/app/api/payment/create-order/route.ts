@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
-import { LOCALIZED_PRICING, CurrencyCode, INR_CONVERSION_RATES } from "@/lib/currency";
+import { LOCALIZED_PRICING, CurrencyCode } from "@/lib/currency";
+import { getLatestExchangeRates } from "@/lib/pricing-server";
 
 const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -27,7 +28,8 @@ export async function POST(req: Request) {
     }
 
     // Convert localized foreign currency price to its stable INR equivalent amount
-    const conversionRate = INR_CONVERSION_RATES[currency] || 1.0;
+    const rates = await getLatestExchangeRates();
+    const conversionRate = rates[currency] || 1.0;
     const baseAmountInINR = baseAmount * conversionRate;
 
     // Razorpay processes payments in the smallest unit of currency (paise for INR)
