@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { trackPurchaseAnalytics } from "@/lib/db";
 
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
@@ -13,7 +14,12 @@ export async function POST(req: Request) {
       razorpay_signature,
       resumeId,
       userId,
-      planId
+      planId,
+      country,
+      currency,
+      revenueLocal,
+      revenueINR,
+      conversionRate
     } = await req.json();
 
     if (!razorpay_order_id || !razorpay_payment_id) {
@@ -39,10 +45,10 @@ export async function POST(req: Request) {
       }
     }
 
-    // 1. Check if the purchase is for the BOOSTCV Pro plan subscription
     const sessionToken = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
 
+    // 1. Check if the purchase is for the BOOSTCV Pro plan subscription
     if (planId === "pro") {
       try {
         const userRef = doc(db, "users", userId);
@@ -62,7 +68,7 @@ export async function POST(req: Request) {
         console.warn("[PAYMENT VERIFY] Firestore update failed for Pro profile:", dbErr);
       }
     } else {
-      // 2. Single resume export flow (remains exactly as it is)
+      // 2. Single resume export flow
       try {
         const resumeRef = doc(db, "resumes", resumeId);
         await setDoc(
@@ -87,7 +93,29 @@ export async function POST(req: Request) {
       }
     }
 
-    // Verification successful (or skipped in local mock run)
+    // 3. Track purchase in Firestore analytics collection
+    try {
+      const finalCountry = country || "US";
+      const finalCurrency = currency || "USD";
+      const finalLocal = revenueLocal || (planId === "pro" ? 9.99 : 3.99);
+      const finalConversion = conversionRate || 83.5;
+      const finalINR = revenueINR || (finalLocal * finalConversion);
+
+      await trackPurchaseAnalytics(
+        userId,
+        resumeId || `resume_${userId}`,
+        planId || "export",
+        finalCountry,
+        finalCurrency,
+        finalLocal,
+        finalINR,
+        finalConversion
+      );
+    } catch (analyticsErr) {
+      console.warn("[PAYMENT VERIFY] Analytics tracking crashed:", analyticsErr);
+    }
+
+    // Verification successful
     return NextResponse.json({
       success: true,
       message: "Payment successfully verified.",

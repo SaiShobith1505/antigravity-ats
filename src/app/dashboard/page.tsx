@@ -22,7 +22,8 @@ import {
   formatPrice, 
   COUNTRY_TO_CURRENCY,
   CurrencyCode, 
-  CountryCode 
+  CountryCode,
+  INR_CONVERSION_RATES
 } from "@/lib/currency";
 import { 
   Zap, 
@@ -96,6 +97,8 @@ export default function DashboardPage() {
   const [showMockModal, setShowMockModal] = useState(false);
   const [mockOrderId, setMockOrderId] = useState("");
   const [mockAmount, setMockAmount] = useState(9900);
+  const [mockDisplayAmount, setMockDisplayAmount] = useState(0);
+  const [mockDisplayCurrency, setMockDisplayCurrency] = useState<CurrencyCode>("INR");
 
   // AI JD Matcher & Optimizer states
   const [activeTab, setActiveTab] = useState<"edit" | "ats" | "matcher" | "company" | "history" | "account" | "ats-checker">("edit");
@@ -470,6 +473,26 @@ export default function DashboardPage() {
     const { country, currency } = detectUserCountryAndCurrency();
     setSelectedCountry(country);
     setSelectedCurrency(currency);
+
+    // Fetch server-detected Next.js Edge Geolocation header fallback
+    const fetchServerCountry = async () => {
+      try {
+        const res = await fetch("/api/payment/detect-country");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.country) {
+            const hasManualOverride = localStorage.getItem("cv_boost_selected_country");
+            if (!hasManualOverride) {
+              setSelectedCountry(data.country);
+              setSelectedCurrency(data.currency);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Server edge country resolver failed, relying on browser sniffing:", err);
+      }
+    };
+    fetchServerCountry();
   }, []);
 
   const handleCountryChange = (country: CountryCode) => {
@@ -799,7 +822,12 @@ export default function DashboardPage() {
         razorpay_order_id: mockOrderId,
         razorpay_payment_id: `pay_mock_${Math.random().toString(36).substring(2, 12)}`,
         razorpay_signature: "mock_signature_bypass",
-        resumeId
+        resumeId,
+        country: selectedCountry,
+        currency: selectedCurrency,
+        revenueLocal: mockDisplayAmount,
+        revenueINR: mockAmount / 100,
+        conversionRate: INR_CONVERSION_RATES[selectedCurrency] || 1.0
       };
       if (checkoutType === "pro") {
         verifyPayload.planId = "pro";
@@ -894,7 +922,9 @@ export default function DashboardPage() {
         console.log("[TEST MODE] Mock order detected. Triggering Mock Payment Sandbox Modal...");
         setMockOrderId(order.id);
         setMockAmount(order.amount);
-        setMockCurrency(order.currency || selectedCurrency);
+        setMockCurrency("INR");
+        setMockDisplayAmount(order.displayAmount || (order.amount / 100));
+        setMockDisplayCurrency(order.displayCurrency || selectedCurrency);
         setShowMockModal(true);
         return;
       }
@@ -902,7 +932,7 @@ export default function DashboardPage() {
       const options = {
         key: order.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
-        currency: order.currency || selectedCurrency,
+        currency: "INR", // Keep Razorpay calculations in INR
         name: "BOOSTCV",
         description: "Placement Resume Package PDF Unlock",
         order_id: order.id,
@@ -916,7 +946,13 @@ export default function DashboardPage() {
                 razorpay_order_id: res.razorpay_order_id,
                 razorpay_payment_id: res.razorpay_payment_id,
                 razorpay_signature: res.razorpay_signature,
-                resumeId
+                resumeId,
+                userId: user.uid,
+                country: selectedCountry,
+                currency: selectedCurrency,
+                revenueLocal: order.displayAmount || (order.amount / 100),
+                revenueINR: order.amount / 100,
+                conversionRate: order.conversionRate || 1.0
               }),
             });
             
@@ -994,7 +1030,9 @@ export default function DashboardPage() {
         console.log("[TEST MODE] Mock order detected. Triggering Mock Pro Payment Sandbox Modal...");
         setMockOrderId(order.id);
         setMockAmount(order.amount);
-        setMockCurrency(order.currency || selectedCurrency);
+        setMockCurrency("INR");
+        setMockDisplayAmount(order.displayAmount || (order.amount / 100));
+        setMockDisplayCurrency(order.displayCurrency || selectedCurrency);
         setShowMockModal(true);
         return;
       }
@@ -1002,7 +1040,7 @@ export default function DashboardPage() {
       const options = {
         key: order.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
-        currency: order.currency || selectedCurrency,
+        currency: "INR",
         name: "BOOSTCV Pro Plan",
         description: "10 Exports & Unlimited Scans Pro Subscription",
         order_id: order.id,
@@ -1018,7 +1056,12 @@ export default function DashboardPage() {
                 razorpay_signature: res.razorpay_signature,
                 resumeId,
                 userId: user.uid,
-                planId: "pro"
+                planId: "pro",
+                country: selectedCountry,
+                currency: selectedCurrency,
+                revenueLocal: order.displayAmount || (order.amount / 100),
+                revenueINR: order.amount / 100,
+                conversionRate: order.conversionRate || 1.0
               }),
             });
             
@@ -1379,7 +1422,11 @@ export default function DashboardPage() {
         <div className="text-center space-y-2">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D6C5A4]/25 border border-[#D6C5A4]/40 text-[#1F5C4A] text-[10px] font-black tracking-wider uppercase font-sans">Limited Launch Offer</span>
           <h3 className="text-xl font-black text-[#1C1C1C] uppercase font-sans">Upgrade to BOOSTCV Pro</h3>
-          <p className="text-xs text-[#6B7280] font-semibold leading-relaxed max-w-md mx-auto">
+          <div className="flex items-center justify-center space-x-1 py-1">
+            <CheckCircle2 className="h-3.5 w-3.5 text-[#1F5C4A]" />
+            <span className="text-[10px] text-[#1F5C4A] font-bold">Pricing automatically adjusted for your region</span>
+          </div>
+          <p className="text-xs text-[#6B7280] font-semibold leading-relaxed max-w-md mx-auto pt-1">
             Unlock unlimited scans, dynamic recruiter analysis, and continuous placement optimizations.
           </p>
         </div>
@@ -3055,13 +3102,19 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
+                {/* Geolocation Adjustment Banner */}
+                <div className="flex items-center justify-center space-x-1 text-[9px] text-[#1F5C4A] font-bold pb-2">
+                  <CheckCircle2 className="h-3 w-3 text-[#1F5C4A]" />
+                  <span>Pricing automatically adjusted for your region</span>
+                </div>
+
                 {/* Razorpay Standard Instant Unlock Button */}
                 <button
                   onClick={triggerRazorpayCheckout}
                   className="w-full py-2.5 rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white font-black text-xs shadow-sm transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
                 >
                   <Zap className="h-4 w-4 text-white fill-white stroke-[2.5]" />
-                  <span>Unlock & Download Now — {formatPrice(tailorApplied ? LOCALIZED_PRICING[selectedCurrency]?.tailorPrice : LOCALIZED_PRICING[selectedCurrency]?.exportPrice, selectedCurrency)}</span>
+                  <span>Unlock & Download Now — {formatPrice(LOCALIZED_PRICING[selectedCurrency]?.exportPrice || 99, selectedCurrency)}</span>
                 </button>
 
                 {/* Supported Payment Methods Badges */}
@@ -3617,13 +3670,19 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
+                    {/* Geolocation Adjustment Banner */}
+                    <div className="flex items-center justify-center space-x-1 text-[9px] text-[#1F5C4A] font-bold pb-2">
+                      <CheckCircle2 className="h-3 w-3 text-[#1F5C4A]" />
+                      <span>Pricing automatically adjusted for your region</span>
+                    </div>
+
                     {/* Razorpay Standard Instant Unlock Button */}
                     <button
                       onClick={triggerRazorpayCheckout}
                       className="w-full py-2.5 rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white font-black text-xs shadow-sm transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
                       <Zap className="h-4 w-4 text-white fill-white stroke-[2.5]" />
-                      <span>Unlock & Download Now — {formatPrice(tailorApplied ? LOCALIZED_PRICING[selectedCurrency]?.tailorPrice : LOCALIZED_PRICING[selectedCurrency]?.exportPrice, selectedCurrency)}</span>
+                      <span>Unlock & Download Now — {formatPrice(LOCALIZED_PRICING[selectedCurrency]?.exportPrice || 99, selectedCurrency)}</span>
                     </button>
 
                     {/* Supported Payment Methods Badges */}
@@ -3857,7 +3916,7 @@ export default function DashboardPage() {
                     className="px-6 py-3 text-xs font-black rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white active:scale-98 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
                   >
                     <Download className="h-4 w-4 text-white" />
-                    <span>Unlock Selection PDF ({formatPrice(tailorApplied ? LOCALIZED_PRICING[selectedCurrency]?.tailorPrice : LOCALIZED_PRICING[selectedCurrency]?.exportPrice, selectedCurrency)})</span>
+                    <span>Unlock Selection PDF ({formatPrice(LOCALIZED_PRICING[selectedCurrency]?.exportPrice || 99, selectedCurrency)})</span>
                   </button>
                 )}
               </div>
@@ -3900,12 +3959,16 @@ export default function DashboardPage() {
                 <span className="text-[#1F5C4A] font-bold select-all">{mockOrderId}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#6B7280]">Amount Due:</span>
-                <span className="text-[#1F5C4A] font-extrabold text-sm">{formatPrice(mockAmount / 100, mockCurrency)}</span>
+                <span className="text-[#6B7280]">Local Price:</span>
+                <span className="text-[#1C1C1C] font-bold">{formatPrice(mockDisplayAmount, mockDisplayCurrency)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#6B7280]">Currency:</span>
-                <span className="text-[#1C1C1C]">{mockCurrency} ({LOCALIZED_PRICING[mockCurrency]?.currencyName || mockCurrency})</span>
+                <span className="text-[#6B7280]">INR Converted:</span>
+                <span className="text-[#1F5C4A] font-extrabold text-sm">₹{(mockAmount / 100).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#6B7280]">Processing Currency:</span>
+                <span className="text-[#1C1C1C]">INR (Indian Rupee)</span>
               </div>
               <div className="flex justify-between border-t border-stone-200 pt-2.5 mt-1">
                 <span className="text-[#6B7280]">Simulation Method:</span>

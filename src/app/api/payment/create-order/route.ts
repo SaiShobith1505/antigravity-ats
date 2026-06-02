@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { LOCALIZED_PRICING, CurrencyCode } from "@/lib/currency";
+import { LOCALIZED_PRICING, CurrencyCode, INR_CONVERSION_RATES } from "@/lib/currency";
 
 const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -14,7 +12,7 @@ const razorpay = keyId && keySecret ? new Razorpay({
 
 export async function POST(req: Request) {
   try {
-    const { resumeId, userId, usedAITailor, planId, currency: clientCurrency } = await req.json();
+    const { resumeId, userId, planId, currency: clientCurrency } = await req.json();
 
     const currency: CurrencyCode = clientCurrency || "INR";
     const pricing = LOCALIZED_PRICING[currency] || LOCALIZED_PRICING.INR;
@@ -25,47 +23,34 @@ export async function POST(req: Request) {
       baseAmount = pricing.proPrice;
       console.log(`[CREATE ORDER] Creating Pro plan subscription order of ${pricing.currencySymbol}${baseAmount} (${currency}) for user ${userId}.`);
     } else {
-      // Verify tailored status directly from Firestore for secure billing check
-      let tailored = usedAITailor === true;
-      try {
-        const resumeRef = doc(db, "resumes", resumeId);
-        const resumeSnap = await getDoc(resumeRef);
-        if (resumeSnap.exists()) {
-          const resumeData = resumeSnap.data();
-          if (resumeData.usedAITailor === true) {
-            tailored = true;
-          }
-        }
-      } catch (dbErr) {
-        console.warn("[CREATE ORDER] Firestore read failed, relying on request context parameter fallback:", dbErr);
-      }
-
-      if (tailored) {
-        baseAmount = pricing.tailorPrice;
-        console.log(`[CREATE ORDER] Confirmed tailored status for ${resumeId}. Upgraded price to ${pricing.currencySymbol}${baseAmount} (${currency}).`);
-      } else {
-        console.log(`[CREATE ORDER] Creating standard order of ${pricing.currencySymbol}${baseAmount} (${currency}) for ${resumeId}.`);
-      }
+      console.log(`[CREATE ORDER] Creating standard flat-rate order of ${pricing.currencySymbol}${baseAmount} (${currency}) for ${resumeId}. (AI-Tailored pricing tier removed)`);
     }
 
-    // Razorpay and common payment gateways expect amount in smallest unit of currency (paise/cents)
-    const amount = Math.round(baseAmount * 100);
+    // Convert localized foreign currency price to its stable INR equivalent amount
+    const conversionRate = INR_CONVERSION_RATES[currency] || 1.0;
+    const baseAmountInINR = baseAmount * conversionRate;
+
+    // Razorpay processes payments in the smallest unit of currency (paise for INR)
+    const amount = Math.round(baseAmountInINR * 100);
     const receipt = `rcpt_${resumeId.slice(0, 10)}_${Date.now().toString().slice(-6)}`;
 
     // If Razorpay SDK is configured, create live checkout order
     if (razorpay) {
       const order = await razorpay.orders.create({
         amount,
-        currency,
+        currency: "INR", // Keep Razorpay calculations in INR
         receipt,
       });
 
       return NextResponse.json({
         id: order.id,
         amount: order.amount,
-        currency: order.currency,
+        currency: "INR",
         receipt: order.receipt,
         keyId: process.env.RAZORPAY_KEY_ID,
+        displayCurrency: currency, // Local currency for UI & analytics
+        displayAmount: baseAmount, // Local price amount for UI & analytics
+        conversionRate,
       });
     }
 
@@ -73,9 +58,12 @@ export async function POST(req: Request) {
     return NextResponse.json({
       id: `order_mock_${Math.random().toString(36).substring(2, 12)}`,
       amount,
-      currency,
+      currency: "INR",
       receipt,
       isMock: true,
+      displayCurrency: currency,
+      displayAmount: baseAmount,
+      conversionRate,
     });
 
   } catch (err: any) {

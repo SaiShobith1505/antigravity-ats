@@ -710,3 +710,48 @@ export async function updateUserProfile(
     localStorage.setItem(`cv_boost_profile_${uid}`, JSON.stringify(updated));
   }
 }
+
+export interface PurchaseAnalyticsItem {
+  id: string;
+  userId: string;
+  resumeId: string;
+  planId: string;
+  country: string;
+  currency: string;
+  revenueLocal: number;
+  revenueINR: number;
+  conversionRate: number;
+  timestamp: string;
+}
+
+export async function trackPurchaseAnalytics(
+  userId: string,
+  resumeId: string,
+  planId: string,
+  country: string,
+  currency: string,
+  revenueLocal: number,
+  revenueINR: number,
+  conversionRate: number
+): Promise<void> {
+  try {
+    const analyticsId = `p_anal_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const analyticsRef = doc(db, "analytics_purchases", analyticsId);
+    const payload: PurchaseAnalyticsItem = {
+      id: analyticsId,
+      userId,
+      resumeId,
+      planId,
+      country,
+      currency,
+      revenueLocal,
+      revenueINR,
+      conversionRate,
+      timestamp: new Date().toISOString()
+    };
+    await setDoc(analyticsRef, payload);
+    console.log(`[ANALYTICS] Purchase successfully logged: ${analyticsId} for user ${userId} in ${country}.`);
+  } catch (err) {
+    console.warn("[ANALYTICS] Firestore analytics logging failed:", err);
+  }
+}
