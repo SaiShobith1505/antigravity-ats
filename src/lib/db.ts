@@ -357,6 +357,7 @@ export async function setPaymentStatusPaid(
 }
 
 // Default Demo Resume
+// Default Demo Resume
 export const defaultResumeData: ResumeData = {
   personal: {
     fullName: "Amit Sharma",
@@ -390,7 +391,7 @@ export const defaultResumeData: ResumeData = {
 
   projects: [
     {
-      title: "BOOSTCV (ATS SaaS Compiler)",
+      title: "BOOSTCV (Placement Resume Compiler)",
       techStack: "Next.js, Tailwind, React, Node.js",
       description:
         "Engineered ATS-optimized resume generation platform with clean parsing structure.",
@@ -428,6 +429,165 @@ export const defaultResumeData: ResumeData = {
     "React Advanced Developer Certification",
   ],
 };
+
+export const indiaDefaultResumeData = defaultResumeData;
+
+export const usDefaultResumeData: ResumeData = {
+  personal: {
+    fullName: "Alex Morgan",
+    email: "alex.morgan@gatech.edu",
+    phone: "+1 (555) 019-2834",
+    linkedin: "linkedin.com/in/alex-morgan-gatech",
+    github: "github.com/alexmorgan-dev",
+  },
+  education: [
+    {
+      institution: "Georgia Institute of Technology (Georgia Tech)",
+      degree: "B.S. in Computer Science",
+      year: "2022 - 2026",
+      gpa: "3.85 GPA",
+    },
+  ],
+  experience: [
+    {
+      company: "Apex Enterprise Solutions",
+      role: "Software Engineer Intern",
+      duration: "May 2025 - August 2025",
+      bullets: [
+        "Designed and implemented high-throughput REST APIs handling over 10M daily client requests.",
+        "Optimized AWS DynamoDB read/write capacities, reducing monthly cloud expenditure by 18%.",
+        "Configured robust CI/CD pipelines deploying containerized microservices to ECS.",
+      ],
+    },
+  ],
+  projects: [
+    {
+      title: "AWS Serverless Microservices Project",
+      techStack: "AWS Lambda, API Gateway, DynamoDB, Python",
+      description:
+        "Built and deployed a fully serverless, highly-available ecommerce checkout backend.",
+    },
+  ],
+  skills: {
+    languages: ["Python", "Java", "Go", "TypeScript", "SQL"],
+    frameworks: ["Flask", "FastAPI", "React", "Node.js", "AWS SDK"],
+    tools: ["Git", "Docker", "AWS", "Terraform", "Kubernetes"],
+  },
+  certifications: [
+    "AWS Certified Developer - Associate",
+    "HashiCorp Certified: Terraform Associate",
+  ],
+};
+
+export const ukDefaultResumeData: ResumeData = {
+  personal: {
+    fullName: "James Smith",
+    email: "j.smith@imperial.ac.uk",
+    phone: "+44 7911 123456",
+    linkedin: "linkedin.com/in/james-smith-imperial",
+    github: "github.com/jsmith-dev",
+  },
+  education: [
+    {
+      institution: "Imperial College London",
+      degree: "BSc in Computing (Software Engineering)",
+      year: "2023 - 2026",
+      gpa: "First Class Honours",
+    },
+  ],
+  experience: [
+    {
+      company: "Vanguard Tech Capital",
+      role: "Graduate Software Analyst",
+      duration: "June 2025 - September 2025",
+      bullets: [
+        "Pioneered a real-time portfolio tracking system processing streaming market feeds.",
+        "Authored performant concurrent algorithms reducing data aggregation delay by 150ms.",
+        "Partnered with senior lead architects to model system behavior under high load simulations.",
+      ],
+    },
+  ],
+  projects: [
+    {
+      title: "Distributed Systems Simulation",
+      techStack: "Rust, gRPC, Protocol Buffers, Docker",
+      description:
+        "Developed a distributed consensus engine showcasing multi-node transaction replication.",
+    },
+  ],
+  skills: {
+    languages: ["Rust", "C++", "TypeScript", "Python", "PostgreSQL"],
+    frameworks: ["Express", "React", "Next.js", "Actix-web", "Node.js"],
+    tools: ["Git", "Docker", "Linux", "Kubernetes", "Jira"],
+  },
+  certifications: [
+    "Professional Scrum Master I (PSM I)",
+    "Oracle Certified Professional: Java SE Programmer",
+  ],
+};
+
+export const caDefaultResumeData: ResumeData = {
+  personal: {
+    fullName: "Emily Chen",
+    email: "emily.chen@uwaterloo.ca",
+    phone: "+1 (226) 555-0149",
+    linkedin: "linkedin.com/in/emily-chen-waterloo",
+    github: "github.com/emilychen-dev",
+  },
+  education: [
+    {
+      institution: "University of Waterloo",
+      degree: "Bachelor of Software Engineering (BSE)",
+      year: "2021 - 2026",
+      gpa: "3.90 GPA",
+    },
+  ],
+  experience: [
+    {
+      company: "Stellar Cloud Systems",
+      role: "Software Engineering Co-op",
+      duration: "September 2025 - December 2025",
+      bullets: [
+        "Architected an API Gateway service supporting dynamic JWT token routing and validation.",
+        "Integrated Elasticsearch for log indexing, improving debugger query efficiency by 40%.",
+        "Authored comprehensive unit and integration suites raising coverage benchmarks to 92%.",
+      ],
+    },
+  ],
+  projects: [
+    {
+      title: "Scalable API Gateway Engine",
+      techStack: "Go, Gin, Redis, Docker, JWT",
+      description:
+        "Engineered an enterprise-grade API proxying layer featuring robust rate-limiting.",
+    },
+  ],
+  skills: {
+    languages: ["Go", "TypeScript", "Python", "Java", "SQL"],
+    frameworks: ["Gin", "React", "Next.js", "Spring Boot", "Express"],
+    tools: ["Git", "Docker", "Redis", "Elasticsearch", "Google Cloud Platform"],
+  },
+  certifications: [
+    "Google Cloud Certified Associate Cloud Engineer",
+    "Certified Kubernetes Administrator (CKA)",
+  ],
+};
+
+export function getDefaultResumeData(countryCode: string): ResumeData {
+  switch (countryCode) {
+    case "US":
+      return usDefaultResumeData;
+    case "GB":
+    case "UK":
+      return ukDefaultResumeData;
+    case "CA":
+      return caDefaultResumeData;
+    case "IN":
+    default:
+      return indiaDefaultResumeData;
+  }
+}
+
 
 export interface UserProfile {
   uid: string;

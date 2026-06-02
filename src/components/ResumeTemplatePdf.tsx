@@ -6,9 +6,16 @@ import {
   Page, 
   Text, 
   View, 
-  StyleSheet 
+  StyleSheet,
+  Link
 } from "@react-pdf/renderer";
 import { ResumeData } from "@/lib/db";
+
+const ensureUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `https://${url}`;
+};
 
 // 1. STYLE SHEET: CLASSIC PROFESSIONAL
 const stylesClassic = StyleSheet.create({
@@ -317,11 +324,23 @@ export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data, temp
           <View style={styles.contactDetails}>
             {personal.phone && <Text>{personal.phone}</Text>}
             {personal.phone && personal.email && <Text>{template === "technical" ? "|" : "•"}</Text>}
-            {personal.email && <Text>{personal.email}</Text>}
+            {personal.email && (
+              <Link style={{ textDecoration: "none", color: "inherit" }} src={`mailto:${personal.email}`}>
+                {personal.email}
+              </Link>
+            )}
             {personal.email && personal.linkedin && <Text>{template === "technical" ? "|" : "•"}</Text>}
-            {personal.linkedin && <Text>{personal.linkedin}</Text>}
+            {personal.linkedin && (
+              <Link style={{ textDecoration: "none", color: "inherit" }} src={ensureUrl(personal.linkedin)}>
+                {personal.linkedin}
+              </Link>
+            )}
             {personal.linkedin && personal.github && <Text>{template === "technical" ? "|" : "•"}</Text>}
-            {personal.github && <Text>{personal.github}</Text>}
+            {personal.github && (
+              <Link style={{ textDecoration: "none", color: "inherit" }} src={ensureUrl(personal.github)}>
+                {personal.github}
+              </Link>
+            )}
           </View>
         </View>
 
@@ -330,7 +349,7 @@ export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data, temp
           <View>
             <Text style={styles.sectionTitle}>Education</Text>
             {education.map((edu, idx) => (
-              <View key={idx} style={{ marginBottom: template === "technical" ? 3 : 5 }}>
+              <View key={idx} style={{ marginBottom: template === "technical" ? 3 : 5 }} wrap={false}>
                 <View style={styles.itemHeaderRow}>
                   <Text style={styles.itemLeftTitle}>{edu.institution}</Text>
                   <Text style={styles.itemRightDetail}>{edu.year}</Text>
@@ -349,7 +368,7 @@ export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data, temp
           <View>
             <Text style={styles.sectionTitle}>Experience</Text>
             {experience.map((exp, idx) => (
-              <View key={idx} style={{ marginBottom: template === "technical" ? 4 : 6 }}>
+              <View key={idx} style={{ marginBottom: template === "technical" ? 4 : 6 }} wrap={false}>
                 <View style={styles.itemHeaderRow}>
                   <Text style={styles.itemLeftTitle}>{exp.company}</Text>
                   <Text style={styles.itemRightDetail}>{exp.duration}</Text>
@@ -379,7 +398,7 @@ export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data, temp
           <View>
             <Text style={styles.sectionTitle}>Projects</Text>
             {projects.map((proj, idx) => (
-              <View key={idx} style={{ marginBottom: template === "technical" ? 4 : 6 }}>
+              <View key={idx} style={{ marginBottom: template === "technical" ? 4 : 6 }} wrap={false}>
                 <View style={styles.itemHeaderRow}>
                   <Text style={styles.itemLeftTitle}>{proj.title}</Text>
                   {proj.techStack && (
@@ -435,7 +454,7 @@ export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data, temp
 
         {/* Certifications Section */}
         {certifications && certifications.length > 0 && (
-          <View style={{ marginTop: template === "technical" ? 3 : 5 }}>
+          <View style={{ marginTop: template === "technical" ? 3 : 5 }} wrap={false}>
             <Text style={styles.sectionTitle}>Certifications</Text>
             <View style={styles.bulletList}>
               {certifications.map((cert, idx) => (

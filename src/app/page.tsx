@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
 import {
@@ -17,6 +17,12 @@ import {
   Target,
 } from "lucide-react";
 import { Footer } from "@/components/Footer";
+import { 
+  detectUserCountryAndCurrency, 
+  LOCALIZED_PRICING, 
+  formatPrice,
+  CurrencyCode
+} from "@/lib/currency";
 
 const reportMetrics = [
   { label: "Structure", value: 92 },
@@ -67,6 +73,12 @@ const faqs = [
 export default function LandingPage() {
   const { user } = useAuth();
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [currency, setCurrency] = useState<CurrencyCode>("INR");
+
+  useEffect(() => {
+    const { currency: detectedCurrency } = detectUserCountryAndCurrency();
+    setCurrency(detectedCurrency);
+  }, []);
 
   const appHref = user ? "/dashboard" : "/login";
 
@@ -109,7 +121,7 @@ export default function LandingPage() {
             <div className="lg:col-span-6">
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-medium text-[#1F5C4A] shadow-sm">
                 <ShieldCheck className="h-3.5 w-3.5" />
-                Professional resume intelligence for placements
+                Resume Intelligence for Modern Job Seekers
               </div>
               <h1 className="max-w-3xl text-5xl font-semibold tracking-tight text-[#1C1C1C] sm:text-6xl lg:text-7xl">
                 Get More Interview Calls.
@@ -138,7 +150,7 @@ export default function LandingPage() {
                   <p className="mt-1 text-xs font-medium text-[#6B7280]">health categories</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-semibold">₹99</p>
+                  <p className="text-2xl font-semibold">{formatPrice(LOCALIZED_PRICING[currency]?.exportPrice || 99, currency)}</p>
                   <p className="mt-1 text-xs font-medium text-[#6B7280]">one-time export</p>
                 </div>
                 <div>
@@ -247,8 +259,8 @@ export default function LandingPage() {
                 Offer Ends Soon • Limited Launch Offer
               </div>
               <div className="flex items-center justify-center gap-3">
-                <span className="text-lg font-medium text-[#6B7280] line-through">₹149</span>
-                <span className="text-5xl font-semibold tracking-tight">₹99</span>
+                <span className="text-lg font-medium text-[#6B7280] line-through">{formatPrice(LOCALIZED_PRICING[currency]?.tailorPrice || 149, currency)}</span>
+                <span className="text-5xl font-semibold tracking-tight">{formatPrice(LOCALIZED_PRICING[currency]?.exportPrice || 99, currency)}</span>
                 <span className="text-sm font-medium text-[#6B7280]">one-time</span>
               </div>
               <p className="mx-auto mt-5 max-w-sm text-sm leading-6 text-[#6B7280]">

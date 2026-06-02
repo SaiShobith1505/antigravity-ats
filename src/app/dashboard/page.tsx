@@ -13,8 +13,17 @@ import {
   getPaymentStatus, 
   setPaymentStatusPaid,
   getUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  getDefaultResumeData
 } from "@/lib/db";
+import { 
+  detectUserCountryAndCurrency, 
+  LOCALIZED_PRICING, 
+  formatPrice, 
+  COUNTRY_TO_CURRENCY,
+  CurrencyCode, 
+  CountryCode 
+} from "@/lib/currency";
 import { 
   Zap, 
   Lock, 
@@ -22,6 +31,7 @@ import {
   Share2, 
   CheckCircle2, 
   ChevronLeft,
+  ChevronDown,
   Smartphone,
   ArrowRight,
   TrendingUp,
@@ -75,6 +85,12 @@ export default function DashboardPage() {
   const [referralLink, setReferralLink] = useState("");
   const [copied, setCopied] = useState(false);
   const [paymentError, setPaymentError] = useState("");
+
+  // Localized Currency and Country States
+  const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>("INR");
+  const [selectedCountry, setSelectedCountry] = useState<CountryCode>("IN");
+  const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
+  const [mockCurrency, setMockCurrency] = useState<CurrencyCode>("INR");
 
   // Simulated Payment Sandbox Modal States
   const [showMockModal, setShowMockModal] = useState(false);
@@ -449,6 +465,22 @@ export default function DashboardPage() {
 
   const resumeId = user ? `resume_${user.uid}` : "default-resume";
 
+  // Auto-detect visitor's country and preferred currency on mount
+  useEffect(() => {
+    const { country, currency } = detectUserCountryAndCurrency();
+    setSelectedCountry(country);
+    setSelectedCurrency(currency);
+  }, []);
+
+  const handleCountryChange = (country: CountryCode) => {
+    const currency = COUNTRY_TO_CURRENCY[country];
+    setSelectedCountry(country);
+    setSelectedCurrency(currency);
+    localStorage.setItem("cv_boost_selected_country", country);
+    localStorage.setItem("cv_boost_selected_currency", currency);
+    setCurrencyDropdownOpen(false);
+  };
+
   // Load user data on startup
   useEffect(() => {
     if (!authLoading && !user) {
@@ -475,17 +507,19 @@ export default function DashboardPage() {
 
       // Load resume data
       const load = async () => {
+        const { country } = detectUserCountryAndCurrency();
+        const regionalDefault = getDefaultResumeData(country);
         const res = await getResume(resumeId);
         if (res && res.data) {
           const merged = {
-            ...defaultResumeData,
+            ...regionalDefault,
             ...res.data,
-            personal: { ...defaultResumeData.personal, ...(res.data.personal || {}) },
-            skills: { ...defaultResumeData.skills, ...(res.data.skills || {}) },
-            education: res.data.education || defaultResumeData.education,
-            experience: res.data.experience || defaultResumeData.experience,
-            projects: res.data.projects || defaultResumeData.projects,
-            certifications: res.data.certifications || defaultResumeData.certifications || [],
+            personal: { ...regionalDefault.personal, ...(res.data.personal || {}) },
+            skills: { ...regionalDefault.skills, ...(res.data.skills || {}) },
+            education: res.data.education || regionalDefault.education,
+            experience: res.data.experience || regionalDefault.experience,
+            projects: res.data.projects || regionalDefault.projects,
+            certifications: res.data.certifications || regionalDefault.certifications || [],
           };
           setResumeData(merged);
           if (res.atsScore !== undefined && res.atsScore !== null) {
@@ -503,6 +537,8 @@ export default function DashboardPage() {
           if (res.companyAnalysisHistory) {
             setCompanyHistory(res.companyAnalysisHistory);
           }
+        } else {
+          setResumeData(regionalDefault);
         }
         if (user.email === "admin@cvboost.co") {
           setIsPaid(true);
@@ -844,7 +880,7 @@ export default function DashboardPage() {
       const response = await fetch("/api/payment/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resumeId, userId: user.uid, usedAITailor: tailorApplied }),
+        body: JSON.stringify({ resumeId, userId: user.uid, usedAITailor: tailorApplied, currency: selectedCurrency }),
       });
       
       if (!response.ok) {
@@ -858,6 +894,7 @@ export default function DashboardPage() {
         console.log("[TEST MODE] Mock order detected. Triggering Mock Payment Sandbox Modal...");
         setMockOrderId(order.id);
         setMockAmount(order.amount);
+        setMockCurrency(order.currency || selectedCurrency);
         setShowMockModal(true);
         return;
       }
@@ -865,7 +902,7 @@ export default function DashboardPage() {
       const options = {
         key: order.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
-        currency: "INR",
+        currency: order.currency || selectedCurrency,
         name: "BOOSTCV",
         description: "Placement Resume Package PDF Unlock",
         order_id: order.id,
@@ -943,7 +980,7 @@ export default function DashboardPage() {
       const response = await fetch("/api/payment/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resumeId, userId: user.uid, planId: "pro" }),
+        body: JSON.stringify({ resumeId, userId: user.uid, planId: "pro", currency: selectedCurrency }),
       });
       
       if (!response.ok) {
@@ -957,6 +994,7 @@ export default function DashboardPage() {
         console.log("[TEST MODE] Mock order detected. Triggering Mock Pro Payment Sandbox Modal...");
         setMockOrderId(order.id);
         setMockAmount(order.amount);
+        setMockCurrency(order.currency || selectedCurrency);
         setShowMockModal(true);
         return;
       }
@@ -964,7 +1002,7 @@ export default function DashboardPage() {
       const options = {
         key: order.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
-        currency: "INR",
+        currency: order.currency || selectedCurrency,
         name: "BOOSTCV Pro Plan",
         description: "10 Exports & Unlimited Scans Pro Subscription",
         order_id: order.id,
@@ -1352,7 +1390,7 @@ export default function DashboardPage() {
             <div className="space-y-2">
               <span className="text-[9px] font-black text-[#6B7280] uppercase tracking-wider block">Free Trial Plan</span>
               <h4 className="text-base font-black text-[#1C1C1C]">Basic Access</h4>
-              <div className="text-2xl font-black text-[#1C1C1C]">₹0 <span className="text-xs font-semibold text-[#6B7280] lowercase">/ forever</span></div>
+              <div className="text-2xl font-black text-[#1C1C1C]">{LOCALIZED_PRICING[selectedCurrency]?.currencySymbol || "₹"}0 <span className="text-xs font-semibold text-[#6B7280] lowercase">/ forever</span></div>
               <ul className="space-y-2.5 text-[10px] text-[#6B7280] font-bold">
                 <li className="flex items-center space-x-2">
                   <span className="text-[#1F5C4A] font-extrabold">✓</span>
@@ -1360,7 +1398,7 @@ export default function DashboardPage() {
                 </li>
                 <li className="flex items-center space-x-2">
                   <span className="text-red-500 font-extrabold">✗</span>
-                  <span className="line-through text-stone-400">Premium Exports (₹99 / each)</span>
+                  <span className="line-through text-stone-400">Premium Exports ({formatPrice(LOCALIZED_PRICING[selectedCurrency]?.exportPrice || 99, selectedCurrency)} / each)</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <span className="text-red-500 font-extrabold">✗</span>
@@ -1385,7 +1423,7 @@ export default function DashboardPage() {
             <div className="space-y-2">
               <span className="text-[9px] font-black text-[#1F5C4A] uppercase tracking-wider block">Professional Upgrade</span>
               <h4 className="text-base font-black text-[#1C1C1C]">BOOSTCV Pro</h4>
-              <div className="text-2xl font-black text-[#1F5C4A]">₹299 <span className="text-xs font-semibold text-[#6B7280] lowercase">/ month</span></div>
+              <div className="text-2xl font-black text-[#1F5C4A]">{formatPrice(LOCALIZED_PRICING[selectedCurrency]?.proPrice || 299, selectedCurrency)} <span className="text-xs font-semibold text-[#6B7280] lowercase">/ month</span></div>
               <ul className="space-y-2.5 text-[10px] text-[#1C1C1C] font-extrabold">
                 <li className="flex items-center space-x-2">
                   <span className="text-[#1F5C4A] font-extrabold">✓</span>
@@ -2593,7 +2631,7 @@ export default function DashboardPage() {
             </div>
             <div className="p-3 bg-stone-50 border border-stone-200 rounded-xl space-y-0.5">
               <span className="text-[#6B7280] uppercase tracking-wider block">EXPORT CHARGES:</span>
-              <span className="text-[#1C1C1C]">₹99.00 / resume download session</span>
+              <span className="text-[#1C1C1C]">{formatPrice(LOCALIZED_PRICING[selectedCurrency]?.exportPrice || 99, selectedCurrency)} / resume download session</span>
             </div>
           </div>
         </div>
@@ -3001,7 +3039,7 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-2 gap-2 border-y border-stone-200 py-2.5 text-[8.5px] text-[#6B7280] font-bold font-sans">
                   <div className="flex items-center space-x-1.5">
                     <span className="text-[#1F5C4A]">✓</span>
-                    <span>98%+ Interview Guaranteed</span>
+                    <span>98%+ ATS Compliance Score</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
                     <span className="text-[#1F5C4A]">✓</span>
@@ -3013,7 +3051,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center space-x-1.5">
                     <span className="text-[#1F5C4A]">✓</span>
-                    <span>Lifetime Free AI Re-tuner</span>
+                    <span>Built on ATS Best Practices</span>
                   </div>
                 </div>
 
@@ -3023,8 +3061,16 @@ export default function DashboardPage() {
                   className="w-full py-2.5 rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white font-black text-xs shadow-sm transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
                 >
                   <Zap className="h-4 w-4 text-white fill-white stroke-[2.5]" />
-                  <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 99}</span>
+                  <span>Unlock & Download Now — {formatPrice(tailorApplied ? LOCALIZED_PRICING[selectedCurrency]?.tailorPrice : LOCALIZED_PRICING[selectedCurrency]?.exportPrice, selectedCurrency)}</span>
                 </button>
+
+                {/* Supported Payment Methods Badges */}
+                <div className="flex items-center justify-center space-x-1.5 text-[7.5px] font-black text-stone-400 font-sans tracking-wide pt-0.5">
+                  <span className="uppercase text-[6.5px] font-black text-stone-400">Supported:</span>
+                  <span className="px-1 py-0.5 rounded bg-stone-50 border border-stone-200 text-stone-500 font-black">VISA</span>
+                  <span className="px-1 py-0.5 rounded bg-stone-50 border border-stone-200 text-stone-500 font-black">MASTERCARD</span>
+                  <span className="px-1 py-0.5 rounded bg-stone-50 border border-stone-200 text-stone-500 font-black">AMEX</span>
+                </div>
 
                 {/* Classmate referral share widget for free access */}
                 <div className="border-t border-stone-200 pt-3 space-y-2">
@@ -3194,6 +3240,51 @@ export default function DashboardPage() {
                 🔓 Premium Exports Remaining: {downloadsRemaining}
               </span>
             )}
+            
+            {/* Localized Country/Currency Selector Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setCurrencyDropdownOpen(!currencyDropdownOpen)}
+                className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-[10px] font-bold font-sans transition-colors cursor-pointer shadow-sm text-[#1C1C1C]"
+              >
+                <span>{
+                  selectedCountry === "IN" ? "🇮🇳" :
+                  selectedCountry === "US" ? "🇺🇸" :
+                  selectedCountry === "GB" ? "🇬🇧" :
+                  selectedCountry === "EU" ? "🇪🇺" :
+                  selectedCountry === "AU" ? "🇦🇺" :
+                  selectedCountry === "CA" ? "🇨🇦" : "🇺🇸"
+                }</span>
+                <span className="uppercase">{selectedCurrency}</span>
+                <ChevronDown className="h-3 w-3 text-[#6B7280]" />
+              </button>
+
+              {currencyDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setCurrencyDropdownOpen(false)} />
+                  <div className="absolute right-0 mt-1.5 w-44 bg-white border border-stone-200 rounded-xl shadow-lg z-50 py-1.5 animate-in fade-in slide-in-from-top-1 duration-150 text-left">
+                    {[
+                      { code: "IN", flag: "🇮🇳", name: "India (₹)", currency: "INR" },
+                      { code: "US", flag: "🇺🇸", name: "United States ($)", currency: "USD" },
+                      { code: "GB", flag: "🇬🇧", name: "United Kingdom (£)", currency: "GBP" },
+                      { code: "EU", flag: "🇪🇺", name: "Europe (€)", currency: "EUR" },
+                      { code: "AU", flag: "🇦🇺", name: "Australia (A$)", currency: "AUD" },
+                      { code: "CA", flag: "🇨🇦", name: "Canada (C$)", currency: "CAD" },
+                    ].map((c) => (
+                      <button
+                        key={c.code}
+                        onClick={() => handleCountryChange(c.code as CountryCode)}
+                        className={`w-full flex items-center space-x-2.5 px-3 py-2 text-[10px] font-bold font-sans hover:bg-stone-50 transition-colors ${selectedCountry === c.code ? "text-[#1F5C4A] bg-[#1F5C4A]/5" : "text-[#6B7280] hover:text-[#1C1C1C]"}`}
+                      >
+                        <span className="text-sm leading-none">{c.flag}</span>
+                        <span>{c.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
             <button 
               onClick={signOut}
               className="text-[10px] text-[#6B7280] hover:text-[#1C1C1C] font-bold font-sans transition-colors cursor-pointer"
@@ -3510,7 +3601,7 @@ export default function DashboardPage() {
                     <div className="grid grid-cols-2 gap-2 border-y border-stone-200 py-2.5 text-[9px] text-[#6B7280] font-bold font-sans">
                       <div className="flex items-center space-x-1.5">
                         <span className="text-[#1F5C4A]">✓</span>
-                        <span>98%+ Interview Guaranteed</span>
+                        <span>98%+ ATS Compliance Score</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
                         <span className="text-[#1F5C4A]">✓</span>
@@ -3522,7 +3613,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="flex items-center space-x-1.5">
                         <span className="text-[#1F5C4A]">✓</span>
-                        <span>Lifetime Free AI Re-tuner</span>
+                        <span>Built on ATS Best Practices</span>
                       </div>
                     </div>
 
@@ -3532,8 +3623,16 @@ export default function DashboardPage() {
                       className="w-full py-2.5 rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white font-black text-xs shadow-sm transition-all transform active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
                       <Zap className="h-4 w-4 text-white fill-white stroke-[2.5]" />
-                      <span>Unlock & Download Now — ₹{tailorApplied ? 149 : 99}</span>
+                      <span>Unlock & Download Now — {formatPrice(tailorApplied ? LOCALIZED_PRICING[selectedCurrency]?.tailorPrice : LOCALIZED_PRICING[selectedCurrency]?.exportPrice, selectedCurrency)}</span>
                     </button>
+
+                    {/* Supported Payment Methods Badges */}
+                    <div className="flex items-center justify-center space-x-1.5 text-[7.5px] font-black text-stone-400 font-sans tracking-wide pt-0.5">
+                      <span className="uppercase text-[6.5px] font-black text-stone-400">Supported:</span>
+                      <span className="px-1 py-0.5 rounded bg-stone-50 border border-stone-200 text-stone-500 font-black">VISA</span>
+                      <span className="px-1 py-0.5 rounded bg-stone-50 border border-stone-200 text-stone-500 font-black">MASTERCARD</span>
+                      <span className="px-1 py-0.5 rounded bg-stone-50 border border-stone-200 text-stone-500 font-black">AMEX</span>
+                    </div>
 
                     {/* Classmate referral share widget for free access */}
                     <div className="border-t border-stone-200 pt-3 space-y-2">
@@ -3758,7 +3857,7 @@ export default function DashboardPage() {
                     className="px-6 py-3 text-xs font-black rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white active:scale-98 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
                   >
                     <Download className="h-4 w-4 text-white" />
-                    <span>Unlock Selection PDF (₹{tailorApplied ? 149 : 99})</span>
+                    <span>Unlock Selection PDF ({formatPrice(tailorApplied ? LOCALIZED_PRICING[selectedCurrency]?.tailorPrice : LOCALIZED_PRICING[selectedCurrency]?.exportPrice, selectedCurrency)})</span>
                   </button>
                 )}
               </div>
@@ -3802,11 +3901,11 @@ export default function DashboardPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-[#6B7280]">Amount Due:</span>
-                <span className="text-[#1F5C4A] font-extrabold text-sm">₹{(mockAmount / 100).toFixed(2)}</span>
+                <span className="text-[#1F5C4A] font-extrabold text-sm">{formatPrice(mockAmount / 100, mockCurrency)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#6B7280]">Currency:</span>
-                <span className="text-[#1C1C1C]">INR (Indian Rupee)</span>
+                <span className="text-[#1C1C1C]">{mockCurrency} ({LOCALIZED_PRICING[mockCurrency]?.currencyName || mockCurrency})</span>
               </div>
               <div className="flex justify-between border-t border-stone-200 pt-2.5 mt-1">
                 <span className="text-[#6B7280]">Simulation Method:</span>
@@ -3837,7 +3936,7 @@ export default function DashboardPage() {
               
               <button
                 onClick={handleMockPaymentSuccess}
-                className="py-3 px-4 rounded-xl hover:brightness-110 text-white font-black text-xs transition-all transform active:scale-98 shadow-[0_0_15px_rgba(6,182,212,0.25)] flex items-center justify-center space-x-1.5"
+                className="py-3 px-4 rounded-xl hover:brightness-110 text-white bg-[#1F5C4A] hover:bg-[#18483A] font-black text-xs transition-all transform active:scale-98 shadow-[0_4px_12px_rgba(31,92,74,0.2)] flex items-center justify-center space-x-1.5"
               >
                 <CheckCircle2 className="h-4 w-4 text-white" />
                 <span>Simulate Pay</span>

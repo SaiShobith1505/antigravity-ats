@@ -9,7 +9,7 @@ export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    subject: "B.Tech Placement Support",
+    subject: "General Career Support",
     message: ""
   });
   const [success, setSuccess] = useState(false);
@@ -17,7 +17,7 @@ export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess(true);
-    setFormData({ name: "", email: "", subject: "B.Tech Placement Support", message: "" });
+    setFormData({ name: "", email: "", subject: "General Career Support", message: "" });
     setTimeout(() => setSuccess(false), 5000);
   };
 
@@ -58,13 +58,13 @@ export default function ContactPage() {
           <div className="space-y-3 text-center md:text-left">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#1F5C4A]/10/40 border border-[#1F5C4A]/20/30 text-[#1F5C4A] text-[10px] font-bold font-mono tracking-wider uppercase">
               <Mail className="h-3.5 w-3.5" />
-              <span>Campus Contact System</span>
+              <span>Global Support System</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
               Contact Information
             </h1>
             <p className="text-zinc-500 text-xs font-mono font-bold uppercase tracking-wider">
-              Get in touch with the BOOSTCV Placements Campaign Support Team
+              Get in touch with the BOOSTCV Global Career Support Team
             </p>
           </div>
 
@@ -101,7 +101,7 @@ export default function ContactPage() {
                       <Phone className="h-5 w-5 text-[#1F5C4A]" />
                     </div>
                     <div>
-                      <div className="text-white font-bold text-xs uppercase tracking-wider font-mono">Campus Support Call</div>
+                      <div className="text-white font-bold text-xs uppercase tracking-wider font-mono">Global Support Line</div>
                       <span className="text-zinc-300">+91 98765 43210</span>
                       <div className="text-[10px] text-zinc-500 mt-1 font-mono">Operational: Mon - Sat, 10 AM - 6 PM</div>
                     </div>
@@ -133,13 +133,13 @@ export default function ContactPage() {
               <div className="glass-panel border border-zinc-900 rounded-2xl p-6 sm:p-8 space-y-6">
                 
                 <h3 className="text-base font-black text-white font-mono uppercase tracking-wider border-b border-zinc-900 pb-2">
-                  Send Campus Support Message
+                  Send Support Message
                 </h3>
 
                 {success ? (
                   <div className="p-4 rounded-xl bg-[#1F5C4A]/10/20 border border-[#1F5C4A]/20/30 text-[#1F5C4A] text-xs font-bold font-mono tracking-wide flex items-center space-x-2.5">
                     <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[#1F5C4A]" />
-                    <span>Your placement query was logged successfully! We will email you back within 4 hours.</span>
+                    <span>Your support query was logged successfully! We will email you back within 4 hours.</span>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-4">
@@ -182,7 +182,7 @@ export default function ContactPage() {
                         onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                         className="bg-zinc-900/40 border border-zinc-800 focus:border-[#1F5C4A] focus:ring-1 focus:ring-[#1F5C4A] text-slate-100 rounded-xl px-4 py-3 w-full text-sm outline-none transition-all"
                       >
-                        <option value="B.Tech Placement Support">B.Tech Placement Support</option>
+                        <option value="General Career Support">General Career Support</option>
                         <option value="Refund & Cancellation">Refund & Cancellation Inquiry</option>
                         <option value="Razorpay Transaction Issue">Razorpay Transaction Issue</option>
                         <option value="Resume PDF Rendering Query">Resume PDF Rendering Query</option>

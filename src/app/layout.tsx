@@ -4,8 +4,8 @@ import { AuthProvider } from "@/lib/auth";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://boostcv.in"),
-  title: "BOOSTCV — Get More Interview Calls & Placement Offers",
-  description: "Analyze your resume, match it against real jobs, identify missing skills, and generate a recruiter-approved version built for placements and internships.",
+  title: "BOOSTCV — Resume Intelligence for Modern Job Seekers",
+  description: "Analyze your resume against real job descriptions, identify missing skills, and compile a recruiter-approved structural format optimized for competitive hiring processes.",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     ]
   },
   openGraph: {
-    title: "BOOSTCV — Get More Interview Calls & Placement Offers",
-    description: "Analyze your resume, match it against real jobs, identify missing skills, and generate a recruiter-approved version built for placements and internships.",
+    title: "BOOSTCV — Resume Intelligence for Modern Job Seekers",
+    description: "Analyze your resume against real job descriptions, identify missing skills, and compile a recruiter-approved structural format optimized for competitive hiring processes.",
     url: "https://boostcv.in",
     siteName: "BOOSTCV",
     images: [
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "BOOSTCV — Get More Interview Calls & Placement Offers"
+        alt: "BOOSTCV — Resume Intelligence for Modern Job Seekers"
       }
     ],
     locale: "en_US",
@@ -33,8 +33,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "BOOSTCV — Get More Interview Calls & Placement Offers",
-    description: "Analyze your resume, match it against real jobs, identify missing skills, and generate a recruiter-approved version built for placements and internships.",
+    title: "BOOSTCV — Resume Intelligence for Modern Job Seekers",
+    description: "Analyze your resume against real job descriptions, identify missing skills, and compile a recruiter-approved structural format optimized for competitive hiring processes.",
     images: ["/twitter-image.png"],
   }
 };
