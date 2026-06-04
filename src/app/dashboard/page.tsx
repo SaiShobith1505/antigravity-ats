@@ -2946,10 +2946,10 @@ export default function DashboardPage() {
         }`}>
           <h2 className={`font-bold text-black ${
             selectedTemplate === "minimal"
-              ? "text-2xl text-[#1F5C4A] mb-1 tracking-tight"
+              ? "text-2xl text-[#1F5C4A] mb-3 tracking-tight"
               : selectedTemplate === "technical"
-              ? "text-lg mb-0.5"
-              : "text-xl mb-1"
+              ? "text-lg mb-2"
+              : "text-xl mb-3"
           }`}>{resumeData.personal.fullName || "Your Full Name"}</h2>
           <div className={`flex flex-wrap gap-2 text-zinc-600 text-[8px] ${
             selectedTemplate === "minimal" 
@@ -3527,10 +3527,10 @@ export default function DashboardPage() {
               }`}>
                 <h2 className={`font-bold text-black ${
                   selectedTemplate === "minimal"
-                    ? "text-2xl text-[#1F5C4A] mb-1 tracking-tight"
+                    ? "text-2xl text-[#1F5C4A] mb-3 tracking-tight"
                     : selectedTemplate === "technical"
-                    ? "text-lg mb-0.5"
-                    : "text-xl mb-1"
+                    ? "text-lg mb-2"
+                    : "text-xl mb-3"
                 }`}>{resumeData.personal.fullName || "Your Full Name"}</h2>
                 <div className={`flex flex-wrap gap-2 text-zinc-600 text-[8px] ${
                   selectedTemplate === "minimal" 

@@ -35,7 +35,7 @@ const stylesClassic = StyleSheet.create({
     fontFamily: "Helvetica-Bold",
     fontSize: 18,
     color: "#000000",
-    marginBottom: 3,
+    marginBottom: 8,
   },
   contactDetails: {
     flexDirection: "row",
@@ -130,7 +130,7 @@ const stylesMinimal = StyleSheet.create({
     fontSize: 20,
     letterSpacing: -0.5,
     color: "#1F5C4A", // Sleek modern cyan accent
-    marginBottom: 4,
+    marginBottom: 10,
   },
   contactDetails: {
     flexDirection: "row",
@@ -223,7 +223,7 @@ const stylesTechnical = StyleSheet.create({
     fontFamily: "Helvetica-Bold",
     fontSize: 16,
     color: "#000000",
-    marginBottom: 2,
+    marginBottom: 6,
   },
   contactDetails: {
     flexDirection: "row",
