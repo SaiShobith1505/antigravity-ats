@@ -858,6 +858,7 @@ export default function DashboardPage() {
           setIsPaid(true);
           setDownloadsRemaining(2);
           await setPaymentStatusPaid(resumeId);
+          setActiveTab("edit"); // Switch to builder tab to edit and download
         }
         setPaymentError("");
         setShowMockModal(false);
@@ -961,6 +962,7 @@ export default function DashboardPage() {
               setDownloadsRemaining(2);
               setPaymentStatusPaid(resumeId);
               setPaymentError("");
+              setActiveTab("edit"); // Switch to builder tab to edit and download
             } else {
               const errData = await verifyRes.json();
               setPaymentError(errData.error || "Cryptographic verification failed.");
@@ -1079,6 +1081,7 @@ export default function DashboardPage() {
               await updateUserProfile(user.uid, newProfile);
               setPaymentError("");
               alert("Congratulations! You are now upgraded to BOOSTCV Pro.");
+              setActiveTab("edit"); // Switch to builder tab to edit and download
             } else {
               const errData = await verifyRes.json();
               setPaymentError(errData.error || "Cryptographic verification failed.");
@@ -1409,6 +1412,44 @@ export default function DashboardPage() {
             ))}
             {(!parsedReport.metricEnhancements || parsedReport.metricEnhancements.length === 0) && (
               <p className="text-[10px] text-[#6B7280] italic font-semibold">Perfect! No urgent improvements required.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Action funnel */}
+        <div className="bg-white border border-stone-200 rounded-3xl p-6 text-center space-y-4 shadow-sm mt-6">
+          <div className="flex justify-between items-center border-b border-stone-200 pb-3">
+            <span className="text-[10px] font-black font-sans tracking-widest text-[#1C1C1C] uppercase">
+              Fix Your Gaps & Unlock Premium Export
+            </span>
+            <span className={`text-[8.5px] font-sans font-black px-2 py-0.5 rounded uppercase ${isPaid ? "bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A]" : "bg-stone-100 border border-stone-200 text-[#6B7280]"}`}>
+              {isPaid ? "🔓 Premium Unlocked" : "🔒 Free Preview Mode"}
+            </span>
+          </div>
+          
+          <p className="text-xs text-[#6B7280] max-w-lg mx-auto leading-relaxed font-semibold">
+            {isPaid 
+              ? "You have active export sessions! Go to the Resume Builder to edit your details, optimize matching keywords, and download your recruiter-ready PDF."
+              : "Unlock access to edit this resume in our interactive builder, apply professional placement templates, optimize matching keywords, and download your selectable PDF."}
+          </p>
+
+          <div className="pt-2 flex justify-center">
+            {isPaid ? (
+              <button
+                onClick={() => setActiveTab("edit")}
+                className="px-6 py-3 text-xs font-black rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white active:scale-98 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
+              >
+                <ArrowRight className="h-4 w-4 text-white" />
+                <span>Go to Resume Builder</span>
+              </button>
+            ) : (
+              <button
+                onClick={triggerRazorpayCheckout}
+                className="px-6 py-3 text-xs font-black rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white active:scale-98 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
+              >
+                <Lock className="h-4 w-4 text-white" />
+                <span>Unlock & Edit in Builder ({formatPrice(LOCALIZED_PRICING[selectedCurrency]?.exportPrice || 99, selectedCurrency)})</span>
+              </button>
             )}
           </div>
         </div>
@@ -1762,6 +1803,44 @@ export default function DashboardPage() {
                   </div>
                 )}
               </ul>
+            </div>
+          </div>
+          
+          {/* Action funnel to resume builder & lock status */}
+          <div className="bg-white border border-stone-200 rounded-3xl p-6 text-center space-y-4 shadow-sm mt-6">
+            <div className="flex justify-between items-center border-b border-stone-200 pb-3">
+              <span className="text-[10px] font-black font-sans tracking-widest text-[#1C1C1C] uppercase">
+                Fix Your Gaps & Unlock Premium Export
+              </span>
+              <span className={`text-[8.5px] font-sans font-black px-2 py-0.5 rounded uppercase ${isPaid ? "bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A]" : "bg-stone-100 border border-stone-200 text-[#6B7280]"}`}>
+                {isPaid ? "🔓 Premium Unlocked" : "🔒 Free Preview Mode"}
+              </span>
+            </div>
+            
+            <p className="text-xs text-[#6B7280] max-w-lg mx-auto leading-relaxed font-semibold">
+              {isPaid 
+                ? "You have active export sessions! Go to the Resume Builder to edit your details, optimize matching keywords, and download your recruiter-ready PDF."
+                : "Unlock access to edit this resume in our interactive builder, apply professional placement templates, optimize matching keywords, and download your selectable PDF."}
+            </p>
+
+            <div className="pt-2 flex justify-center">
+              {isPaid ? (
+                <button
+                  onClick={() => setActiveTab("edit")}
+                  className="px-6 py-3 text-xs font-black rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white active:scale-98 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
+                >
+                  <ArrowRight className="h-4 w-4 text-white" />
+                  <span>Go to Resume Builder</span>
+                </button>
+              ) : (
+                <button
+                  onClick={triggerRazorpayCheckout}
+                  className="px-6 py-3 text-xs font-black rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white active:scale-98 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
+                >
+                  <Lock className="h-4 w-4 text-white" />
+                  <span>Unlock & Edit in Builder ({formatPrice(LOCALIZED_PRICING[selectedCurrency]?.exportPrice || 99, selectedCurrency)})</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
