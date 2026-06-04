@@ -80,33 +80,21 @@ export const AuthProvider: React.FC<{
   }, []);
 
   const signInWithGoogle = async () => {
-    try {
-      if (auth) {
-        const provider = new GoogleAuthProvider();
-        const res = await signInWithPopup(auth, provider);
-        if (res.user) {
-          const userObj = {
-            uid: res.user.uid,
-            email: res.user.email,
-            displayName: res.user.displayName || "Google Candidate",
-            photoURL: res.user.photoURL,
-          };
-          setUser(userObj);
-          localStorage.setItem("cv_boost_user", JSON.stringify(userObj));
-        }
-      } else {
-        throw new Error("Firebase auth not configured");
+    if (auth) {
+      const provider = new GoogleAuthProvider();
+      const res = await signInWithPopup(auth, provider);
+      if (res.user) {
+        const userObj = {
+          uid: res.user.uid,
+          email: res.user.email,
+          displayName: res.user.displayName || "Google Candidate",
+          photoURL: res.user.photoURL,
+        };
+        setUser(userObj);
+        localStorage.setItem("cv_boost_user", JSON.stringify(userObj));
       }
-    } catch (error) {
-      console.warn("Google Sign-In failed, logging in as mock Google Candidate:", error);
-      const mockUser = {
-        uid: "mock-google-uid-123",
-        email: "student.mock@college.edu",
-        displayName: "Amit Sharma (Google)",
-        photoURL: null,
-      };
-      setUser(mockUser);
-      localStorage.setItem("cv_boost_user", JSON.stringify(mockUser));
+    } else {
+      throw new Error("Google Sign-In failed. Firebase auth is not configured.");
     }
   };
 
@@ -124,21 +112,10 @@ export const AuthProvider: React.FC<{
     }
 
     // 2. Regular standard credentials workflow
-    try {
-      if (auth) {
-        await signInWithEmailAndPassword(auth, email, password || "password123");
-      } else {
-        throw new Error("Firebase auth service missing");
-      }
-    } catch (error) {
-      console.warn("Firebase credentials verification failed, running offline mock session:", error);
-      const mockStudent = {
-        uid: `mock-student-uid-${Math.floor(Math.random() * 1000)}`,
-        email: email || "student@college.edu",
-        displayName: email ? email.split("@")[0] : "B.Tech Candidate",
-      };
-      setUser(mockStudent);
-      localStorage.setItem("cv_boost_user", JSON.stringify(mockStudent));
+    if (auth) {
+      await signInWithEmailAndPassword(auth, email, password || "");
+    } else {
+      throw new Error("Authentication failed. Email and password verification requires active database configurations.");
     }
   };
 

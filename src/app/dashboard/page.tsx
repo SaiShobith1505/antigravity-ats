@@ -3465,20 +3465,35 @@ export default function DashboardPage() {
               <span className="text-[10px] font-black font-sans tracking-wider text-[#6B7280] uppercase">
                 Placement Template Compiler
               </span>
-              <div className="flex items-center space-x-1.5 p-0.5 bg-white border border-stone-200 rounded-lg">
-                {(["classic", "minimal", "technical"] as const).map((temp) => (
-                  <button
-                    key={temp}
-                    onClick={() => setSelectedTemplate(temp)}
-                    className={`px-2.5 py-1 text-[9px] font-bold font-sans tracking-wide rounded-md transition-all uppercase cursor-pointer ${
-                      selectedTemplate === temp
-                        ? "bg-[#1F5C4A] text-white shadow-sm font-black"
-                        : "text-[#6B7280] hover:text-[#1F5C4A]"
-                    }`}
-                  >
-                    {temp}
-                  </button>
-                ))}
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-1.5 p-0.5 bg-white border border-stone-200 rounded-lg">
+                  {(["classic", "minimal", "technical"] as const).map((temp) => (
+                    <button
+                      key={temp}
+                      onClick={() => setSelectedTemplate(temp)}
+                      className={`px-2.5 py-1 text-[9px] font-bold font-sans tracking-wide rounded-md transition-all uppercase cursor-pointer ${
+                        selectedTemplate === temp
+                          ? "bg-[#1F5C4A] text-white shadow-sm font-black"
+                          : "text-[#6B7280] hover:text-[#1F5C4A]"
+                      }`}
+                    >
+                      {temp}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Seperate Download button in admin access */}
+                {user && user.email === "admin@cvboost.co" && (
+                  <PDFDownloadButton 
+                    data={resumeData} 
+                    isPaid={true} 
+                    userEmail={user.email} 
+                    template={selectedTemplate} 
+                    resumeId={resumeId}
+                    onDownloadConsumed={() => {}}
+                    compact={true}
+                  />
+                )}
               </div>
             </div>
 

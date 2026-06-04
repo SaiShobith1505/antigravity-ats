@@ -13,6 +13,7 @@ interface PDFDownloadButtonProps {
   template?: "classic" | "minimal" | "technical";
   resumeId: string;
   onDownloadConsumed: (remaining: number) => void;
+  compact?: boolean;
 }
 
 export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ 
@@ -21,7 +22,8 @@ export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({
   userEmail, 
   template = "classic",
   resumeId,
-  onDownloadConsumed
+  onDownloadConsumed,
+  compact = false
 }) => {
   const isAdmin = userEmail === "admin@cvboost.co";
 
@@ -66,17 +68,21 @@ export const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({
           <button
             disabled={loading}
             onClick={handleDownloadClick}
-            className="px-6 py-3 text-xs font-black rounded-lg bg-[#1F5C4A] hover:bg-[#2F7A62] text-white active:scale-98 disabled:opacity-50 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
+            className={`${
+              compact 
+                ? "px-3 py-1.5 text-[9px] font-black space-x-1.5" 
+                : "px-6 py-3 text-xs font-black space-x-2"
+            } rounded-lg bg-[#1F5C4A] hover:bg-[#2F7A62] text-white active:scale-98 disabled:opacity-50 transition-all shadow-sm flex items-center cursor-pointer`}
           >
             {loading ? (
               <>
                 <span className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>Compiling PDF...</span>
+                <span>{compact ? "Compiling..." : "Compiling PDF..."}</span>
               </>
             ) : (
               <>
-                <Download className="h-4 w-4 text-white stroke-[2.5]" />
-                <span>Download Selectable PDF</span>
+                <Download className={`${compact ? "h-3.5 w-3.5" : "h-4 w-4"} text-white stroke-[2.5]`} />
+                <span>{compact ? "Download PDF" : "Download Selectable PDF"}</span>
               </>
             )}
           </button>
