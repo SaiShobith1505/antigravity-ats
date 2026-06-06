@@ -108,6 +108,11 @@ const stylesClassic = StyleSheet.create({
   },
   skillsText: {
     flex: 1,
+  },
+  summaryText: {
+    fontSize: 9,
+    color: "#222222",
+    marginBottom: 4,
   }
 });
 
@@ -202,6 +207,11 @@ const stylesMinimal = StyleSheet.create({
   },
   skillsText: {
     flex: 1,
+  },
+  summaryText: {
+    fontSize: 9,
+    color: "#333333",
+    marginBottom: 4,
   }
 });
 
@@ -296,6 +306,11 @@ const stylesTechnical = StyleSheet.create({
   },
   skillsText: {
     flex: 1,
+  },
+  summaryText: {
+    fontSize: 8.5,
+    color: "#222222",
+    marginBottom: 3,
   }
 });
 
@@ -343,6 +358,14 @@ export const ResumeTemplatePdf: React.FC<ResumeTemplatePdfProps> = ({ data, temp
             )}
           </View>
         </View>
+
+        {/* Summary Section */}
+        {personal.summary && (
+          <View wrap={false}>
+            <Text style={styles.sectionTitle}>Summary</Text>
+            <Text style={styles.summaryText}>{personal.summary}</Text>
+          </View>
+        )}
 
         {/* Education Section */}
         {education && education.length > 0 && (

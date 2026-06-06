@@ -17,16 +17,65 @@ import {
   Award
 } from "lucide-react";
 
+import { calculateLiveGaps, serializeResumeDataToText } from "@/lib/scoring-engine";
+
 interface ResumeFormProps {
   data: ResumeData;
   onChange: (newData: ResumeData) => void;
+  activeFixState?: any;
 }
 
-export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
-  const [activeTab, setActiveTab] = useState<"personal" | "education" | "experience" | "projects" | "skills" | "certifications">("personal");
+export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, activeFixState }) => {
+  const [activeTab, setActiveTab] = useState<"personal" | "summary" | "education" | "experience" | "projects" | "skills" | "certifications">("personal");
   const [aiLoadingIdx, setAiLoadingIdx] = useState<number | null>(null);
   const [aiMessyText, setAiMessyText] = useState("");
   const [activeAiBox, setActiveAiBox] = useState<number | null>(null);
+
+  const liveGaps = activeFixState ? calculateLiveGaps(data, activeFixState) : null;
+  const [aiSummaryLoading, setAiSummaryLoading] = useState(false);
+
+  const handleGenerateAiSummary = () => {
+    setAiSummaryLoading(true);
+    setTimeout(() => {
+      const langs = (data.skills.languages || []).slice(0, 3).join(", ");
+      const fws = (data.skills.frameworks || []).slice(0, 3).join(", ");
+      const proj = data.projects[0]?.title || "software development";
+      
+      const summaryText = `B.Tech Computer Science student specializing in engineering scalable applications with proficiency in ${langs || "modern programming languages"}. Experienced in leveraging ${fws || "web frameworks"} to build performant features, showcased by developing projects like ${proj}. Passionate about backend architecture and optimal system performance.`;
+      
+      onChange({
+        ...data,
+        personal: {
+          ...data.personal,
+          summary: summaryText
+        }
+      });
+      setAiSummaryLoading(false);
+    }, 400);
+  };
+
+  const handleXYZRewrite = (expIndex: number, bulletIdx: number, originalText: string) => {
+    let suggested = originalText;
+    const lower = originalText.toLowerCase();
+    if (lower.includes("database") || lower.includes("query") || lower.includes("sql")) {
+      suggested = "Optimized relational database queries, reducing response latency by 32% and supporting 10k+ concurrent requests.";
+    } else if (lower.includes("api") || lower.includes("backend") || lower.includes("server")) {
+      suggested = "Engineered high-throughput REST APIs handling 5M+ daily requests, improving throughput scaling by 25%.";
+    } else if (lower.includes("ui") || lower.includes("frontend") || lower.includes("react") || lower.includes("view")) {
+      suggested = "Redesigned 8 responsive views using React/Next.js, boosting user engagement sessions by 14%.";
+    } else if (lower.includes("cicd") || lower.includes("docker") || lower.includes("deploy") || lower.includes("aws")) {
+      suggested = "Configured robust CI/CD deployment pipelines, shortening software release cycles by 40%.";
+    } else {
+      suggested = originalText + " resulting in a 15% increase in operational efficiency.";
+    }
+    updateBullet(expIndex, bulletIdx, suggested);
+  };
+
+  const handleInjectKeyword = (keyword: string) => {
+    const toolsText = (data.skills.tools || []).join(", ");
+    const updated = toolsText ? `${toolsText}, ${keyword}` : keyword;
+    updateSkillsArray("tools", updated);
+  };
 
   const updatePersonal = (field: string, value: string) => {
     onChange({
@@ -186,6 +235,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
       <div className="flex border-b border-stone-200 bg-white p-2 overflow-x-auto space-x-1">
         {[
           { id: "personal", label: "Contact", icon: User },
+          { id: "summary", label: "Summary", icon: Sparkles },
           { id: "education", label: "Education", icon: GraduationCap },
           { id: "experience", label: "Experience", icon: Briefcase },
           { id: "projects", label: "Projects", icon: FolderGit2 },
@@ -193,11 +243,36 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
           { id: "certifications", label: "Certifications", icon: Award },
         ].map((tab) => {
           const Icon = tab.icon;
+          let decoration = null;
+          let glowClass = "";
+
+          if (liveGaps) {
+            if (tab.id === "summary" && liveGaps.missingSections.includes("summary")) {
+              glowClass = "ring-2 ring-amber-500/50 animate-pulse border-amber-500 bg-amber-50";
+              decoration = <span className="h-2 w-2 rounded-full bg-amber-500 ml-1" />;
+            } else if (tab.id === "experience" && liveGaps.unquantifiedBullets.length > 0) {
+              glowClass = "border-red-500 bg-red-50/10";
+              decoration = (
+                <span className="ml-1 px-1.5 py-0.25 text-[8px] bg-red-100 text-red-700 font-extrabold rounded-full">
+                  ⚠️ {liveGaps.unquantifiedBullets.length}
+                </span>
+              );
+            } else if (tab.id === "skills" && liveGaps.missingKeywords.length > 0) {
+              decoration = (
+                <span className="ml-1 px-1.5 py-0.25 text-[8px] bg-amber-100 text-amber-700 font-extrabold rounded-full">
+                  {liveGaps.missingKeywords.length}
+                </span>
+              );
+            } else if (tab.id === "certifications" && liveGaps.missingSections.includes("certifications")) {
+              decoration = <span className="ml-1 text-[8px] text-amber-500 font-extrabold">⚠️</span>;
+            }
+          }
+
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg text-xs font-bold tracking-wider uppercase transition-all whitespace-nowrap ${
+              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg text-xs font-bold tracking-wider uppercase transition-all whitespace-nowrap relative ${glowClass} ${
                 activeTab === tab.id
                   ? "bg-[#1F5C4A] text-white shadow-sm border border-[#1F5C4A]"
                   : "text-[#6B7280] hover:text-[#1C1C1C]"
@@ -205,6 +280,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
             >
               <Icon className="h-4 w-4" />
               <span>{tab.label}</span>
+              {decoration}
             </button>
           );
         })}
@@ -279,6 +355,49 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#1F5C4A] text-[#1C1C1C] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
                 />
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* PROFESSIONAL SUMMARY FORM */}
+        {activeTab === "summary" && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center bg-stone-50 border border-stone-200 rounded-xl p-4">
+              <div>
+                <h3 className="text-xs font-black text-[#1F5C4A] uppercase tracking-wider font-sans">
+                  Professional Summary Draft
+                </h3>
+                <p className="text-[10px] text-[#6B7280] font-bold">
+                  Write a 2-3 line target profile summarizing your stack and major strengths.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleGenerateAiSummary}
+                disabled={aiSummaryLoading}
+                className="py-1.5 px-3.5 rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white transition-all font-bold text-xs flex items-center space-x-1.5 cursor-pointer disabled:opacity-50 shadow-sm"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>{aiSummaryLoading ? "Drafting..." : "AI Draft"}</span>
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-xs font-extrabold uppercase tracking-widest text-[#6B7280] mb-1.5">
+                Summary Text
+              </label>
+              <textarea
+                value={data.personal.summary || ""}
+                onChange={(e) => onChange({
+                  ...data,
+                  personal: {
+                    ...data.personal,
+                    summary: e.target.value
+                  }
+                })}
+                placeholder="E.g., B.Tech Computer Science student specializing in backend architecture, system design, and building scalable Node.js microservices."
+                className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#1F5C4A] text-[#1C1C1C] placeholder-[#9CA3AF] rounded-lg p-3 w-full h-32 text-sm outline-none transition-all resize-none font-sans leading-relaxed"
+              />
             </div>
           </div>
         )}
@@ -437,6 +556,16 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                             placeholder="Developed backend routing features to support client data."
                             className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#1F5C4A] text-[#1C1C1C] placeholder-stone-400 rounded-lg p-2.5 flex-1 text-sm outline-none transition-all"
                           />
+                          {warnNumber && bullet.trim().length > 10 && (
+                            <button
+                              type="button"
+                              onClick={() => handleXYZRewrite(idx, bIdx, bullet)}
+                              title="Auto-quantify using Google XYZ formula"
+                              className="text-amber-500 hover:text-amber-600 p-1.5 rounded hover:bg-amber-50 cursor-pointer"
+                            >
+                              <Lightbulb className="h-4 w-4" />
+                            </button>
+                          )}
                           <button
                             onClick={() => removeBullet(idx, bIdx)}
                             className="text-[#6B7280] hover:text-[#C0392B] p-1.5"
@@ -640,6 +769,26 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                 className="bg-stone-50 border border-stone-200 focus:border-stone-200 focus:ring-1 focus:ring-[#1F5C4A] text-[#1C1C1C] placeholder-stone-400 rounded-lg p-3 w-full text-sm outline-none transition-all"
               />
             </div>
+
+            {liveGaps && liveGaps.missingKeywords.length > 0 && (
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
+                <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">
+                  Suggest to Inject (Click to add to tools):
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {liveGaps.missingKeywords.map((kw: string, idx: number) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleInjectKeyword(kw)}
+                      className="px-2.5 py-1 text-[9px] font-sans font-extrabold rounded-md bg-white border border-amber-300 text-amber-800 hover:bg-amber-100 transition-all cursor-pointer shadow-sm"
+                    >
+                      + {kw}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -695,6 +844,110 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
         )}
 
       </div>
+
+      {/* Fix Completion Center Panel */}
+      {liveGaps && (
+        <div className="border-t border-stone-200 bg-stone-50 p-4 space-y-3 flex-shrink-0 text-left">
+          <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[#1C1C1C]">
+            <span>Fix Completion Center</span>
+            <span className="text-[#1F5C4A]">
+              Optimization: {Math.round(
+                (( ( (activeFixState.gaps.missingSections || []).length + 
+                     (activeFixState.gaps.missingKeywords || []).length + 
+                     (activeFixState.gaps.unquantifiedBullets || []).length + 
+                     (activeFixState.gaps.formattingErrors || []).length ) - 
+                   ( liveGaps.missingSections.length + 
+                     liveGaps.missingKeywords.length + 
+                     liveGaps.unquantifiedBullets.length + 
+                     liveGaps.formattingErrors.length ) ) / 
+                 Math.max(1, (activeFixState.gaps.missingSections || []).length + 
+                            (activeFixState.gaps.missingKeywords || []).length + 
+                            (activeFixState.gaps.unquantifiedBullets || []).length + 
+                            (activeFixState.gaps.formattingErrors || []).length)) * 100
+              )}%
+            </span>
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-full bg-stone-200 h-2 rounded-full overflow-hidden">
+            <div 
+              className="bg-[#1F5C4A] h-full transition-all duration-500" 
+              style={{
+                width: `${Math.max(0, Math.min(100, Math.round(
+                  (( ( (activeFixState.gaps.missingSections || []).length + 
+                       (activeFixState.gaps.missingKeywords || []).length + 
+                       (activeFixState.gaps.unquantifiedBullets || []).length + 
+                       (activeFixState.gaps.formattingErrors || []).length ) - 
+                     ( liveGaps.missingSections.length + 
+                       liveGaps.missingKeywords.length + 
+                       liveGaps.unquantifiedBullets.length + 
+                       liveGaps.formattingErrors.length ) ) / 
+                   Math.max(1, (activeFixState.gaps.missingSections || []).length + 
+                              (activeFixState.gaps.missingKeywords || []).length + 
+                              (activeFixState.gaps.unquantifiedBullets || []).length + 
+                              (activeFixState.gaps.formattingErrors || []).length)) * 100
+                )))}%`
+              }}
+            />
+          </div>
+
+          {/* Checklist list */}
+          <div className="max-h-24 overflow-y-auto space-y-1.5 pr-1 text-[9px] font-bold text-[#6B7280]">
+            {/* Missing Sections Checklist */}
+            {(activeFixState.gaps.missingSections || []).map((sec: string) => {
+              const isDone = !liveGaps.missingSections.includes(sec);
+              return (
+                <div key={`sec-${sec}`} className="flex items-center space-x-2">
+                  <input type="checkbox" checked={isDone} readOnly className="rounded text-[#1F5C4A] focus:ring-0 pointer-events-none" />
+                  <span className={isDone ? "line-through text-stone-400 font-medium" : "text-[#1C1C1C] font-semibold"}>
+                    Add {sec === "personal" ? "Contact Details" : sec.charAt(0).toUpperCase() + sec.slice(1)} Section
+                  </span>
+                </div>
+              );
+            })}
+
+            {/* Missing Keywords Checklist */}
+            {(activeFixState.gaps.missingKeywords || []).map((kw: string) => {
+              const isDone = !liveGaps.missingKeywords.includes(kw);
+              return (
+                <div key={`kw-${kw}`} className="flex items-center space-x-2">
+                  <input type="checkbox" checked={isDone} readOnly className="rounded text-[#1F5C4A] focus:ring-0 pointer-events-none" />
+                  <span className={isDone ? "line-through text-stone-400 font-medium" : "text-[#1C1C1C] font-semibold"}>
+                    Inject Keyword tag: {kw}
+                  </span>
+                </div>
+              );
+            })}
+
+            {/* Unquantified Bullets Checklist */}
+            {(activeFixState.gaps.unquantifiedBullets || []).map((b: any, idx: number) => {
+              const isStillUnquantified = liveGaps.unquantifiedBullets.some((ub: any) => ub.expIdx === b.expIdx && ub.bulletIdx === b.bulletIdx);
+              const isDone = !isStillUnquantified;
+              return (
+                <div key={`bullet-${idx}`} className="flex items-center space-x-2">
+                  <input type="checkbox" checked={isDone} readOnly className="rounded text-[#1F5C4A] focus:ring-0 pointer-events-none" />
+                  <span className={isDone ? "line-through text-stone-400 font-medium" : "text-[#1C1C1C] font-semibold"}>
+                    Quantify role #{b.expIdx + 1} achievement bullet #{b.bulletIdx + 1}
+                  </span>
+                </div>
+              );
+            })}
+
+            {/* Formatting errors Checklist */}
+            {(activeFixState.gaps.formattingErrors || []).map((err: string) => {
+              const isDone = !liveGaps.formattingErrors.includes(err);
+              return (
+                <div key={`err-${err}`} className="flex items-center space-x-2">
+                  <input type="checkbox" checked={isDone} readOnly className="rounded text-[#1F5C4A] focus:ring-0 pointer-events-none" />
+                  <span className={isDone ? "line-through text-stone-400 font-medium" : "text-[#1C1C1C] font-semibold"}>
+                    Fix formatting violation: {err === "emoji_usage" ? "Remove emojis" : "Remove graphics stars"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

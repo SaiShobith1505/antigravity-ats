@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import crypto from "crypto";
+import { calculateAtsScore, serializeResumeDataToText } from "@/lib/scoring-engine";
 
 const aiApiKey = process.env.GEMINI_API_KEY;
 const ai = aiApiKey ? new GoogleGenAI({ apiKey: aiApiKey }) : null;
@@ -110,6 +111,12 @@ Resume Text:
         if (resultText) {
           const parsed = JSON.parse(resultText);
           if (parsed && parsed.parsedResume && typeof parsed.atsScore === "number") {
+            const scoreResult = calculateAtsScore(serializeResumeDataToText(parsed.parsedResume), filename);
+            parsed.atsScore = scoreResult.atsScore;
+            parsed.warnings = scoreResult.warnings;
+            parsed.breakdown = scoreResult.breakdown;
+            parsed.keywordGaps = scoreResult.keywordGaps;
+            parsed.metricEnhancements = scoreResult.metricEnhancements;
             return NextResponse.json(parsed);
           }
         }
@@ -578,36 +585,15 @@ Resume Text:
         bulletQualityScore = 30;
       }
     }
-    const achievementsScore = Math.min(100, actionVerbScore + quantificationScore + bulletQualityScore);
-
-    // Derive final score
-    const derivedScore = Math.round(
-      structureScore * 0.20 +
-      formattingScore * 0.20 +
-      readabilityScore * 0.15 +
-      keywordsScore * 0.15 +
-      projectsScore * 0.15 +
-      achievementsScore * 0.15
-    );
-
-    const atsScore = Math.min(99, Math.max(35, derivedScore));
-
-    const breakdown = {
-      structure: Math.max(10, structureScore),
-      formatting: Math.max(10, formattingScore),
-      readability: Math.max(10, readabilityScore),
-      keywords: Math.max(10, keywordsScore),
-      projects: Math.max(10, projectsScore),
-      achievements: Math.max(10, achievementsScore)
-    };
+    const scoreResult = calculateAtsScore(serializeResumeDataToText(parsedResume), filename);
 
     return NextResponse.json({
       parsedResume,
-      atsScore,
-      warnings: warnings.length > 0 ? warnings : ["Your resume matches standard recruiter formatting guidelines beautifully. Good structure."],
-      keywordGaps: keywordGaps.length > 0 ? keywordGaps.slice(0, 6) : ["TypeScript", "Docker", "AWS"],
-      metricEnhancements: metricEnhancements.length > 0 ? metricEnhancements.slice(0, 3) : ["Optimize project metrics using the XYZ formula (e.g. Accomplished X, as measured by Y, by doing Z)."],
-      breakdown
+      atsScore: scoreResult.atsScore,
+      warnings: scoreResult.warnings,
+      keywordGaps: scoreResult.keywordGaps,
+      metricEnhancements: scoreResult.metricEnhancements,
+      breakdown: scoreResult.breakdown
     });
 
   } catch (err: any) {

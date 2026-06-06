@@ -14,8 +14,10 @@ import {
   setPaymentStatusPaid,
   getUserProfile,
   updateUserProfile,
-  getDefaultResumeData
+  getDefaultResumeData,
+  saveScoreAudit
 } from "@/lib/db";
+import { calculateAtsScore, calculateLiveGaps, serializeResumeDataToText } from "@/lib/scoring-engine";
 import { 
   detectUserCountryAndCurrency, 
   LOCALIZED_PRICING, 
@@ -80,6 +82,7 @@ export default function DashboardPage() {
   const [checkerScanning, setCheckerScanning] = useState(false);
   const [checkerProgress, setCheckerProgress] = useState(0);
   const [checkerReport, setCheckerReport] = useState<any | null>(null);
+  const [activeFixState, setActiveFixState] = useState<any | null>(null);
 
   // Referral Viral growth states
   const [referralCount, setReferralCount] = useState(0);
@@ -563,6 +566,13 @@ export default function DashboardPage() {
         } else {
           setResumeData(regionalDefault);
         }
+
+        const storedFixState = localStorage.getItem("cv_boost_active_fix_state");
+        if (storedFixState) {
+          try {
+            setActiveFixState(JSON.parse(storedFixState));
+          } catch (_) {}
+        }
         if (user.email === "admin@cvboost.co") {
           setIsPaid(true);
           setDownloadsRemaining(999);
@@ -642,155 +652,29 @@ export default function DashboardPage() {
 
   // Real-time content-quality heuristic scoring analyzer
   const calculateHeuristicAtsScore = (data: typeof defaultResumeData) => {
-    // 1. Structure Check (20% of final score)
-    let structureScore = 0;
-    if (data.education && data.education.length > 0) structureScore += 20;
-    if (data.experience && data.experience.length > 0) structureScore += 20;
-    if (data.projects && data.projects.length > 0) structureScore += 20;
-    if (data.skills && (data.skills.languages.length > 0 || data.skills.frameworks.length > 0 || data.skills.tools.length > 0)) structureScore += 20;
-    if (data.certifications && data.certifications.length > 0) structureScore += 20;
-    structureScore = Math.max(10, structureScore);
+    const serializedText = serializeResumeDataToText(data);
+    const result = calculateAtsScore(serializedText, "resume.pdf", jobDescription);
 
-    // 2. Formatting Check (20% of final score)
-    // BOOSTCV baseline template is pristine (100%). Deducts points only if emojis or graphics are manually introduced in text.
-    let formattingScore = 100;
-    const allText = JSON.stringify(data);
-    const emojiRegex = /[\u{1F300}-\u{1F9FF}]/gu;
-    if (emojiRegex.test(allText)) {
-      formattingScore -= 20;
-    }
-    if (allText.includes("★") || allText.includes("●") || allText.includes("■") || allText.includes("◆")) {
-      formattingScore -= 20;
-    }
-    formattingScore = Math.max(10, formattingScore);
-
-    // 3. Readability Check (15% of final score)
-    let readabilityScore = 40; // baseline for pre-optimized BOOSTCV layout flow
-    let contactPoints = 0;
-    if (data.personal.email) contactPoints += 15;
-    if (data.personal.phone) contactPoints += 15;
-    if (data.personal.linkedin) contactPoints += 15;
-    if (data.personal.github) contactPoints += 15;
-    readabilityScore += contactPoints;
-    readabilityScore += 20; // flow sorted standard
-    readabilityScore = Math.min(100, Math.max(10, readabilityScore));
-
-    // 4. Skills Check (15% of final score)
-    const standardSkills = ["react", "next.js", "nodejs", "typescript", "docker", "git", "sql", "nosql", "aws", "gcp", "rest api"];
-    let matchedSkills = 0;
-    const lowerAllText = allText.toLowerCase();
-    standardSkills.forEach(kw => {
-      if (lowerAllText.includes(kw)) matchedSkills++;
-    });
-    const matchRatio = matchedSkills / standardSkills.length;
-    let baseSkillsScore = Math.round(matchRatio * 100);
-
-    // Buzzword penalty
-    const buzzwords = ["synergy", "dynamic", "motivated", "detail-oriented", "results-driven", "innovative", "passionate", "team-player"];
-    let buzzwordPenalties = 0;
-    buzzwords.forEach(word => {
-      const occurrences = (lowerAllText.match(new RegExp(`\\b${word}\\b`, "g")) || []).length;
-      if (occurrences > 2) {
-        buzzwordPenalties += 5;
+    // SCORE_AUDIT_MODE discrepancy comparisons
+    const SCORE_AUDIT_MODE = true;
+    if (SCORE_AUDIT_MODE && activeFixState) {
+      const scannerScore = activeFixState.scoreBefore;
+      const builderScore = result.atsScore;
+      const variance = builderScore - scannerScore;
+      if (Math.abs(variance) > 3) {
+        saveScoreAudit({
+          resumeId,
+          builderScore,
+          scannerScore,
+          variance,
+          builderBreakdown: result.breakdown,
+          scannerBreakdown: checkerReport?.breakdown || {},
+          details: `Builder vs Scanner mismatch found. Variance: ${variance}`
+        });
       }
-    });
-    const skillsScore = Math.max(10, baseSkillsScore - buzzwordPenalties);
-
-    // 5. Projects Depth Check (15% of final score)
-    let projectsScore = 10;
-    let projectCountScore = 0;
-    if (data.projects.length >= 3) projectCountScore = 80;
-    else if (data.projects.length === 2) projectCountScore = 65;
-    else if (data.projects.length === 1) projectCountScore = 50;
-
-    let projectLinksBonus = 0;
-    data.projects.forEach(p => {
-      if (p.techStack && (p.techStack.toLowerCase().includes("github") || p.techStack.toLowerCase().includes("http") || p.techStack.toLowerCase().includes("www"))) {
-        projectLinksBonus = 10;
-      }
-      if (p.description && (p.description.toLowerCase().includes("github") || p.description.toLowerCase().includes("http") || p.description.toLowerCase().includes("www"))) {
-        projectLinksBonus = 10;
-      }
-    });
-
-    let descriptionsBonus = 0;
-    let totalDescLength = 0;
-    data.projects.forEach(p => {
-      totalDescLength += (p.description || "").length;
-    });
-    if (data.projects.length > 0 && (totalDescLength / data.projects.length) > 50) {
-      descriptionsBonus = 10;
     }
-    projectsScore = Math.min(100, projectCountScore + projectLinksBonus + descriptionsBonus);
 
-    // 6. Achievements Check (15% of final score)
-    const actionVerbs = [
-      "spearheaded", "led", "developed", "optimized", "designed", "built", "implemented",
-      "increased", "reduced", "managed", "created", "executed", "formulated", "engineered",
-      "boosted", "drove", "improved", "scaled", "automated", "streamlined", "accelerated",
-      "pioneered", "coordinated", "launched", "established", "architected", "analyzed"
-    ];
-    let actionVerbScore = 5;
-    let foundVerbs = 0;
-    actionVerbs.forEach(v => {
-      if (lowerAllText.includes(v)) foundVerbs++;
-    });
-    if (foundVerbs >= 4) actionVerbScore = 30;
-    else if (foundVerbs >= 2) actionVerbScore = 15;
-
-    // Quantification (Google XYZ metrics)
-    let quantificationScore = 5;
-    let totalBullets = 0;
-    let quantifiedBullets = 0;
-    data.experience.forEach(exp => {
-      exp.bullets.forEach(bullet => {
-        totalBullets++;
-        if (/\d+%?|\b(percent|CGPA|CGPA\b|INR|USD|GB|MB|ms)\b/.test(bullet)) {
-          quantifiedBullets++;
-        }
-      });
-    });
-    const bulletMetricsRatio = totalBullets > 0 ? quantifiedBullets / totalBullets : 0;
-    if (bulletMetricsRatio >= 0.35) quantificationScore = 40;
-    else if (bulletMetricsRatio >= 0.15) quantificationScore = 20;
-
-    let bulletQualityScore = 15;
-    let totalBulletLength = 0;
-    let bulletCount = 0;
-    data.experience.forEach(exp => {
-      exp.bullets.forEach(b => {
-        totalBulletLength += b.length;
-        bulletCount++;
-      });
-    });
-    if (bulletCount > 0) {
-      const avgLen = totalBulletLength / bulletCount;
-      if (avgLen >= 40 && avgLen <= 150) bulletQualityScore = 30;
-    }
-    const achievementsScore = Math.min(100, actionVerbScore + quantificationScore + bulletQualityScore);
-
-    // Derive the final Resume Health based on 6 weights
-    const derivedScore = Math.round(
-      structureScore * 0.20 +
-      formattingScore * 0.20 +
-      readabilityScore * 0.15 +
-      skillsScore * 0.15 +
-      projectsScore * 0.15 +
-      achievementsScore * 0.15
-    );
-
-    const score = Math.min(99, Math.max(35, derivedScore));
-
-    const breakdown = {
-      structure: Math.max(10, structureScore),
-      formatting: Math.max(10, formattingScore),
-      readability: Math.max(10, readabilityScore),
-      keywords: Math.max(10, skillsScore),
-      projects: Math.max(10, projectsScore),
-      achievements: Math.max(10, achievementsScore)
-    };
-
-    return { score, breakdown };
+    return { score: result.atsScore, breakdown: result.breakdown };
   };
 
   // Sync state modifications in form
@@ -812,6 +696,56 @@ export default function DashboardPage() {
     if (user) {
       saveResume(user.uid, resumeId, newData, newScore, tailorApplied, updatedReport, analysisHistory, companyHistory);
     }
+  };
+
+  const handleFixIssuesInBuilder = () => {
+    if (!checkerReport) return;
+    const analysisId = `scan_${Date.now()}`;
+    
+    const missingSections: string[] = [];
+    if (!resumeData.personal.summary) missingSections.push("summary");
+    if (!resumeData.education || resumeData.education.length === 0) missingSections.push("education");
+    if (!resumeData.experience || resumeData.experience.length === 0) missingSections.push("experience");
+    if (!resumeData.projects || resumeData.projects.length === 0) missingSections.push("projects");
+    if (!resumeData.skills || ((resumeData.skills.languages || []).length === 0 && (resumeData.skills.frameworks || []).length === 0 && (resumeData.skills.tools || []).length === 0)) missingSections.push("skills");
+    if (!resumeData.certifications || resumeData.certifications.length === 0) missingSections.push("certifications");
+
+    const unquantifiedBullets: Array<{ expIdx: number; bulletIdx: number; text: string }> = [];
+    if (resumeData.experience) {
+      resumeData.experience.forEach((exp, expIdx) => {
+        if (exp.bullets) {
+          exp.bullets.forEach((bullet, bulletIdx) => {
+            if (!/\d+%?|\b(percent|CGPA|CGPA\b|INR|USD|GB|MB|ms)\b/.test(bullet)) {
+              unquantifiedBullets.push({ expIdx, bulletIdx, text: bullet });
+            }
+          });
+        }
+      });
+    }
+
+    const formattingErrors: string[] = [];
+    const allText = JSON.stringify(resumeData);
+    const emojiRegex = /[\u{1F300}-\u{1F9FF}]/gu;
+    if (emojiRegex.test(allText)) formattingErrors.push("emoji_usage");
+    if (allText.includes("★") || allText.includes("●") || allText.includes("■") || allText.includes("◆")) {
+      formattingErrors.push("graphics_stars");
+    }
+
+    const fixState = {
+      analysis_id: analysisId,
+      scoreBefore: checkerReport.atsScore || atsScore,
+      completedFixes: [],
+      gaps: {
+        missingSections,
+        missingKeywords: checkerReport.keywordGaps || [],
+        unquantifiedBullets,
+        formattingErrors
+      }
+    };
+
+    localStorage.setItem("cv_boost_active_fix_state", JSON.stringify(fixState));
+    setActiveFixState(fixState);
+    setActiveTab("edit");
   };
 
   // Simulated Payment Sandbox Handlers
@@ -1436,11 +1370,11 @@ export default function DashboardPage() {
           <div className="pt-2 flex justify-center">
             {isPaid ? (
               <button
-                onClick={() => setActiveTab("edit")}
+                onClick={handleFixIssuesInBuilder}
                 className="px-6 py-3 text-xs font-black rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white active:scale-98 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
               >
                 <ArrowRight className="h-4 w-4 text-white" />
-                <span>Go to Resume Builder</span>
+                <span>Fix Issues In Builder</span>
               </button>
             ) : (
               <button
@@ -1826,11 +1760,11 @@ export default function DashboardPage() {
             <div className="pt-2 flex justify-center">
               {isPaid ? (
                 <button
-                  onClick={() => setActiveTab("edit")}
+                  onClick={handleFixIssuesInBuilder}
                   className="px-6 py-3 text-xs font-black rounded-lg bg-[#1F5C4A] hover:bg-[#18483A] text-white active:scale-98 transition-all shadow-sm flex items-center space-x-2 cursor-pointer"
                 >
                   <ArrowRight className="h-4 w-4 text-white" />
-                  <span>Go to Resume Builder</span>
+                  <span>Fix Issues In Builder</span>
                 </button>
               ) : (
                 <button
@@ -3437,7 +3371,7 @@ export default function DashboardPage() {
 
             {/* Tab conditional panels rendering */}
             {activeTab === "edit" && (
-              <ResumeForm data={resumeData} onChange={handleFormChange} />
+              <ResumeForm data={resumeData} onChange={handleFormChange} activeFixState={activeFixState} />
             )}
 
             {activeTab === "ats" && renderAtsDeepScanWorkspace()}
@@ -3546,6 +3480,22 @@ export default function DashboardPage() {
                   {resumeData.personal.github && <span>{resumeData.personal.github}</span>}
                 </div>
               </div>
+
+              {/* Summary Section */}
+              {resumeData.personal.summary && (
+                <div className="mb-4 text-left">
+                  <h3 className={`font-bold uppercase pb-0.5 text-[9px] tracking-wide ${
+                    selectedTemplate === "minimal"
+                      ? "text-[#1F5C4A] border-none mb-1 mt-2"
+                      : "text-black border-b border-stone-200 mb-1.5"
+                  }`}>
+                    Summary
+                  </h3>
+                  <p className="text-[8.5px] text-stone-700 leading-relaxed font-medium">
+                    {resumeData.personal.summary}
+                  </p>
+                </div>
+              )}
 
               {/* Education - Unprotected / Crisp and visible */}
               {resumeData.education.length > 0 && (

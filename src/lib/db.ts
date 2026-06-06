@@ -18,6 +18,7 @@ export interface ResumeData {
     phone: string;
     linkedin: string;
     github: string;
+    summary?: string;
   };
 
   education: Array<{
@@ -365,6 +366,7 @@ export const defaultResumeData: ResumeData = {
     phone: "+91 98765 43210",
     linkedin: "linkedin.com/in/amit-sharma-btech",
     github: "github.com/amitsharma-dev",
+    summary: "B.Tech Computer Science student at DTU. Specialized in backend engineering, system optimization, and building high-performance Node.js microservices.",
   },
 
   education: [
@@ -439,6 +441,7 @@ export const usDefaultResumeData: ResumeData = {
     phone: "+1 (555) 019-2834",
     linkedin: "linkedin.com/in/alex-morgan-gatech",
     github: "github.com/alexmorgan-dev",
+    summary: "Computer Science student at Georgia Tech with software engineering experience. Skilled in AWS serverless architectures, Java backend systems, and containerized microservices.",
   },
   education: [
     {
@@ -486,6 +489,7 @@ export const ukDefaultResumeData: ResumeData = {
     phone: "+44 7911 123456",
     linkedin: "linkedin.com/in/james-smith-imperial",
     github: "github.com/jsmith-dev",
+    summary: "Computing undergraduate at Imperial College London. Focused on distributed systems, concurrent programming in Rust and C++, and performant API development.",
   },
   education: [
     {
@@ -533,6 +537,7 @@ export const caDefaultResumeData: ResumeData = {
     phone: "+1 (226) 555-0149",
     linkedin: "linkedin.com/in/emily-chen-waterloo",
     github: "github.com/emilychen-dev",
+    summary: "Waterloo Software Engineering student. Experienced in Go API gateways, Redis rate-limiting, and developing containerized Kubernetes cloud environments.",
   },
   education: [
     {
@@ -753,5 +758,32 @@ export async function trackPurchaseAnalytics(
     console.log(`[ANALYTICS] Purchase successfully logged: ${analyticsId} for user ${userId} in ${country}.`);
   } catch (err) {
     console.warn("[ANALYTICS] Firestore analytics logging failed:", err);
+  }
+}
+
+export interface ScoreAudit {
+  id: string;
+  timestamp: any;
+  resumeId: string;
+  builderScore: number;
+  scannerScore: number;
+  variance: number;
+  builderBreakdown: any;
+  scannerBreakdown: any;
+  details: string;
+}
+
+export async function saveScoreAudit(audit: Omit<ScoreAudit, "id" | "timestamp">): Promise<void> {
+  try {
+    const auditId = `audit_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const auditRef = doc(db, "score_audits", auditId);
+    await setDoc(auditRef, {
+      ...audit,
+      id: auditId,
+      timestamp: serverTimestamp()
+    });
+    console.log(`[SCORE_AUDIT] Logged discrepancy: ${auditId} | builder=${audit.builderScore} scanner=${audit.scannerScore} var=${audit.variance}`);
+  } catch (err) {
+    console.warn("[SCORE_AUDIT] Failed to save audit log:", err);
   }
 }
