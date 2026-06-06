@@ -8,6 +8,7 @@ import {
   FileText,
   AlertCircle,
   CheckCircle2,
+  Check,
   Sparkles,
   ArrowRight,
   ShieldCheck,
@@ -22,6 +23,7 @@ import {
   HelpCircle
 } from "lucide-react";
 import Link from "next/link";
+import { PROFILE_KEYWORDS } from "@/lib/scoring-engine";
 
 export default function AdminPage() {
   const { user, signInWithEmail, signOut, loading: authLoading } = useAuth();
