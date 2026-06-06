@@ -3,6 +3,8 @@ import { GoogleGenAI } from "@google/genai";
 // @ts-ignore
 import mammoth from "mammoth";
 import { calculateAtsScore } from "@/lib/scoring-engine";
+import fs from "fs";
+
 
 export const dynamic = "force-dynamic";
 
@@ -35,11 +37,15 @@ export async function POST(req: Request) {
         const { PdfReader } = require("pdfreader");
         const pdfText = await new Promise<string>((resolve, reject) => {
           let extracted = "";
+          let currentPage = 1;
           new PdfReader().parseBuffer(buffer, (err: any, item: any) => {
             if (err) {
               reject(err);
             } else if (!item) {
               resolve(extracted);
+            } else if (item.page !== undefined) {
+              currentPage = item.page;
+              extracted += `\n[PAGE ${currentPage}]\n`;
             } else if (item.text) {
               extracted += item.text + " ";
             }
@@ -121,27 +127,78 @@ Do not include any markdown wrappers (no \`\`\`json), comments, or commentary. O
         if (resultText) {
           const aiResult = JSON.parse(resultText);
           if (typeof aiResult.atsScore === "number" && aiResult.breakdown) {
-            // Calibrate Gemini score to be within ±3 of heuristic score
-            let calibratedScore = aiResult.atsScore;
-            if (Math.abs(calibratedScore - heuristicScore) > 3) {
-              calibratedScore = calibratedScore > heuristicScore ? heuristicScore + 3 : heuristicScore - 3;
+            // Calibrate breakdowns to within ±5 of heuristic breakdowns
+            const calibratedBreakdown = {
+              structure: aiResult.breakdown.structure || heuristicResult.breakdown.structure,
+              formatting: aiResult.breakdown.formatting || heuristicResult.breakdown.formatting,
+              readability: aiResult.breakdown.readability || heuristicResult.breakdown.readability,
+              keywords: aiResult.breakdown.keywords || heuristicResult.breakdown.keywords,
+              projects: aiResult.breakdown.projects || heuristicResult.breakdown.projects,
+              achievements: aiResult.breakdown.achievements || heuristicResult.breakdown.achievements
+            };
+
+            const categories = ["structure", "formatting", "readability", "keywords", "projects", "achievements"] as const;
+            categories.forEach(cat => {
+              const hVal = heuristicResult.breakdown[cat];
+              let val = calibratedBreakdown[cat];
+              if (Math.abs(val - hVal) > 5) {
+                calibratedBreakdown[cat] = val > hVal ? hVal + 5 : hVal - 5;
+              }
+            });
+
+            // Derive overall score directly from calibrated breakdowns for mathematical consistency
+            const derivedCalibratedScore = Math.round(
+              calibratedBreakdown.structure * 0.20 +
+              calibratedBreakdown.formatting * 0.20 +
+              calibratedBreakdown.readability * 0.15 +
+              calibratedBreakdown.keywords * 0.15 +
+              calibratedBreakdown.projects * 0.15 +
+              calibratedBreakdown.achievements * 0.15
+            );
+            const calibratedScore = Math.min(99, Math.max(35, derivedCalibratedScore));
+
+            const finalWarnings = aiResult.warnings && aiResult.warnings.length > 0 ? aiResult.warnings : heuristicResult.warnings;
+
+            const evidenceLog = {
+              score_breakdown: {
+                structure: calibratedBreakdown.structure,
+                formatting: calibratedBreakdown.formatting,
+                readability: calibratedBreakdown.readability,
+                skills: calibratedBreakdown.keywords,
+                projects: calibratedBreakdown.projects,
+                achievements: calibratedBreakdown.achievements
+              },
+              warnings: heuristicResult.verifiedWarnings.map((w: any) => ({
+                warning_type: w.warning_type,
+                confidence: w.confidence,
+                evidence: w.evidence,
+                affected_section: w.affected_section,
+                triggering_pattern: w.triggering_pattern
+              })),
+              evidence: heuristicResult.verifiedWarnings.map((w: any) => ({
+                warning_type: w.warning_type,
+                confidence: w.confidence,
+                evidence: w.evidence,
+                affected_section: w.affected_section,
+                triggering_pattern: w.triggering_pattern
+              }))
+            };
+
+            try {
+              fs.writeFileSync("c:/Project/ATS_EVIDENCE_LOG.json", JSON.stringify(evidenceLog, null, 2));
+            } catch (fsErr) {
+              console.error("Failed to write ATS_EVIDENCE_LOG.json:", fsErr);
             }
 
             return NextResponse.json({
               atsScore: calibratedScore,
-              warnings: aiResult.warnings && aiResult.warnings.length > 0 ? aiResult.warnings : heuristicResult.warnings,
+              warnings: finalWarnings,
               verifiedWarnings: heuristicResult.verifiedWarnings,
               actionableFixes: heuristicResult.actionableFixes,
               keywordGaps: aiResult.keywordGaps && aiResult.keywordGaps.length > 0 ? aiResult.keywordGaps : heuristicResult.keywordGaps,
               metricEnhancements: aiResult.metricEnhancements && aiResult.metricEnhancements.length > 0 ? aiResult.metricEnhancements : heuristicResult.metricEnhancements,
-              breakdown: {
-                structure: aiResult.breakdown.structure || heuristicResult.breakdown.structure,
-                formatting: aiResult.breakdown.formatting || heuristicResult.breakdown.formatting,
-                readability: aiResult.breakdown.readability || heuristicResult.breakdown.readability,
-                keywords: aiResult.breakdown.keywords || heuristicResult.breakdown.keywords,
-                projects: aiResult.breakdown.projects || heuristicResult.breakdown.projects,
-                achievements: aiResult.breakdown.achievements || heuristicResult.breakdown.achievements
-              },
+              breakdown: calibratedBreakdown,
+              atsEvidenceLog: evidenceLog
             });
           }
         }
@@ -151,7 +208,41 @@ Do not include any markdown wrappers (no \`\`\`json), comments, or commentary. O
     }
 
     // Heuristic return if Gemini is disabled or failed
-    return NextResponse.json(heuristicResult);
+    const evidenceLog = {
+      score_breakdown: {
+        structure: heuristicResult.breakdown.structure,
+        formatting: heuristicResult.breakdown.formatting,
+        readability: heuristicResult.breakdown.readability,
+        skills: heuristicResult.breakdown.keywords,
+        projects: heuristicResult.breakdown.projects,
+        achievements: heuristicResult.breakdown.achievements
+      },
+      warnings: heuristicResult.verifiedWarnings.map((w: any) => ({
+        warning_type: w.warning_type,
+        confidence: w.confidence,
+        evidence: w.evidence,
+        affected_section: w.affected_section,
+        triggering_pattern: w.triggering_pattern
+      })),
+      evidence: heuristicResult.verifiedWarnings.map((w: any) => ({
+        warning_type: w.warning_type,
+        confidence: w.confidence,
+        evidence: w.evidence,
+        affected_section: w.affected_section,
+        triggering_pattern: w.triggering_pattern
+      }))
+    };
+
+    try {
+      fs.writeFileSync("c:/Project/ATS_EVIDENCE_LOG.json", JSON.stringify(evidenceLog, null, 2));
+    } catch (fsErr) {
+      console.error("Failed to write ATS_EVIDENCE_LOG.json:", fsErr);
+    }
+
+    return NextResponse.json({
+      ...heuristicResult,
+      atsEvidenceLog: evidenceLog
+    });
 
   } catch (err: any) {
     console.error("ATS scanner route crashed:", err);

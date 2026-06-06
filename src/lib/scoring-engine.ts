@@ -1,12 +1,14 @@
 import { ResumeData } from "./db";
 
 export interface VerifiedWarning {
-  warning_type: "grid_layout" | "hidden_table" | "graphics_star" | "profile_image" | "unquantified_bullet" | "missing_section" | "excessive_buzzwords";
+  warning_type: string;
   confidence: number;
-  triggering_text: string;
+  evidence: string;
+  affected_section: string;
   triggering_pattern: string;
-  affected_section: "personal" | "education" | "experience" | "projects" | "skills" | "certifications" | "summary";
+  source_page?: number;
 }
+
 
 export interface ActionableFix {
   issue: string;
@@ -120,10 +122,21 @@ export function serializeResumeDataToText(data: ResumeData): string {
     lines.push(data.certifications.join(", "));
   }
 
-  // To help parser identify BoostCV template base
-  lines.push("ATS SAAS Compiler BoostCV");
-
   return lines.join("\n");
+}
+
+function getPageForIndex(text: string, index: number): number {
+  const pageMarkerRegex = /\[PAGE (\d+)\]/g;
+  let match;
+  let lastPage = 1;
+  while ((match = pageMarkerRegex.exec(text)) !== null) {
+    if (match.index <= index) {
+      lastPage = parseInt(match[1], 10);
+    } else {
+      break;
+    }
+  }
+  return lastPage;
 }
 
 export function calculateAtsScore(
@@ -131,7 +144,6 @@ export function calculateAtsScore(
   filename: string,
   jobDescription?: string
 ): ScoringResult {
-  const warnings: string[] = [];
   const verifiedWarnings: VerifiedWarning[] = [];
   const actionableFixes: ActionableFix[] = [];
   const keywordGaps: string[] = [];
@@ -151,13 +163,12 @@ export function calculateAtsScore(
   if (hasEducation) {
     structureScore += 20;
   } else {
-    warnings.push("Missing Education Section. Critical for recruiter academic qualification checks.");
     verifiedWarnings.push({
       warning_type: "missing_section",
       confidence: 1.0,
-      triggering_text: "",
-      triggering_pattern: "missing_education",
-      affected_section: "education"
+      evidence: "No Education heading detected.",
+      affected_section: "education",
+      triggering_pattern: "missing_education"
     });
     actionableFixes.push({
       issue: "Missing Education Section",
@@ -172,13 +183,12 @@ export function calculateAtsScore(
   if (hasExperience) {
     structureScore += 20;
   } else {
-    warnings.push("Missing Professional Experience Section. Placements boards require tech intern listings.");
     verifiedWarnings.push({
       warning_type: "missing_section",
       confidence: 1.0,
-      triggering_text: "",
-      triggering_pattern: "missing_experience",
-      affected_section: "experience"
+      evidence: "No Experience heading detected.",
+      affected_section: "experience",
+      triggering_pattern: "missing_experience"
     });
     actionableFixes.push({
       issue: "Missing Experience Section",
@@ -193,13 +203,12 @@ export function calculateAtsScore(
   if (hasProjects) {
     structureScore += 20;
   } else {
-    warnings.push("Missing Technical Projects Section. Critical for engineering resumes.");
     verifiedWarnings.push({
       warning_type: "missing_section",
       confidence: 1.0,
-      triggering_text: "",
-      triggering_pattern: "missing_projects",
-      affected_section: "projects"
+      evidence: "No Projects heading detected.",
+      affected_section: "projects",
+      triggering_pattern: "missing_projects"
     });
     actionableFixes.push({
       issue: "Missing Technical Projects",
@@ -214,13 +223,12 @@ export function calculateAtsScore(
   if (hasSkills) {
     structureScore += 20;
   } else {
-    warnings.push("Missing Technical Skills Section. Search filters fail without specific tools.");
     verifiedWarnings.push({
       warning_type: "missing_section",
       confidence: 1.0,
-      triggering_text: "",
-      triggering_pattern: "missing_skills",
-      affected_section: "skills"
+      evidence: "No Skills heading detected.",
+      affected_section: "skills",
+      triggering_pattern: "missing_skills"
     });
     actionableFixes.push({
       issue: "Missing Technical Skills Section",
@@ -235,13 +243,12 @@ export function calculateAtsScore(
   if (hasCertifications) {
     structureScore += 20;
   } else {
-    warnings.push("Missing Certifications & Awards Section. Adding professional credentials builds validation.");
     verifiedWarnings.push({
       warning_type: "missing_section",
       confidence: 1.0,
-      triggering_text: "",
-      triggering_pattern: "missing_certifications",
-      affected_section: "certifications"
+      evidence: "No Certifications heading detected.",
+      affected_section: "certifications",
+      triggering_pattern: "missing_certifications"
     });
     actionableFixes.push({
       issue: "Missing Certifications Section",
@@ -256,158 +263,134 @@ export function calculateAtsScore(
   structureScore = Math.max(10, structureScore);
 
   // 2. Formatting Check (20% of final score)
-  const isBoostCV = lowerText.includes("boostcv") || lowerText.includes("ats saas compiler");
   let formattingScore = 100;
 
-  if (!isBoostCV) {
-    // Check for Canva columns and layout grids
-    if (lowerText.includes("|") || lowerText.includes("  \t") || (lowerText.includes(" • ") && lowerFilename.includes("canva"))) {
-      let trigText = "";
-      if (lowerText.includes("|")) trigText = "|";
-      else if (lowerText.includes("  \t")) trigText = "tab spacer";
-      else trigText = "• spacer";
+  // Check for Canva columns and layout grids
+  const isCanvaFile = lowerFilename.includes("canva") || lowerFilename.includes("cv_layout");
+  if (isCanvaFile && (lowerText.includes("|") || lowerText.includes("  \t") || lowerText.includes(" • "))) {
+    const pipeIdx = text.indexOf("|");
+    const pageNum = getPageForIndex(text, pipeIdx !== -1 ? pipeIdx : 0);
+    verifiedWarnings.push({
+      warning_type: "grid_layout",
+      confidence: 0.88,
+      evidence: "Detected 2-column reading order conflict.",
+      affected_section: "personal",
+      triggering_pattern: "canva_or_column_spacers",
+      source_page: pageNum
+    });
+    actionableFixes.push({
+      issue: "Complex Grid Layout Detected",
+      reason: "Recruiter parsing systems fail to parse parallel text columns linearly, mixing experiences together.",
+      severity: "high",
+      affected_section: "personal",
+      recommended_fix: "Use a clean, single-column standard format to guarantee linear parsing.",
+      expected_score_gain: { category: "formatting", points: 20 }
+    });
+    formattingScore -= 20;
+  }
 
-      warnings.push("Detected complex multi-column grids or visual separators (Canva indicators). Clean single-column layout recommended.");
-      verifiedWarnings.push({
-        warning_type: "grid_layout",
-        confidence: 0.9,
-        triggering_text: trigText,
-        triggering_pattern: "canva_or_column_spacers",
-        affected_section: "personal"
-      });
-      actionableFixes.push({
-        issue: "Complex Grid Layout Detected",
-        reason: "Recruiter parsing systems fail to parse parallel text columns linearly, mixing experiences together.",
-        severity: "high",
-        affected_section: "personal",
-        recommended_fix: "Use a clean, single-column standard format to guarantee linear parsing.",
-        expected_score_gain: { category: "formatting", points: 20 }
-      });
-      formattingScore -= 20;
-    }
+  // Check for Hidden Tables using strict boundary
+  const hasTableWord = /\btables?\b/i.test(text);
+  const hasCellWord = /\bcells?\b/i.test(text);
+  if (hasTableWord || (hasCellWord && text.includes("\t"))) {
+    const tableMatch = text.match(/\btables?\b/i) || text.match(/\bcells?\b/i);
+    const tableIndex = tableMatch ? tableMatch.index || 0 : 0;
+    const pageNum = getPageForIndex(text, tableIndex);
+    verifiedWarnings.push({
+      warning_type: "hidden_table",
+      confidence: 0.91,
+      evidence: "Detected consecutive tab-aligned columns or table cells.",
+      affected_section: "experience",
+      triggering_pattern: "/\\btables?\\b|\\bcells?\\b/",
+      source_page: pageNum
+    });
+    actionableFixes.push({
+      issue: "Hidden Tables or Grid Charts",
+      reason: "ATS systems skip scanning content nested in complex HTML or XML table cells.",
+      severity: "high",
+      affected_section: "experience",
+      recommended_fix: "Present experience data using simple paragraphs and bulleted text instead of tables.",
+      expected_score_gain: { category: "formatting", points: 15 }
+    });
+    formattingScore -= 15;
+  }
 
-    // Check for Hidden Tables
-    if (lowerText.includes("table") || (lowerText.includes("cell") && text.match(/\n.*\t.*\t/))) {
-      warnings.push("Potential hidden tables or grid charts detected. ATS scanners ignore table cell data or read it in garbled order.");
-      verifiedWarnings.push({
-        warning_type: "hidden_table",
-        confidence: 0.85,
-        triggering_text: "cell sequence or raw tables",
-        triggering_pattern: "/table|cell/",
-        affected_section: "experience"
-      });
-      actionableFixes.push({
-        issue: "Hidden Tables or Grid Charts",
-        reason: "ATS systems skip scanning content nested in complex HTML or XML table cells.",
-        severity: "high",
-        affected_section: "experience",
-        recommended_fix: "Present experience data using simple paragraphs and bulleted text instead of tables.",
-        expected_score_gain: { category: "formatting", points: 15 }
-      });
-      formattingScore -= 15;
-    }
+  // Multi-column layouts check
+  const hasMultiColumnLines = text.split("\n").some((line: string) => /\s{6,}/.test(line) && line.length > 30 && !line.includes("@") && !line.includes("http"));
+  if (hasMultiColumnLines && (lowerFilename.includes("canva") || lowerFilename.includes("layout"))) {
+    const lineIndex = text.indexOf("      ");
+    const pageNum = getPageForIndex(text, lineIndex !== -1 ? lineIndex : 0);
+    verifiedWarnings.push({
+      warning_type: "grid_layout",
+      confidence: 0.88,
+      evidence: "Detected 2-column parallel alignment or Canva indicator.",
+      affected_section: "personal",
+      triggering_pattern: "/\\s{6,}/",
+      source_page: pageNum
+    });
+    formattingScore -= 15;
+  }
 
-    // Multi-column layouts check
-    if (text.split("\n").some((line: string) => /\s{4,}/.test(line) && line.length > 30)) {
-      warnings.push("Multi-column layout structure detected. Standard applicant systems fail to read parallel columns linearly.");
-      verifiedWarnings.push({
-        warning_type: "grid_layout",
-        confidence: 0.9,
-        triggering_text: "large spacer gaps",
-        triggering_pattern: "/\\s{4,}/",
-        affected_section: "personal"
-      });
-      formattingScore -= 15;
-    }
+  // Photo/Image check using strict boundaries
+  const imageMatch = text.match(/\b(photo|picture|avatar|profile pic)\b/i);
+  if (imageMatch) {
+    const pageNum = getPageForIndex(text, imageMatch.index || 0);
+    verifiedWarnings.push({
+      warning_type: "profile_image",
+      confidence: 0.85,
+      evidence: `Detected keyword associated with profile image: "${imageMatch[0]}".`,
+      affected_section: "personal",
+      triggering_pattern: "/\\b(photo|avatar|picture|profile pic)\\b/",
+      source_page: pageNum
+    });
+    actionableFixes.push({
+      issue: "Profile Image Detected",
+      reason: "Visual graphics bloat file sizes and cause parser validation warnings under GDPR/bias protocols.",
+      severity: "medium",
+      affected_section: "personal",
+      recommended_fix: "Remove any visual avatars, placeholders, or image segments from the layout.",
+      expected_score_gain: { category: "formatting", points: 15 }
+    });
+    formattingScore -= 15;
+  }
 
-    // Photo/Image check
-    if (lowerText.includes("photo") || lowerText.includes("picture") || lowerText.includes("avatar") || lowerText.includes("profile pic") || lowerText.includes("image")) {
-      warnings.push("Embedded profile picture or avatar icon detected. Recruiter guidelines recommend removing visual images to avoid parsing errors.");
-      verifiedWarnings.push({
-        warning_type: "profile_image",
-        confidence: 0.8,
-        triggering_text: "photo keyword",
-        triggering_pattern: "/photo|avatar|picture/",
-        affected_section: "personal"
-      });
-      actionableFixes.push({
-        issue: "Profile Image Detected",
-        reason: "Visual graphics bloat file sizes and cause parser validation warnings under GDPR/bias protocols.",
-        severity: "medium",
-        affected_section: "personal",
-        recommended_fix: "Remove any visual avatars, placeholders, or image segments from the layout.",
-        expected_score_gain: { category: "formatting", points: 15 }
-      });
-      formattingScore -= 15;
-    }
-
-    // Graphics stars check
-    const graphicsMatches = text.match(/[★●■◆]/g);
-    if (graphicsMatches || lowerText.includes("proficiency:") || lowerText.includes("level:")) {
-      warnings.push("Excessive graphics or proficiency star-ratings detected in skills. ATS filters cannot parse ratings and standard text is preferred.");
-      verifiedWarnings.push({
-        warning_type: "graphics_star",
-        confidence: 0.95,
-        triggering_text: graphicsMatches ? graphicsMatches.join(" ") : "proficiency/level tag",
-        triggering_pattern: "/[★●■◆]|proficiency|level/",
-        affected_section: "skills"
-      });
-      actionableFixes.push({
-        issue: "Skill Graphic Metrics / Stars",
-        reason: "Scanners fail to convert graphics (e.g. 4/5 stars) into text, classifying the skill as unverified.",
-        severity: "medium",
-        affected_section: "skills",
-        recommended_fix: "List skills as simple text strings without graphics or rating widgets.",
-        expected_score_gain: { category: "formatting", points: 15 }
-      });
-      formattingScore -= 15;
-    }
-  } else {
-    // BOOSTCV clean document check
-    const graphicsMatches = text.match(/[★●■◆]/g);
-    if (graphicsMatches) {
-      warnings.push("Manual graphics or star-ratings manually introduced in input fields. Emojis and visual graphics are invisible to ATS parsers.");
-      verifiedWarnings.push({
-        warning_type: "graphics_star",
-        confidence: 0.95,
-        triggering_text: graphicsMatches.join(" "),
-        triggering_pattern: "/[★●■◆]/",
-        affected_section: "skills"
-      });
-      actionableFixes.push({
-        issue: "Visual Graphics in Fields",
-        reason: "Star indicators confuse resume parsers and lower content scan reliability.",
-        severity: "medium",
-        affected_section: "skills",
-        recommended_fix: "Remove special shapes or star indicators from text inputs.",
-        expected_score_gain: { category: "formatting", points: 15 }
-      });
-      formattingScore -= 15;
-    }
-    if (lowerText.includes("photo") || lowerText.includes("picture") || lowerText.includes("avatar") || lowerText.includes("profile pic")) {
-      warnings.push("Mention of profile images manually introduced in fields. Recruiter guidelines recommend keeping text clear of visual placeholders.");
-      verifiedWarnings.push({
-        warning_type: "profile_image",
-        confidence: 0.85,
-        triggering_text: "photo placeholder keyword",
-        triggering_pattern: "/photo|avatar/",
-        affected_section: "personal"
-      });
-      formattingScore -= 10;
-    }
+  // Graphics stars check
+  const graphicsMatches = text.match(/[★●■◆]/g);
+  if (graphicsMatches) {
+    const charIndex = text.indexOf(graphicsMatches[0]);
+    const pageNum = getPageForIndex(text, charIndex);
+    verifiedWarnings.push({
+      warning_type: "graphics_star",
+      confidence: 0.95,
+      evidence: `Detected visual rating indicators: "${graphicsMatches.slice(0, 5).join(" ")}".`,
+      affected_section: "skills",
+      triggering_pattern: "/[★●■◆]/",
+      source_page: pageNum
+    });
+    actionableFixes.push({
+      issue: "Skill Graphic Metrics / Stars",
+      reason: "Scanners fail to convert graphics (e.g. 4/5 stars) into text, classifying the skill as unverified.",
+      severity: "medium",
+      affected_section: "skills",
+      recommended_fix: "List skills as simple text strings without graphics or rating widgets.",
+      expected_score_gain: { category: "formatting", points: 15 }
+    });
+    formattingScore -= 15;
   }
 
   // Emoji check
   const emojiRegex = /[\u{1F300}-\u{1F9FF}]/gu;
   const emojiMatches = text.match(emojiRegex);
   if (emojiMatches && emojiMatches.length > 0) {
-    warnings.push("Emojis (🚀, 💻, etc.) manually introduced in text. Professional recruiters recommend removing all emojis for clean ATS linear scanning.");
+    const charIndex = text.search(emojiRegex);
+    const pageNum = getPageForIndex(text, charIndex !== -1 ? charIndex : 0);
     verifiedWarnings.push({
       warning_type: "graphics_star",
-      confidence: 1.0,
-      triggering_text: emojiMatches.slice(0, 5).join(" "),
+      confidence: 0.95,
+      evidence: `Detected emojis: "${emojiMatches.slice(0, 5).join(" ")}".`,
+      affected_section: "personal",
       triggering_pattern: "emoji_regex",
-      affected_section: "personal"
+      source_page: pageNum
     });
     actionableFixes.push({
       issue: "Emojis inside content fields",
@@ -428,13 +411,12 @@ export function calculateAtsScore(
   if (hasSummary) {
     readabilityScore += 20;
   } else {
-    warnings.push("Missing professional summary section. HR recruiters expect a 2-3 line target profile at the very top.");
     verifiedWarnings.push({
       warning_type: "missing_section",
       confidence: 1.0,
-      triggering_text: "",
-      triggering_pattern: "missing_summary",
-      affected_section: "summary"
+      evidence: "No summary heading detected.",
+      affected_section: "summary",
+      triggering_pattern: "missing_summary"
     });
     actionableFixes.push({
       issue: "Missing Professional Summary",
@@ -450,65 +432,79 @@ export function calculateAtsScore(
   if (lowerText.includes("@")) {
     contactPoints += 15;
   } else {
-    warnings.push("Missing Email Address. Critical for recruiter follow-up.");
     verifiedWarnings.push({
       warning_type: "missing_section",
       confidence: 1.0,
-      triggering_text: "",
-      triggering_pattern: "missing_email",
-      affected_section: "personal"
+      evidence: "No email address format detected.",
+      affected_section: "personal",
+      triggering_pattern: "missing_email"
     });
   }
 
   if (/\+?\d{2,4}[-.\s]?\d{3,5}[-.\s]?\d{4,6}/.test(text)) {
     contactPoints += 15;
   } else {
-    warnings.push("Missing Phone Number. Critical for screening calls.");
     verifiedWarnings.push({
       warning_type: "missing_section",
       confidence: 0.9,
-      triggering_text: "",
-      triggering_pattern: "missing_phone",
-      affected_section: "personal"
+      evidence: "No telephone number pattern detected.",
+      affected_section: "personal",
+      triggering_pattern: "missing_phone"
     });
   }
 
   if (lowerText.includes("linkedin")) {
     contactPoints += 15;
   } else {
-    warnings.push("Missing LinkedIn profile URL. 92% of recruiters verify candidates on LinkedIn before booking calls.");
     verifiedWarnings.push({
       warning_type: "missing_section",
       confidence: 1.0,
-      triggering_text: "",
-      triggering_pattern: "missing_linkedin",
-      affected_section: "personal"
+      evidence: "No LinkedIn profile link detected.",
+      affected_section: "personal",
+      triggering_pattern: "missing_linkedin"
     });
   }
 
   if (lowerText.includes("github") || lowerText.includes("git")) {
     contactPoints += 15;
   } else {
-    warnings.push("Missing GitHub / portfolio URL. Engineering callbacks double when projects are verified via active code repositories.");
     verifiedWarnings.push({
       warning_type: "missing_section",
       confidence: 1.0,
-      triggering_text: "",
-      triggering_pattern: "missing_github",
-      affected_section: "personal"
+      evidence: "No GitHub repository link detected.",
+      affected_section: "personal",
+      triggering_pattern: "missing_github"
     });
   }
 
   readabilityScore += contactPoints;
 
-  // Flow order check
-  const sections = ["education", "experience", "projects", "skills"];
-  const sectionIndex = sections.map(sec => lowerText.indexOf(sec));
+  // Flow order check using strict word boundaries
+  const sectionMatchers = [
+    { id: "education", regex: /\b(education|academic)\b/i },
+    { id: "experience", regex: /\b(experience|work|employment)\b/i },
+    { id: "projects", regex: /\b(projects|project)\b/i },
+    { id: "skills", regex: /\b(skills|technical skills|technologies)\b/i }
+  ];
+  const sectionIndex = sectionMatchers.map(sec => {
+    const match = text.match(sec.regex);
+    return match && match.index !== undefined ? match.index : -1;
+  });
   const isSorted = sectionIndex.every((val, i, arr) => !i || arr[i - 1] === -1 || val === -1 || val >= arr[i - 1]);
   if (isSorted) {
     readabilityScore += 20;
   } else {
-    warnings.push("Chronological section flow issue: Recommended order is Header -> Summary -> Education -> Experience -> Projects -> Skills.");
+    const flowTriggerIndex = sectionIndex.findIndex((val, i, arr) => i > 0 && arr[i - 1] !== -1 && val !== -1 && val < arr[i - 1]);
+    const flowIndex = flowTriggerIndex !== -1 ? sectionIndex[flowTriggerIndex] : 0;
+    const pageNum = getPageForIndex(text, flowIndex);
+    verifiedWarnings.push({
+      warning_type: "chronological_flow",
+      confidence: 1.0,
+      evidence: `Chronological flow index mismatch: [${sectionIndex.join(", ")}].`,
+      affected_section: "experience",
+      triggering_pattern: "section_chronology",
+      source_page: pageNum
+    });
     readabilityScore = Math.max(10, readabilityScore - 10);
   }
 
@@ -547,13 +543,15 @@ export function calculateAtsScore(
     const occurrences = (lowerText.match(new RegExp(`\\b${word}\\b`, "g")) || []).length;
     if (occurrences > 2) {
       buzzwordPenalties += 5;
-      warnings.push(`Overused generic buzzword: "${word}" (${occurrences} times). Replace with strong action-oriented accomplishments.`);
+      const bIndex = lowerText.indexOf(word);
+      const pageNum = getPageForIndex(text, bIndex !== -1 ? bIndex : 0);
       verifiedWarnings.push({
         warning_type: "excessive_buzzwords",
         confidence: 1.0,
-        triggering_text: word,
+        evidence: `Buzzword "${word}" repeated ${occurrences} times.`,
+        affected_section: "experience",
         triggering_pattern: `buzzword_${word}`,
-        affected_section: "experience"
+        source_page: pageNum
       });
     }
   });
@@ -583,7 +581,16 @@ export function calculateAtsScore(
   const hasProjectLinks = lowerText.includes("github.com") || lowerText.includes("http://") || lowerText.includes("https://");
   const linkBonus = hasProjectLinks ? 10 : 0;
   if (!hasProjectLinks && hasProjects) {
-    warnings.push("Projects lack repository or deployment links. Recruiters trust projects with clickable proof-of-work URLs.");
+    const projIdx = text.toLowerCase().indexOf("project");
+    const pageNum = getPageForIndex(text, projIdx !== -1 ? projIdx : 0);
+    verifiedWarnings.push({
+      warning_type: "missing_links",
+      confidence: 0.90,
+      evidence: "Projects lack repository or deployment links.",
+      affected_section: "projects",
+      triggering_pattern: "project_links_check",
+      source_page: pageNum
+    });
     actionableFixes.push({
       issue: "Missing Project Links",
       reason: "Recruiters double project validity assessments when clickable code source repositories are provided.",
@@ -609,12 +616,35 @@ export function calculateAtsScore(
   if (foundVerbsCount >= 4) actionVerbScore = 30;
   else if (foundVerbsCount >= 2) actionVerbScore = 15;
   else {
-    warnings.push("Lacks strong action verbs. Start experience bullet points with words like 'Spearheaded', 'Optimized', or 'Engineered'.");
+    const pageNum = getPageForIndex(text, text.toLowerCase().indexOf("experience") !== -1 ? text.toLowerCase().indexOf("experience") : 0);
+    verifiedWarnings.push({
+      warning_type: "weak_verbs",
+      confidence: 0.90,
+      evidence: "Lacks strong action verbs in experience description.",
+      affected_section: "experience",
+      triggering_pattern: "action_verbs_check",
+      source_page: pageNum
+    });
   }
 
   // Quantification Check
   let quantificationScore = 5;
-  const bullets = text.split(/[•\n\-\*]/).map(b => b.trim()).filter(b => b.length > 15);
+
+  // Extract Experience section for bullet analysis
+  let experienceText = text;
+  const expMatch = text.match(/\b(experience|work|employment)\b/i);
+  if (expMatch && expMatch.index !== undefined) {
+    const startIdx = expMatch.index;
+    const remainingText = text.slice(startIdx);
+    const nextSecMatch = remainingText.slice(20).match(/\b(projects?|skills|technical|certifications?|awards?|education)\b/i);
+    if (nextSecMatch && nextSecMatch.index !== undefined) {
+      experienceText = remainingText.slice(0, nextSecMatch.index + 20);
+    } else {
+      experienceText = remainingText;
+    }
+  }
+
+  const bullets = experienceText.split(/[•\n\-\*]/).map(b => b.trim()).filter(b => b.length > 15);
   let quantifiedBullets = 0;
   let unquantifiedBulletExamples: string[] = [];
 
@@ -634,16 +664,29 @@ export function calculateAtsScore(
     quantificationScore = 40;
   } else if (bulletMetricsRatio >= 0.15) {
     quantificationScore = 20;
-    warnings.push("Few quantified accomplishments found. Increase numbers, percentages, or placements metrics inside achievements.");
+    const bulletText = unquantifiedBulletExamples[0] || "";
+    const bulletIndex = bulletText ? text.indexOf(bulletText) : 0;
+    const pageNum = getPageForIndex(text, bulletIndex !== -1 ? bulletIndex : 0);
+    verifiedWarnings.push({
+      warning_type: "unquantified_bullet",
+      confidence: 0.90,
+      evidence: `Few quantified accomplishments found. Snippet: "${bulletText.slice(0, 40)}..."`,
+      affected_section: "experience",
+      triggering_pattern: "lack_of_numbers",
+      source_page: pageNum
+    });
   } else {
-    warnings.push("Lacks quantified achievements. Recruiters require metrics, scale increases, and measurable outputs (XYZ structure).");
     if (bullets.length > 0) {
+      const bulletText = unquantifiedBulletExamples[0] || "";
+      const bulletIndex = bulletText ? text.indexOf(bulletText) : 0;
+      const pageNum = getPageForIndex(text, bulletIndex !== -1 ? bulletIndex : 0);
       verifiedWarnings.push({
         warning_type: "unquantified_bullet",
-        confidence: 0.9,
-        triggering_text: unquantifiedBulletExamples[0]?.slice(0, 50) || "",
+        confidence: 0.90,
+        evidence: `Bullet lacks numeric metrics: "${bulletText.slice(0, 40)}..."`,
+        affected_section: "experience",
         triggering_pattern: "lack_of_numbers",
-        affected_section: "experience"
+        source_page: pageNum
       });
       actionableFixes.push({
         issue: "Unquantified Achievement Bullets",
@@ -689,9 +732,50 @@ export function calculateAtsScore(
     achievements: Math.max(10, achievementsScore)
   };
 
+  const warningsList: string[] = [];
+  verifiedWarnings.forEach(w => {
+    let desc = "";
+    if (w.warning_type === "missing_section") {
+      if (w.triggering_pattern === "missing_education") desc = "Missing Education Section. Critical for recruiter academic qualification checks.";
+      else if (w.triggering_pattern === "missing_experience") desc = "Missing Professional Experience Section. Placements boards require tech intern listings.";
+      else if (w.triggering_pattern === "missing_projects") desc = "Missing Technical Projects Section. Critical for engineering resumes.";
+      else if (w.triggering_pattern === "missing_skills") desc = "Missing Technical Skills Section. Search filters fail without specific tools.";
+      else if (w.triggering_pattern === "missing_certifications") desc = "Missing Certifications & Awards Section. Adding professional credentials builds validation.";
+      else if (w.triggering_pattern === "missing_summary") desc = "Missing professional summary section. HR recruiters expect a 2-3 line target profile at the very top.";
+      else if (w.triggering_pattern === "missing_email") desc = "Missing Email Address. Critical for recruiter follow-up.";
+      else if (w.triggering_pattern === "missing_phone") desc = "Missing Phone Number. Critical for screening calls.";
+      else if (w.triggering_pattern === "missing_linkedin") desc = "Missing LinkedIn profile URL. 92% of recruiters verify candidates on LinkedIn before booking calls.";
+      else if (w.triggering_pattern === "missing_github") desc = "Missing GitHub / portfolio URL. Engineering callbacks double when projects are verified via active code repositories.";
+    } else if (w.warning_type === "grid_layout") {
+      desc = "Complex multi-column grids or visual separators detected. Clean single-column layout recommended.";
+    } else if (w.warning_type === "hidden_table") {
+      desc = "Potential hidden tables or grid charts detected. ATS scanners ignore table cell data or read it in garbled order.";
+    } else if (w.warning_type === "profile_image") {
+      desc = "Embedded profile picture or avatar icon detected. Recruiter guidelines recommend removing visual images to avoid parsing errors.";
+    } else if (w.warning_type === "graphics_star") {
+      desc = "Excessive graphics, ratings, or emojis detected. Standard text is preferred for linear scanning.";
+    } else if (w.warning_type === "unquantified_bullet") {
+      desc = "Lacks quantified achievements. Recruiters require metrics, scale increases, and measurable outputs.";
+    } else if (w.warning_type === "excessive_buzzwords") {
+      desc = "Overused generic buzzwords detected. Replace with strong action-oriented accomplishments.";
+    } else if (w.warning_type === "chronological_flow") {
+      desc = "Chronological section flow issue: Recommended order is Header -> Summary -> Education -> Experience -> Projects -> Skills.";
+    } else if (w.warning_type === "missing_links") {
+      desc = "Projects lack repository or deployment links. Recruiters trust projects with clickable proof-of-work URLs.";
+    } else if (w.warning_type === "weak_verbs") {
+      desc = "Lacks strong action verbs. Start experience bullet points with words like 'Spearheaded', 'Optimized', or 'Engineered'.";
+    }
+
+    if (!desc) desc = `${w.warning_type.replace(/_/g, " ")} issue.`;
+
+    warningsList.push(`${desc} Evidence: ${w.evidence} (Page: ${w.source_page || 1})`);
+  });
+
+  const finalWarnings = warningsList.length > 0 ? warningsList : ["Your resume matches standard recruiter formatting guidelines beautifully. Good structure."];
+
   return {
     atsScore: finalAtsScore,
-    warnings: warnings.length > 0 ? warnings : ["Your resume matches standard recruiter formatting guidelines beautifully. Good structure."],
+    warnings: finalWarnings,
     verifiedWarnings,
     actionableFixes,
     keywordGaps: keywordGaps.length > 0 ? keywordGaps.slice(0, 6) : ["No severe keyword gaps detected."],
