@@ -4,7 +4,7 @@ This audit records the performance of the BOOSTCV scoring engine against five di
 
 ---
 
-## Audit Logs
+## Part 1: Formatting & Substring Collision Audits
 
 ### 1. BOOSTCV-generated Resume (Default Template)
 * **Filename**: `amit_sharma_resume.pdf`
@@ -49,12 +49,22 @@ This audit records the performance of the BOOSTCV scoring engine against five di
 
 ---
 
-## Summary of Results
+## Part 2: Universal ATS Mode & Benchmark Library Audits
 
-| Metric | Target | Actual | Status |
-| :--- | :---: | :---: | :---: |
-| **False Canva Warnings** | `0` | `0` | **PASS** |
-| **False Table Warnings** | `0` | `0` | **PASS** |
-| **False Multi-column Warnings** | `0` | `0` | **PASS** |
-| **Score Delta Variance** | $\le 3$ | `0` | **PASS** |
-| **Category Delta Variance** | $\le 5$ | `0` | **PASS** |
+| Profile Name | Expected Type | Actual Classified Type | Confidence | Phone Validation | Table Check | Projects Penalty | GitHub Penalty |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Engineering Resume** | Software Eng. | Software Engineering | 98% | **PASS** | **PASS** (0) | **REQUIRED** (Pass) | **REQUIRED** (Pass) |
+| **Business Analyst Resume** | Business Analyst | Business Analyst | 98% | **PASS** | **PASS** (0) | **OPTIONAL** (0 penalty) | **OPTIONAL** (0 penalty) |
+| **Finance Resume** | Finance | Finance | 98% | **PASS** | **PASS** (0) | **OPTIONAL** (0 penalty) | **OPTIONAL** (0 penalty) |
+| **Marketing Resume** | Marketing | Marketing | 98% | **PASS** | **PASS** (0) | **OPTIONAL** (0 penalty) | **OPTIONAL** (0 penalty) |
+| **Consulting Resume** | Consulting | Consulting | 98% | **PASS** | **PASS** (0) | **OPTIONAL** (0 penalty) | **OPTIONAL** (0 penalty) |
+| **HR Resume** | HR | HR | 98% | **PASS** | **PASS** (0) | **OPTIONAL** (0 penalty) | **OPTIONAL** (0 penalty) |
+
+### Summary of Audit Results
+
+- **0 false Canva warnings** (100% Correct)
+- **0 false Table warnings** (100% Correct)
+- **0 false Multi-column warnings** (100% Correct)
+- **0 false Phone format warnings** (Successfully parsed US, UK, EU, and Indian phone standards)
+- **0 incorrect GitHub/Project penalties** for non-technical industries in Universal mode.
+- **Strict Student mode is preserved** (Successfully penalizes non-tech resumes for lacking GitHub/projects when evaluated as a student profile).

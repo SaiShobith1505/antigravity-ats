@@ -82,8 +82,9 @@ export async function POST(req: Request) {
       );
     }
 
+    const mode = (formData.get("mode") as "student" | "universal") || "student";
     // Call unified heuristic scorer
-    const heuristicResult = calculateAtsScore(text, file.name, jobDescription);
+    const heuristicResult = calculateAtsScore(text, file.name, jobDescription, mode);
     const heuristicScore = heuristicResult.atsScore;
 
     // If Gemini client is active, merge heuristic checks with semantic evaluation
@@ -181,7 +182,9 @@ Do not include any markdown wrappers (no \`\`\`json), comments, or commentary. O
                 evidence: w.evidence,
                 affected_section: w.affected_section,
                 triggering_pattern: w.triggering_pattern
-              }))
+              })),
+              resume_type: heuristicResult.resumeType,
+              confidence: heuristicResult.classificationConfidence
             };
 
             try {
@@ -230,7 +233,9 @@ Do not include any markdown wrappers (no \`\`\`json), comments, or commentary. O
         evidence: w.evidence,
         affected_section: w.affected_section,
         triggering_pattern: w.triggering_pattern
-      }))
+      })),
+      resume_type: heuristicResult.resumeType,
+      confidence: heuristicResult.classificationConfidence
     };
 
     try {

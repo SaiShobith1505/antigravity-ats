@@ -37,6 +37,8 @@ export interface ScoringResult {
     projects: number;
     achievements: number;
   };
+  resumeType?: string;
+  classificationConfidence?: number;
 }
 
 const SYNONYM_MAP: Record<string, string[]> = {
@@ -139,10 +141,209 @@ function getPageForIndex(text: string, index: number): number {
   return lastPage;
 }
 
+export interface ProfileSettings {
+  weights: {
+    structure: number;
+    formatting: number;
+    readability: number;
+    keywords: number;
+    projects: number;
+    achievements: number;
+  };
+  requiredSections: string[];
+  requiresGithub: boolean;
+}
+
+export const PROFILE_SETTINGS: Record<string, ProfileSettings> = {
+  "Software Engineering": {
+    weights: { structure: 0.20, formatting: 0.20, readability: 0.15, keywords: 0.15, projects: 0.15, achievements: 0.15 },
+    requiredSections: ["education", "experience", "projects", "skills"],
+    requiresGithub: true
+  },
+  "Data Science": {
+    weights: { structure: 0.20, formatting: 0.20, readability: 0.15, keywords: 0.15, projects: 0.15, achievements: 0.15 },
+    requiredSections: ["education", "experience", "projects", "skills"],
+    requiresGithub: true
+  },
+  "Cybersecurity": {
+    weights: { structure: 0.20, formatting: 0.20, readability: 0.15, keywords: 0.15, projects: 0.15, achievements: 0.15 },
+    requiredSections: ["education", "experience", "projects", "skills"],
+    requiresGithub: true
+  },
+  "Business Analyst": {
+    weights: { structure: 0.20, formatting: 0.20, readability: 0.15, keywords: 0.25, projects: 0.00, achievements: 0.20 },
+    requiredSections: ["education", "experience", "skills"],
+    requiresGithub: false
+  },
+  "Product Management": {
+    weights: { structure: 0.20, formatting: 0.20, readability: 0.15, keywords: 0.20, projects: 0.05, achievements: 0.20 },
+    requiredSections: ["education", "experience", "skills"],
+    requiresGithub: false
+  },
+  "Marketing": {
+    weights: { structure: 0.20, formatting: 0.20, readability: 0.15, keywords: 0.20, projects: 0.00, achievements: 0.25 },
+    requiredSections: ["education", "experience", "skills"],
+    requiresGithub: false
+  },
+  "Finance": {
+    weights: { structure: 0.20, formatting: 0.20, readability: 0.15, keywords: 0.20, projects: 0.00, achievements: 0.25 },
+    requiredSections: ["education", "experience", "skills"],
+    requiresGithub: false
+  },
+  "Consulting": {
+    weights: { structure: 0.20, formatting: 0.20, readability: 0.15, keywords: 0.20, projects: 0.00, achievements: 0.25 },
+    requiredSections: ["education", "experience", "skills"],
+    requiresGithub: false
+  },
+  "Sales": {
+    weights: { structure: 0.20, formatting: 0.20, readability: 0.15, keywords: 0.20, projects: 0.00, achievements: 0.25 },
+    requiredSections: ["education", "experience", "skills"],
+    requiresGithub: false
+  },
+  "Operations": {
+    weights: { structure: 0.20, formatting: 0.20, readability: 0.15, keywords: 0.20, projects: 0.00, achievements: 0.25 },
+    requiredSections: ["education", "experience", "skills"],
+    requiresGithub: false
+  },
+  "HR": {
+    weights: { structure: 0.20, formatting: 0.20, readability: 0.15, keywords: 0.25, projects: 0.00, achievements: 0.20 },
+    requiredSections: ["education", "experience", "skills"],
+    requiresGithub: false
+  },
+  "General Corporate": {
+    weights: { structure: 0.20, formatting: 0.20, readability: 0.15, keywords: 0.20, projects: 0.05, achievements: 0.20 },
+    requiredSections: ["education", "experience", "skills"],
+    requiresGithub: false
+  }
+};
+
+export const PROFILE_KEYWORDS: Record<string, string[]> = {
+  "Software Engineering": ["react", "next.js", "nodejs", "typescript", "docker", "git", "sql", "nosql", "aws", "gcp"],
+  "Data Science": ["python", "machine learning", "deep learning", "pandas", "numpy", "sql", "tableau", "power bi", "analytics", "statistics"],
+  "Cybersecurity": ["cybersecurity", "security", "firewall", "cryptography", "penetration", "vulnerability", "incident response", "soc", "siem", "compliance"],
+  "Business Analyst": ["business analysis", "sql", "tableau", "power bi", "requirements", "user stories", "jira", "agile", "process mapping", "stakeholders"],
+  "Product Management": ["product roadmap", "agile", "scrum", "prd", "user stories", "prioritization", "ux", "metrics", "product strategy", "launch"],
+  "Marketing": ["seo", "sem", "google analytics", "campaign", "social media", "content strategy", "brand", "email marketing", "copywriting", "ctr"],
+  "Finance": ["financial modeling", "accounting", "ledger", "audit", "cfa", "valuation", "excel", "budgeting", "forecasting", "portfolio"],
+  "Consulting": ["strategy", "management consulting", "process improvement", "advisory", "case study", "stakeholder management", "change management", "analysis"],
+  "Sales": ["salesforce", "crm", "lead generation", "sales pipeline", "cold calling", "b2b", "negotiation", "quota", "revenue"],
+  "Operations": ["supply chain", "logistics", "process optimization", "lean", "six sigma", "inventory", "vendor management", "procurement", "efficiency"],
+  "HR": ["recruiting", "talent acquisition", "onboarding", "payroll", "employee relations", "hiring", "compliance", "training", "benefits", "performance"],
+  "General Corporate": ["management", "project", "strategy", "analysis", "communication", "collaboration", "planning", "reporting", "operations", "excel"]
+};
+
+export function classifyResume(text: string): { resume_type: string; confidence: number } {
+  const cleanText = text.toLowerCase();
+  
+  const profiles: Record<string, string[]> = {
+    "Software Engineering": [
+      "software engineer", "software developer", "frontend", "backend", "fullstack", "full stack",
+      "javascript", "typescript", "python", "java", "c++", "c#", "golang", "rust", "react", "angular",
+      "node.js", "kubernetes", "docker", "git", "github", "aws", "gcp", "azure", "algorithms",
+      "data structures", "html", "css", "web development", "databases"
+    ],
+    "Data Science": [
+      "data scientist", "data science", "machine learning", "deep learning", "artificial intelligence",
+      "tensorflow", "pytorch", "pandas", "numpy", "scikit-learn", "data analyst", "data analysis",
+      "tableau", "power bi", "analytics", "statistics", "statistical", "sql", "spark", "hadoop"
+    ],
+    "Cybersecurity": [
+      "cybersecurity", "information security", "network security", "penetration testing", "pentest",
+      "firewall", "cryptography", "malware", "vulnerability", "incident response", "soc", "siem",
+      "cissp", "ceh", "comptia security+", "ethical hacking", "threat intelligence"
+    ],
+    "Business Analyst": [
+      "business analyst", "business analysis", "tableau", "power bi", "sql", "requirements gathering",
+      "user stories", "jira", "process mapping", "wireframes", "system requirements", "business process",
+      "use cases", "stakeholder management", "gap analysis", "brd", "frd"
+    ],
+    "Product Management": [
+      "product manager", "product management", "roadmap", "user research", "agile", "scrum",
+      "product launch", "prd", "backlog", "user stories", "wireframing", "competitor analysis",
+      "product strategy", "customer feedback", "feature prioritization"
+    ],
+    "Marketing": [
+      "marketing", "campaign", "seo", "sem", "adwords", "google analytics", "social media", "brand",
+      "copywriting", "content strategy", "growth marketing", "digital marketing", "ctr", "cpc",
+      "customer acquisition", "email marketing", "public relations"
+    ],
+    "Finance": [
+      "finance", "financial", "accounting", "ledger", "audit", "cfa", "cpa", "valuation", "excel",
+      "investment", "portfolio", "banking", "corporate finance", "budgeting", "forecasting",
+      "taxation", "financial modeling", "profitability"
+    ],
+    "Consulting": [
+      "consulting", "consultant", "strategy", "management consulting", "advisory", "case study",
+      "process improvement", "problem solving", "strategic planning", "change management",
+      "business transformation", "mckinsey", "bcg", "bain", "deloitte", "accenture"
+    ],
+    "Sales": [
+      "sales", "account manager", "salesforce", "crm", "cold calling", "b2b", "negotiation", "quota",
+      "lead generation", "sales pipeline", "business development", "deal closing", "revenue growth"
+    ],
+    "Operations": [
+      "operations", "supply chain", "logistics", "process optimization", "lean", "six sigma",
+      "inventory", "vendor management", "procurement", "operations management", "efficiency",
+      "warehouse", "distribution"
+    ],
+    "HR": [
+      "hr", "human resources", "recruiting", "talent acquisition", "onboarding", "payroll",
+      "employee relations", "hiring", "applicant tracking", "benefits administration", "diversity",
+      "talent management", "performance appraisal"
+    ]
+  };
+
+  let bestType = "General Corporate";
+  let maxScore = 0;
+
+  for (const [type, keywords] of Object.entries(profiles)) {
+    let score = 0;
+    keywords.forEach(kw => {
+      const regex = new RegExp(`\\b${kw.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'gi');
+      const matches = cleanText.match(regex);
+      if (matches) {
+        score += matches.length;
+      }
+    });
+
+    if (score > maxScore) {
+      maxScore = score;
+      bestType = type;
+    }
+  }
+
+  let confidence = 0.5;
+  if (maxScore > 0) {
+    confidence = Math.min(0.98, 0.6 + (maxScore / 10) * 0.38);
+  } else {
+    bestType = "General Corporate";
+    confidence = 0.5;
+  }
+
+  return { resume_type: bestType, confidence };
+}
+
+export function hasPhoneNumber(text: string): boolean {
+  const phoneRegex = /(\+?\(?\d[\d-\s\(\)\.]{6,22}\d)/g;
+  const matches = text.match(phoneRegex);
+  if (!matches) return false;
+  
+  for (const m of matches) {
+    const digits = m.replace(/\D/g, "");
+    if (digits.length >= 7 && digits.length <= 15) {
+      if (/^\d{4}\d{4}$/.test(digits)) continue;
+      if (/^\d{1,2}\d{1,2}\d{4}$/.test(digits)) continue;
+      return true;
+    }
+  }
+  return false;
+}
+
 export function calculateAtsScore(
   text: string,
   filename: string,
-  jobDescription?: string
+  jobDescription?: string,
+  mode: "student" | "universal" = "student"
 ): ScoringResult {
   const verifiedWarnings: VerifiedWarning[] = [];
   const actionableFixes: ActionableFix[] = [];
@@ -152,6 +353,12 @@ export function calculateAtsScore(
   const lowerText = text.toLowerCase();
   const lowerFilename = filename.toLowerCase();
 
+  // Classification Layer
+  const classification = mode === "universal" ? classifyResume(text) : { resume_type: "Software Engineering", confidence: 1.0 };
+  const currentType = classification.resume_type;
+  const currentConf = classification.confidence;
+  const profile = PROFILE_SETTINGS[currentType] || PROFILE_SETTINGS["General Corporate"];
+
   // 1. Structure Check (20% of final score)
   let structureScore = 0;
   const hasEducation = lowerText.includes("education") || lowerText.includes("college") || lowerText.includes("university") || lowerText.includes("academic");
@@ -160,107 +367,219 @@ export function calculateAtsScore(
   const hasSkills = lowerText.includes("skills") || lowerText.includes("technologies") || lowerText.includes("tools");
   const hasCertifications = lowerText.includes("certifications") || lowerText.includes("certification") || lowerText.includes("awards") || lowerText.includes("accomplishments");
 
-  if (hasEducation) {
-    structureScore += 20;
-  } else {
-    verifiedWarnings.push({
-      warning_type: "missing_section",
-      confidence: 1.0,
-      evidence: "No Education heading detected.",
-      affected_section: "education",
-      triggering_pattern: "missing_education"
-    });
-    actionableFixes.push({
-      issue: "Missing Education Section",
-      reason: "ATS filters and placement boards require tech intern listings to confirm college registration.",
-      severity: "critical",
-      affected_section: "education",
-      recommended_fix: "Add institutional credentials, degree path, graduation year, and GPA metrics.",
-      expected_score_gain: { category: "structure", points: 20 }
-    });
-  }
+  if (mode === "student") {
+    if (hasEducation) {
+      structureScore += 20;
+    } else {
+      verifiedWarnings.push({
+        warning_type: "missing_section",
+        confidence: 1.0,
+        evidence: "No Education heading detected.",
+        affected_section: "education",
+        triggering_pattern: "missing_education"
+      });
+      actionableFixes.push({
+        issue: "Missing Education Section",
+        reason: "ATS filters and placement boards require tech intern listings to confirm college registration.",
+        severity: "critical",
+        affected_section: "education",
+        recommended_fix: "Add institutional credentials, degree path, graduation year, and GPA metrics.",
+        expected_score_gain: { category: "structure", points: 20 }
+      });
+    }
 
-  if (hasExperience) {
-    structureScore += 20;
-  } else {
-    verifiedWarnings.push({
-      warning_type: "missing_section",
-      confidence: 1.0,
-      evidence: "No Experience heading detected.",
-      affected_section: "experience",
-      triggering_pattern: "missing_experience"
-    });
-    actionableFixes.push({
-      issue: "Missing Experience Section",
-      reason: "ATS systems weight professional internship listings higher than personal projects.",
-      severity: "critical",
-      affected_section: "experience",
-      recommended_fix: "Include details of past jobs, internships, or freelance roles with achievements.",
-      expected_score_gain: { category: "structure", points: 20 }
-    });
-  }
+    if (hasExperience) {
+      structureScore += 20;
+    } else {
+      verifiedWarnings.push({
+        warning_type: "missing_section",
+        confidence: 1.0,
+        evidence: "No Experience heading detected.",
+        affected_section: "experience",
+        triggering_pattern: "missing_experience"
+      });
+      actionableFixes.push({
+        issue: "Missing Experience Section",
+        reason: "ATS systems weight professional internship listings higher than personal projects.",
+        severity: "critical",
+        affected_section: "experience",
+        recommended_fix: "Include details of past jobs, internships, or freelance roles with achievements.",
+        expected_score_gain: { category: "structure", points: 20 }
+      });
+    }
 
-  if (hasProjects) {
-    structureScore += 20;
-  } else {
-    verifiedWarnings.push({
-      warning_type: "missing_section",
-      confidence: 1.0,
-      evidence: "No Projects heading detected.",
-      affected_section: "projects",
-      triggering_pattern: "missing_projects"
-    });
-    actionableFixes.push({
-      issue: "Missing Technical Projects",
-      reason: "Engineering recruiters rely heavily on code portfolios to judge technical competence.",
-      severity: "critical",
-      affected_section: "projects",
-      recommended_fix: "Include at least 2 capstone technical projects showcasing your tech stack.",
-      expected_score_gain: { category: "structure", points: 20 }
-    });
-  }
+    if (hasProjects) {
+      structureScore += 20;
+    } else {
+      verifiedWarnings.push({
+        warning_type: "missing_section",
+        confidence: 1.0,
+        evidence: "No Projects heading detected.",
+        affected_section: "projects",
+        triggering_pattern: "missing_projects"
+      });
+      actionableFixes.push({
+        issue: "Missing Technical Projects",
+        reason: "Engineering recruiters rely heavily on code portfolios to judge technical competence.",
+        severity: "critical",
+        affected_section: "projects",
+        recommended_fix: "Include at least 2 capstone technical projects showcasing your tech stack.",
+        expected_score_gain: { category: "structure", points: 20 }
+      });
+    }
 
-  if (hasSkills) {
-    structureScore += 20;
-  } else {
-    verifiedWarnings.push({
-      warning_type: "missing_section",
-      confidence: 1.0,
-      evidence: "No Skills heading detected.",
-      affected_section: "skills",
-      triggering_pattern: "missing_skills"
-    });
-    actionableFixes.push({
-      issue: "Missing Technical Skills Section",
-      reason: "Applicant systems use keyword matching tools on programming languages to rank candidate profiles.",
-      severity: "critical",
-      affected_section: "skills",
-      recommended_fix: "Create a dedicated skills block detailing languages, frameworks, and developer tools.",
-      expected_score_gain: { category: "structure", points: 20 }
-    });
-  }
+    if (hasSkills) {
+      structureScore += 20;
+    } else {
+      verifiedWarnings.push({
+        warning_type: "missing_section",
+        confidence: 1.0,
+        evidence: "No Skills heading detected.",
+        affected_section: "skills",
+        triggering_pattern: "missing_skills"
+      });
+      actionableFixes.push({
+        issue: "Missing Technical Skills Section",
+        reason: "Applicant systems use keyword matching tools on programming languages to rank candidate profiles.",
+        severity: "critical",
+        affected_section: "skills",
+        recommended_fix: "Create a dedicated skills block detailing languages, frameworks, and developer tools.",
+        expected_score_gain: { category: "structure", points: 20 }
+      });
+    }
 
-  if (hasCertifications) {
-    structureScore += 20;
+    if (hasCertifications) {
+      structureScore += 20;
+    } else {
+      verifiedWarnings.push({
+        warning_type: "missing_section",
+        confidence: 1.0,
+        evidence: "No Certifications heading detected.",
+        affected_section: "certifications",
+        triggering_pattern: "missing_certifications"
+      });
+      actionableFixes.push({
+        issue: "Missing Certifications Section",
+        reason: "Certifications validate capabilities in competitive fields and boost overall profile authority.",
+        severity: "medium",
+        affected_section: "certifications",
+        recommended_fix: "Add relevant tech licenses or accomplishments, e.g. AWS Certified Architect.",
+        expected_score_gain: { category: "structure", points: 20 }
+      });
+    }
   } else {
-    verifiedWarnings.push({
-      warning_type: "missing_section",
-      confidence: 1.0,
-      evidence: "No Certifications heading detected.",
-      affected_section: "certifications",
-      triggering_pattern: "missing_certifications"
-    });
-    actionableFixes.push({
-      issue: "Missing Certifications Section",
-      reason: "Certifications validate capabilities in competitive fields and boost overall profile authority.",
-      severity: "medium",
-      affected_section: "certifications",
-      recommended_fix: "Add relevant tech licenses or accomplishments, e.g. AWS Certified Architect.",
-      expected_score_gain: { category: "structure", points: 20 }
-    });
-  }
+    // universal mode
+    const reqSections = profile.requiredSections;
+    const missingSectionPenalty = Math.round(100 / reqSections.length);
+    let tempStructureScore = 100;
 
-  structureScore = Math.max(10, structureScore);
+    if (reqSections.includes("education")) {
+      if (!hasEducation) {
+        verifiedWarnings.push({
+          warning_type: "missing_section",
+          confidence: 1.0,
+          evidence: "No Education heading detected.",
+          affected_section: "education",
+          triggering_pattern: "missing_education"
+        });
+        actionableFixes.push({
+          issue: "Missing Education Section",
+          reason: "ATS filters and recruitment guidelines require academic credentials to be verified.",
+          severity: "critical",
+          affected_section: "education",
+          recommended_fix: "Add institutional credentials, degree path, and graduation year.",
+          expected_score_gain: { category: "structure", points: missingSectionPenalty }
+        });
+        tempStructureScore -= missingSectionPenalty;
+      }
+    }
+
+    if (reqSections.includes("experience")) {
+      if (!hasExperience) {
+        verifiedWarnings.push({
+          warning_type: "missing_section",
+          confidence: 1.0,
+          evidence: "No Experience heading detected.",
+          affected_section: "experience",
+          triggering_pattern: "missing_experience"
+        });
+        actionableFixes.push({
+          issue: "Missing Experience Section",
+          reason: "ATS filters heavily weight professional history and career timeline.",
+          severity: "critical",
+          affected_section: "experience",
+          recommended_fix: "Add details of past jobs, internships, or freelance roles.",
+          expected_score_gain: { category: "structure", points: missingSectionPenalty }
+        });
+        tempStructureScore -= missingSectionPenalty;
+      }
+    }
+
+    if (reqSections.includes("projects")) {
+      if (!hasProjects) {
+        verifiedWarnings.push({
+          warning_type: "missing_section",
+          confidence: 1.0,
+          evidence: "No Projects heading detected.",
+          affected_section: "projects",
+          triggering_pattern: "missing_projects"
+        });
+        actionableFixes.push({
+          issue: "Missing Projects Section",
+          reason: "Portfolios and projects validate technical execution capacity.",
+          severity: "critical",
+          affected_section: "projects",
+          recommended_fix: "Add key projects showcasing execution or code work.",
+          expected_score_gain: { category: "structure", points: missingSectionPenalty }
+        });
+        tempStructureScore -= missingSectionPenalty;
+      }
+    }
+
+    if (reqSections.includes("skills")) {
+      if (!hasSkills) {
+        verifiedWarnings.push({
+          warning_type: "missing_section",
+          confidence: 1.0,
+          evidence: "No Skills heading detected.",
+          affected_section: "skills",
+          triggering_pattern: "missing_skills"
+        });
+        actionableFixes.push({
+          issue: "Missing Skills Section",
+          reason: "ATS uses keyword screening on skills lists to rank candidate profiles.",
+          severity: "critical",
+          affected_section: "skills",
+          recommended_fix: "Add a list of skills, methodologies, or tools.",
+          expected_score_gain: { category: "structure", points: missingSectionPenalty }
+        });
+        tempStructureScore -= missingSectionPenalty;
+      }
+    }
+
+    if (reqSections.includes("certifications")) {
+      if (!hasCertifications) {
+        verifiedWarnings.push({
+          warning_type: "missing_section",
+          confidence: 1.0,
+          evidence: "No Certifications heading detected.",
+          affected_section: "certifications",
+          triggering_pattern: "missing_certifications"
+        });
+        actionableFixes.push({
+          issue: "Missing Certifications Section",
+          reason: "Professional certifications validate competency in key methodologies.",
+          severity: "medium",
+          affected_section: "certifications",
+          recommended_fix: "Add relevant professional certifications or licenses.",
+          expected_score_gain: { category: "structure", points: missingSectionPenalty }
+        });
+        tempStructureScore -= missingSectionPenalty;
+      }
+    }
+
+    structureScore = Math.max(10, tempStructureScore);
+  }
 
   // 2. Formatting Check (20% of final score)
   let formattingScore = 100;
@@ -428,6 +747,7 @@ export function calculateAtsScore(
     });
   }
 
+  let maxContactPoints = 60;
   let contactPoints = 0;
   if (lowerText.includes("@")) {
     contactPoints += 15;
@@ -441,7 +761,7 @@ export function calculateAtsScore(
     });
   }
 
-  if (/\+?\d{2,4}[-.\s]?\d{3,5}[-.\s]?\d{4,6}/.test(text)) {
+  if (hasPhoneNumber(text)) {
     contactPoints += 15;
   } else {
     verifiedWarnings.push({
@@ -465,19 +785,25 @@ export function calculateAtsScore(
     });
   }
 
-  if (lowerText.includes("github") || lowerText.includes("git")) {
-    contactPoints += 15;
+  const reqGithub = (mode === "student") || profile.requiresGithub;
+  if (reqGithub) {
+    if (lowerText.includes("github") || lowerText.includes("git")) {
+      contactPoints += 15;
+    } else {
+      verifiedWarnings.push({
+        warning_type: "missing_section",
+        confidence: 1.0,
+        evidence: "No GitHub repository link detected.",
+        affected_section: "personal",
+        triggering_pattern: "missing_github"
+      });
+    }
   } else {
-    verifiedWarnings.push({
-      warning_type: "missing_section",
-      confidence: 1.0,
-      evidence: "No GitHub repository link detected.",
-      affected_section: "personal",
-      triggering_pattern: "missing_github"
-    });
+    maxContactPoints = 45;
   }
 
-  readabilityScore += contactPoints;
+  const normalizedContactPoints = Math.round((contactPoints / maxContactPoints) * 60);
+  readabilityScore += normalizedContactPoints;
 
   // Flow order check using strict word boundaries
   const sectionMatchers = [
@@ -511,9 +837,10 @@ export function calculateAtsScore(
   readabilityScore = Math.min(100, Math.max(10, readabilityScore));
 
   // 4. Keywords Check (15% of final score)
+  const defaultKeywords = PROFILE_KEYWORDS[currentType] || PROFILE_KEYWORDS["General Corporate"];
   const targetKeywords = jobDescription
     ? jobDescription.toLowerCase().match(/\b[a-z]{3,}\b/g) || []
-    : ["react", "next.js", "nodejs", "typescript", "docker", "git", "sql", "nosql", "aws", "gcp"];
+    : defaultKeywords;
 
   const uniqueTargets = Array.from(new Set(targetKeywords)).slice(0, 15);
   let matchedCount = 0;
@@ -712,13 +1039,22 @@ export function calculateAtsScore(
   const achievementsScore = Math.min(100, actionVerbScore + quantificationScore + bulletQualityScore);
 
   // Derive final score
+  const activeWeights = (mode === "universal") ? profile.weights : {
+    structure: 0.20,
+    formatting: 0.20,
+    readability: 0.15,
+    keywords: 0.15,
+    projects: 0.15,
+    achievements: 0.15
+  };
+
   const derivedScore = Math.round(
-    structureScore * 0.20 +
-    formattingScore * 0.20 +
-    readabilityScore * 0.15 +
-    keywordsScore * 0.15 +
-    projectsScore * 0.15 +
-    achievementsScore * 0.15
+    structureScore * activeWeights.structure +
+    formattingScore * activeWeights.formatting +
+    readabilityScore * activeWeights.readability +
+    keywordsScore * activeWeights.keywords +
+    projectsScore * activeWeights.projects +
+    achievementsScore * activeWeights.achievements
   );
 
   const finalAtsScore = Math.min(99, Math.max(35, derivedScore));
@@ -780,7 +1116,9 @@ export function calculateAtsScore(
     actionableFixes,
     keywordGaps: keywordGaps.length > 0 ? keywordGaps.slice(0, 6) : ["No severe keyword gaps detected."],
     metricEnhancements: metricEnhancements.length > 0 ? metricEnhancements.slice(0, 3) : ["Incorporate Google XYZ metrics: 'Accomplished X, as measured by Y, by doing Z'."],
-    breakdown
+    breakdown,
+    resumeType: currentType,
+    classificationConfidence: currentConf
   };
 }
 
