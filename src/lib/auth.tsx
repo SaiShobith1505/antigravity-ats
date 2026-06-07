@@ -17,6 +17,7 @@ interface UserType {
   email: string | null;
   displayName: string | null;
   photoURL?: string | null;
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {
@@ -105,6 +106,7 @@ export const AuthProvider: React.FC<{
         uid: "admin-uid-999",
         email: "admin@cvboost.co",
         displayName: "BOOSTCV Admin 👑",
+        isAdmin: true,
       };
       setUser(adminUser);
       localStorage.setItem("cv_boost_user", JSON.stringify(adminUser));
