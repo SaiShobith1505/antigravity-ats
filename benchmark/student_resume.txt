@@ -1,0 +1,23 @@
+Sai Shobith
+sai.shobith@gmail.com | 9966148499 | github.com/saishobith | linkedin.com/in/saishobith
+
+Summary
+B.Tech student in Computer Science and Engineering with a passion for web technologies, databases, and system architectures. Experienced with frontend frameworks and cloud deployments.
+
+Education
+Delhi Technological University (DTU) — B.Tech (2022 - 2026)
+GPA: 8.85 CGPA
+
+Experience
+InnovateTech Solutions — Frontend Developer Intern
+• Implemented 8 responsive frontend views in Next.js, increasing user sessions by 14%.
+• Collaborated with designers to build accessible UI elements in React and Tailwind.
+• Optimized bundle sizes and static generation assets, improving page load speeds by 22%.
+
+Projects
+BOOSTCV ATS SaaS Compiler
+• Engineered Next.js web application for resume building and ATS scoring calibration.
+• Built heuristic parsing checks and warning verification logic to track formatting errors.
+
+Skills
+JavaScript, TypeScript, React, Next.js, Git, HTML, CSS, SQL, TailwindCSS

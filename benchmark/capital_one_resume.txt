@@ -1,0 +1,19 @@
+Amit Sharma
+amit.sharma@gmail.com | (832) 787-2174 | linkedin.com/in/amitsharma
+
+Professional Summary
+Highly analytical Business Analyst with over 4 years of experience in financial systems and requirement elicitation. Specialized in bridging business objectives and technical solutions, executing stakeholders prioritization mapping, and delivering functional specifications to development teams. Proven track record of improving operational efficiency by automating reporting cycles.
+
+Education
+Delhi Technological University (DTU) — B.Tech in Engineering (2020 - 2024)
+GPA: 8.85 CGPA
+
+Professional Experience
+Capital One — Business Analyst Intern (May 2023 - July 2023)
+• Managed business requirements gathering and formulated 15+ detailed user stories in Jira.
+• Collaborated with product owners to create wireframes and map process workflows.
+• Spearheaded pipeline data analysis using SQL and Tableau, reducing database load by 35%.
+• Executed user acceptance testing (UAT) scripts for newly deployed software views.
+
+Skills
+Business Analysis, SQL, Tableau, Power BI, Jira, Agile, Scrum, Requirements Elicitation, Process Mapping, Wireframing

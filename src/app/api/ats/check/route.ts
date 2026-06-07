@@ -201,7 +201,9 @@ Do not include any markdown wrappers (no \`\`\`json), comments, or commentary. O
               keywordGaps: aiResult.keywordGaps && aiResult.keywordGaps.length > 0 ? aiResult.keywordGaps : heuristicResult.keywordGaps,
               metricEnhancements: aiResult.metricEnhancements && aiResult.metricEnhancements.length > 0 ? aiResult.metricEnhancements : heuristicResult.metricEnhancements,
               breakdown: calibratedBreakdown,
-              atsEvidenceLog: evidenceLog
+              atsEvidenceLog: evidenceLog,
+              parserConfidence: heuristicResult.parserConfidence,
+              scoreExplanation: heuristicResult.scoreExplanation
             });
           }
         }

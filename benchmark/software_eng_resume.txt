@@ -1,0 +1,23 @@
+Amit Sharma
+amit.sharma@gmail.com | +91 99661 48499 | github.com/amitsharma | linkedin.com/in/amitsharma
+
+Summary
+Software Engineer specialized in fullstack web development and scalable microservices. Skilled in designing, building, and deploying cloud applications using modern web technologies.
+
+Education
+Delhi Technological University (DTU) — B.Tech in Computer Science (2020 - 2024)
+GPA: 9.1/10
+
+Experience
+Tech Corp — Software Engineer Intern
+• Developed a real-time analytics dashboard in React/Node.js, reducing database load by 35%.
+• Spearheaded refactoring of backend modules, increasing API query speed by 20%.
+• Orchestrated continuous integration pipelines in Docker and AWS to streamline deployments.
+
+Projects
+E-Commerce Platform (React, Next.js, Node.js, AWS)
+• Built a secure React and Node.js e-commerce application deployed on AWS EC2.
+• Configured relational database queries and cache layer in Redis, improving latency by 120ms.
+
+Skills
+React, Next.js, Node.js, TypeScript, SQL, Git, Docker, Kubernetes, AWS, GCP

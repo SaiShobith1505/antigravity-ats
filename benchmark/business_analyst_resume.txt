@@ -1,0 +1,18 @@
+Sarah Jenkins
+sarah.jenkins@gmail.com | +1 832 787 2174 | linkedin.com/in/sarahj
+
+Professional Summary
+Detail-oriented Business Analyst with 3 years of experience in stakeholder requirements elicitation and process mapping. Skilled in SQL, Tableau, and Agile methodologies.
+
+Education
+Boston University — B.S. in Business Administration (2018 - 2022)
+GPA: 3.8/4.0
+
+Experience
+EduSkills Corporation — Junior Business Analyst
+• Collaborated with product owners to define user stories and build wireframes in Jira.
+• Analyzed sales pipeline data using Tableau, saving over 40 hours of manual reporting monthly.
+• Formulated functional requirements specifications for translation into executable system components.
+
+Skills
+Business Analysis, SQL, Tableau, Power BI, Jira, Agile, Scrum, Requirements Elicitation

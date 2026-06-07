@@ -1,4 +1,6 @@
 import { ResumeData } from "./db";
+import { explainScore } from "./score_explainer";
+import { classifyResume } from "./resume_type_classifier";
 
 export interface VerifiedWarning {
   warning_type: string;
@@ -39,6 +41,8 @@ export interface ScoringResult {
   };
   resumeType?: string;
   classificationConfidence?: number;
+  parserConfidence?: number;
+  scoreExplanation?: { positives: string[]; negatives: string[] };
 }
 
 const SYNONYM_MAP: Record<string, string[]> = {
@@ -232,111 +236,57 @@ export const PROFILE_KEYWORDS: Record<string, string[]> = {
   "General Corporate": ["management", "project", "strategy", "analysis", "communication", "collaboration", "planning", "reporting", "operations", "excel"]
 };
 
-export function classifyResume(text: string): { resume_type: string; confidence: number } {
-  const cleanText = text.toLowerCase();
-  
-  const profiles: Record<string, string[]> = {
-    "Software Engineering": [
-      "software engineer", "software developer", "frontend", "backend", "fullstack", "full stack",
-      "javascript", "typescript", "python", "java", "c++", "c#", "golang", "rust", "react", "angular",
-      "node.js", "kubernetes", "docker", "git", "github", "aws", "gcp", "azure", "algorithms",
-      "data structures", "html", "css", "web development", "databases"
-    ],
-    "Data Science": [
-      "data scientist", "data science", "machine learning", "deep learning", "artificial intelligence",
-      "tensorflow", "pytorch", "pandas", "numpy", "scikit-learn", "data analyst", "data analysis",
-      "tableau", "power bi", "analytics", "statistics", "statistical", "sql", "spark", "hadoop"
-    ],
-    "Cybersecurity": [
-      "cybersecurity", "information security", "network security", "penetration testing", "pentest",
-      "firewall", "cryptography", "malware", "vulnerability", "incident response", "soc", "siem",
-      "cissp", "ceh", "comptia security+", "ethical hacking", "threat intelligence"
-    ],
-    "Business Analyst": [
-      "business analyst", "business analysis", "tableau", "power bi", "sql", "requirements gathering",
-      "user stories", "jira", "process mapping", "wireframes", "system requirements", "business process",
-      "use cases", "stakeholder management", "gap analysis", "brd", "frd"
-    ],
-    "Product Management": [
-      "product manager", "product management", "roadmap", "user research", "agile", "scrum",
-      "product launch", "prd", "backlog", "user stories", "wireframing", "competitor analysis",
-      "product strategy", "customer feedback", "feature prioritization"
-    ],
-    "Marketing": [
-      "marketing", "campaign", "seo", "sem", "adwords", "google analytics", "social media", "brand",
-      "copywriting", "content strategy", "growth marketing", "digital marketing", "ctr", "cpc",
-      "customer acquisition", "email marketing", "public relations"
-    ],
-    "Finance": [
-      "finance", "financial", "accounting", "ledger", "audit", "cfa", "cpa", "valuation", "excel",
-      "investment", "portfolio", "banking", "corporate finance", "budgeting", "forecasting",
-      "taxation", "financial modeling", "profitability"
-    ],
-    "Consulting": [
-      "consulting", "consultant", "strategy", "management consulting", "advisory", "case study",
-      "process improvement", "problem solving", "strategic planning", "change management",
-      "business transformation", "mckinsey", "bcg", "bain", "deloitte", "accenture"
-    ],
-    "Sales": [
-      "sales", "account manager", "salesforce", "crm", "cold calling", "b2b", "negotiation", "quota",
-      "lead generation", "sales pipeline", "business development", "deal closing", "revenue growth"
-    ],
-    "Operations": [
-      "operations", "supply chain", "logistics", "process optimization", "lean", "six sigma",
-      "inventory", "vendor management", "procurement", "operations management", "efficiency",
-      "warehouse", "distribution"
-    ],
-    "HR": [
-      "hr", "human resources", "recruiting", "talent acquisition", "onboarding", "payroll",
-      "employee relations", "hiring", "applicant tracking", "benefits administration", "diversity",
-      "talent management", "performance appraisal"
-    ]
-  };
 
-  let bestType = "General Corporate";
-  let maxScore = 0;
-
-  for (const [type, keywords] of Object.entries(profiles)) {
-    let score = 0;
-    keywords.forEach(kw => {
-      const regex = new RegExp(`\\b${kw.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'gi');
-      const matches = cleanText.match(regex);
-      if (matches) {
-        score += matches.length;
-      }
-    });
-
-    if (score > maxScore) {
-      maxScore = score;
-      bestType = type;
-    }
-  }
-
-  let confidence = 0.5;
-  if (maxScore > 0) {
-    confidence = Math.min(0.98, 0.6 + (maxScore / 10) * 0.38);
-  } else {
-    bestType = "General Corporate";
-    confidence = 0.5;
-  }
-
-  return { resume_type: bestType, confidence };
-}
 
 export function hasPhoneNumber(text: string): boolean {
   const phoneRegex = /(\+?\(?\d[\d-\s\(\)\.]{6,22}\d)/g;
   const matches = text.match(phoneRegex);
   if (!matches) return false;
-  
+
   for (const m of matches) {
+    if (/\b\d{4}\s*[-–/]\s*\d{4}\b/.test(m)) continue;
+    if (/\b\d{1,2}\s*[-–/]\s*\d{4}\b/.test(m)) continue;
+    if (/\b\d{1,2}\s*[-–/]\s*\d{1,2}\s*[-–/]\s*\d{2,4}\b/.test(m)) continue;
+
     const digits = m.replace(/\D/g, "");
     if (digits.length >= 7 && digits.length <= 15) {
-      if (/^\d{4}\d{4}$/.test(digits)) continue;
-      if (/^\d{1,2}\d{1,2}\d{4}$/.test(digits)) continue;
+      if (/^\d{8}$/.test(digits)) {
+        if (/^(19|20)\d{2}(19|20)\d{2}$/.test(digits)) continue;
+        if (/^\d{2}\d{2}\d{4}$/.test(digits)) continue;
+      }
       return true;
     }
   }
   return false;
+}
+
+export function calculateParserConfidence(text: string, filename: string): number {
+  if (!text || text.trim().length === 0) return 35;
+  const lowerFilename = filename.toLowerCase();
+  let score = 95;
+
+  if (lowerFilename.endsWith(".docx")) {
+    score = 98;
+  }
+
+  const charCount = text.length;
+  const wordCount = text.split(/\s+/).filter(w => w.length > 0).length;
+
+  if (charCount < 400 || wordCount < 50) {
+    return 35;
+  }
+
+  const avgWordLength = charCount / Math.max(1, wordCount);
+  if (avgWordLength > 20) {
+    return 45;
+  }
+
+  const corruptedChars = (text.match(/[\uFFFD\u0000-\u0008\u000B-\u000C\u000E-\u001F]/g) || []).length;
+  if (corruptedChars > 10) {
+    score -= Math.min(30, corruptedChars * 2);
+  }
+
+  return Math.max(35, Math.min(98, score));
 }
 
 export function calculateAtsScore(
@@ -585,16 +535,56 @@ export function calculateAtsScore(
   let formattingScore = 100;
 
   // Check for Canva columns and layout grids
-  const isCanvaFile = lowerFilename.includes("canva") || lowerFilename.includes("cv_layout");
-  if (isCanvaFile && (lowerText.includes("|") || lowerText.includes("  \t") || lowerText.includes(" • "))) {
-    const pipeIdx = text.indexOf("|");
-    const pageNum = getPageForIndex(text, pipeIdx !== -1 ? pipeIdx : 0);
+  const lines = text.split("\n");
+  let tableRowsCount = 0;
+  let firstTableLine = -1;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if ((line.match(/\|/g) || []).length >= 3) {
+      tableRowsCount++;
+      if (firstTableLine === -1) firstTableLine = i;
+      continue;
+    }
+    const cols = line.split(/\s{4,}|\t/).filter(c => c.trim().length > 0);
+    if (cols.length >= 3) {
+      if (!line.includes("@") && !line.includes("linkedin") && !line.includes("github")) {
+        tableRowsCount++;
+        if (firstTableLine === -1) firstTableLine = i;
+      }
+    }
+  }
+  const hasActualTable = tableRowsCount >= 3;
+
+  let colRowsCount = 0;
+  let firstColLine = -1;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line.includes("@") || line.includes("linkedin") || line.includes("github")) {
+      continue;
+    }
+    if (line.includes("|") && line.length > 25) {
+      colRowsCount++;
+      if (firstColLine === -1) firstColLine = i;
+      continue;
+    }
+    const match = line.match(/^([^\s].{8,})\s{8,}([^\s].{8,})$/);
+    if (match) {
+      colRowsCount++;
+      if (firstColLine === -1) firstColLine = i;
+    }
+  }
+  const hasActualMultiColumn = colRowsCount >= 4;
+
+  const isCanvaFile = lowerFilename.includes("canva") || lowerFilename.includes("layout");
+  if (hasActualMultiColumn || (isCanvaFile && (text.includes("|") || text.split("\n").some(l => /\s{6,}/.test(l))))) {
+    const colIdx = firstColLine !== -1 ? text.indexOf(lines[firstColLine]) : 0;
+    const pageNum = getPageForIndex(text, colIdx !== -1 ? colIdx : 0);
     verifiedWarnings.push({
       warning_type: "grid_layout",
       confidence: 0.88,
-      evidence: "Detected 2-column reading order conflict.",
+      evidence: `Detected side-by-side columns alignment on page ${pageNum}.`,
       affected_section: "personal",
-      triggering_pattern: "canva_or_column_spacers",
+      triggering_pattern: "multi_column_parallel",
       source_page: pageNum
     });
     actionableFixes.push({
@@ -609,18 +599,15 @@ export function calculateAtsScore(
   }
 
   // Check for Hidden Tables using strict boundary
-  const hasTableWord = /\btables?\b/i.test(text);
-  const hasCellWord = /\bcells?\b/i.test(text);
-  if (hasTableWord || (hasCellWord && text.includes("\t"))) {
-    const tableMatch = text.match(/\btables?\b/i) || text.match(/\bcells?\b/i);
-    const tableIndex = tableMatch ? tableMatch.index || 0 : 0;
-    const pageNum = getPageForIndex(text, tableIndex);
+  if (hasActualTable) {
+    const tableIdx = firstTableLine !== -1 ? text.indexOf(lines[firstTableLine]) : 0;
+    const pageNum = getPageForIndex(text, tableIdx !== -1 ? tableIdx : 0);
     verifiedWarnings.push({
       warning_type: "hidden_table",
-      confidence: 0.91,
-      evidence: "Detected consecutive tab-aligned columns or table cells.",
+      confidence: 0.94,
+      evidence: `Detected ${tableRowsCount} table structures on page ${pageNum}.`,
       affected_section: "experience",
-      triggering_pattern: "/\\btables?\\b|\\bcells?\\b/",
+      triggering_pattern: "tabular_layout",
       source_page: pageNum
     });
     actionableFixes.push({
@@ -630,22 +617,6 @@ export function calculateAtsScore(
       affected_section: "experience",
       recommended_fix: "Present experience data using simple paragraphs and bulleted text instead of tables.",
       expected_score_gain: { category: "formatting", points: 15 }
-    });
-    formattingScore -= 15;
-  }
-
-  // Multi-column layouts check
-  const hasMultiColumnLines = text.split("\n").some((line: string) => /\s{6,}/.test(line) && line.length > 30 && !line.includes("@") && !line.includes("http"));
-  if (hasMultiColumnLines && (lowerFilename.includes("canva") || lowerFilename.includes("layout"))) {
-    const lineIndex = text.indexOf("      ");
-    const pageNum = getPageForIndex(text, lineIndex !== -1 ? lineIndex : 0);
-    verifiedWarnings.push({
-      warning_type: "grid_layout",
-      confidence: 0.88,
-      evidence: "Detected 2-column parallel alignment or Canva indicator.",
-      affected_section: "personal",
-      triggering_pattern: "/\\s{6,}/",
-      source_page: pageNum
     });
     formattingScore -= 15;
   }
@@ -726,14 +697,62 @@ export function calculateAtsScore(
 
   // 3. Readability Check (15% of final score)
   let readabilityScore = 20; // baseline
-  const hasSummary = lowerText.includes("summary") || lowerText.includes("profile") || lowerText.includes("about me") || lowerText.includes("objective");
+  const summaryKeywords = [
+    "summary",
+    "professional summary",
+    "profile",
+    "career profile",
+    "objective",
+    "about me",
+    "professional profile",
+    "career summary",
+    "executive summary"
+  ];
+  
+  let hasSummary = false;
+  let summaryEvidence = "";
+  
+  for (const heading of summaryKeywords) {
+    const regex = new RegExp(`\\b${heading}\\b`, 'i');
+    if (regex.test(text)) {
+      hasSummary = true;
+      summaryEvidence = `Detected explicit summary heading: "${heading}"`;
+      break;
+    }
+  }
+
+  if (!hasSummary) {
+    const linesList = text.split("\n").map(l => l.trim());
+    let earliestSectionLine = -1;
+    const sectionsReg = /\b(education|experience|work|employment|projects?|skills|technical skills|technologies|certifications?|credentials)\b/i;
+    
+    for (let i = 0; i < linesList.length; i++) {
+      if (sectionsReg.test(linesList[i])) {
+        earliestSectionLine = i;
+        break;
+      }
+    }
+    
+    const limit = earliestSectionLine !== -1 ? earliestSectionLine : Math.min(25, linesList.length);
+    for (let i = 0; i < limit; i++) {
+      const line = linesList[i];
+      if (line.length > 150 && /[a-zA-Z]/.test(line)) {
+        if (!line.includes("@") && !line.includes("linkedin") && !line.includes("github")) {
+          hasSummary = true;
+          summaryEvidence = `Detected implicit summary paragraph on line ${i + 1} with ${line.length} characters.`;
+          break;
+        }
+      }
+    }
+  }
+
   if (hasSummary) {
     readabilityScore += 20;
   } else {
     verifiedWarnings.push({
       warning_type: "missing_section",
-      confidence: 1.0,
-      evidence: "No summary heading detected.",
+      confidence: 0.98,
+      evidence: "No summary heading or summary content found.",
       affected_section: "summary",
       triggering_pattern: "missing_summary"
     });
@@ -1070,6 +1089,7 @@ export function calculateAtsScore(
 
   const warningsList: string[] = [];
   verifiedWarnings.forEach(w => {
+    if (!w.evidence || w.evidence.trim() === "") return;
     let desc = "";
     if (w.warning_type === "missing_section") {
       if (w.triggering_pattern === "missing_education") desc = "Missing Education Section. Critical for recruiter academic qualification checks.";
@@ -1109,7 +1129,9 @@ export function calculateAtsScore(
 
   const finalWarnings = warningsList.length > 0 ? warningsList : ["Your resume matches standard recruiter formatting guidelines beautifully. Good structure."];
 
-  return {
+  const parserConfidence = calculateParserConfidence(text, filename);
+
+  const scoringResult: ScoringResult = {
     atsScore: finalAtsScore,
     warnings: finalWarnings,
     verifiedWarnings,
@@ -1118,8 +1140,12 @@ export function calculateAtsScore(
     metricEnhancements: metricEnhancements.length > 0 ? metricEnhancements.slice(0, 3) : ["Incorporate Google XYZ metrics: 'Accomplished X, as measured by Y, by doing Z'."],
     breakdown,
     resumeType: currentType,
-    classificationConfidence: currentConf
+    classificationConfidence: currentConf,
+    parserConfidence
   };
+
+  scoringResult.scoreExplanation = explainScore(scoringResult, text);
+  return scoringResult;
 }
 
 export function calculateLiveGaps(data: ResumeData, initialFixState: any) {

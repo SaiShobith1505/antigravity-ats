@@ -1,0 +1,311 @@
+[
+  {
+    "filename": "business_analyst_resume.txt",
+    "industry": "Business Analyst",
+    "studentResult": {
+      "score": 57,
+      "parserConfidence": 95,
+      "warningsCount": 5,
+      "warnings": [
+        {
+          "type": "missing_section",
+          "evidence": "No Projects heading detected.",
+          "confidence": 1
+        },
+        {
+          "type": "missing_section",
+          "evidence": "No Certifications heading detected.",
+          "confidence": 1
+        },
+        {
+          "type": "missing_section",
+          "evidence": "No GitHub repository link detected.",
+          "confidence": 1
+        },
+        {
+          "type": "chronological_flow",
+          "evidence": "Chronological flow index mismatch: [275, 152, -1, 712].",
+          "confidence": 1
+        },
+        {
+          "type": "unquantified_bullet",
+          "evidence": "Bullet lacks numeric metrics: \"experience in stakeholder requirements e...\"",
+          "confidence": 0.9
+        }
+      ]
+    },
+    "universalResult": {
+      "score": 86,
+      "parserConfidence": 95,
+      "classifiedType": "Business Analyst",
+      "classificationConfidence": 0.98,
+      "warningsCount": 2,
+      "warnings": [
+        {
+          "type": "chronological_flow",
+          "evidence": "Chronological flow index mismatch: [275, 152, -1, 712].",
+          "confidence": 1
+        },
+        {
+          "type": "unquantified_bullet",
+          "evidence": "Bullet lacks numeric metrics: \"experience in stakeholder requirements e...\"",
+          "confidence": 0.9
+        }
+      ]
+    }
+  },
+  {
+    "filename": "capital_one_resume.txt",
+    "industry": "Business Analyst",
+    "studentResult": {
+      "score": 67,
+      "parserConfidence": 95,
+      "warningsCount": 5,
+      "warnings": [
+        {
+          "type": "missing_section",
+          "evidence": "No Projects heading detected.",
+          "confidence": 1
+        },
+        {
+          "type": "missing_section",
+          "evidence": "No Certifications heading detected.",
+          "confidence": 1
+        },
+        {
+          "type": "missing_section",
+          "evidence": "No GitHub repository link detected.",
+          "confidence": 1
+        },
+        {
+          "type": "chronological_flow",
+          "evidence": "Chronological flow index mismatch: [487, 158, -1, 1024].",
+          "confidence": 1
+        },
+        {
+          "type": "unquantified_bullet",
+          "evidence": "Bullet lacks numeric metrics: \"experience in financial systems and requ...\"",
+          "confidence": 0.9
+        }
+      ]
+    },
+    "universalResult": {
+      "score": 92,
+      "parserConfidence": 95,
+      "classifiedType": "Business Analyst",
+      "classificationConfidence": 0.98,
+      "warningsCount": 2,
+      "warnings": [
+        {
+          "type": "chronological_flow",
+          "evidence": "Chronological flow index mismatch: [487, 158, -1, 1024].",
+          "confidence": 1
+        },
+        {
+          "type": "unquantified_bullet",
+          "evidence": "Bullet lacks numeric metrics: \"experience in financial systems and requ...\"",
+          "confidence": 0.9
+        }
+      ]
+    }
+  },
+  {
+    "filename": "finance_resume.txt",
+    "industry": "Finance",
+    "studentResult": {
+      "score": 64,
+      "parserConfidence": 95,
+      "warningsCount": 3,
+      "warnings": [
+        {
+          "type": "missing_section",
+          "evidence": "No Projects heading detected.",
+          "confidence": 1
+        },
+        {
+          "type": "missing_section",
+          "evidence": "No Certifications heading detected.",
+          "confidence": 1
+        },
+        {
+          "type": "missing_section",
+          "evidence": "No GitHub repository link detected.",
+          "confidence": 1
+        }
+      ]
+    },
+    "universalResult": {
+      "score": 94,
+      "parserConfidence": 95,
+      "classifiedType": "Finance",
+      "classificationConfidence": 0.98,
+      "warningsCount": 0,
+      "warnings": []
+    }
+  },
+  {
+    "filename": "hr_resume.txt",
+    "industry": "HR",
+    "studentResult": {
+      "score": 55,
+      "parserConfidence": 95,
+      "warningsCount": 5,
+      "warnings": [
+        {
+          "type": "missing_section",
+          "evidence": "No Projects heading detected.",
+          "confidence": 1
+        },
+        {
+          "type": "missing_section",
+          "evidence": "No Certifications heading detected.",
+          "confidence": 1
+        },
+        {
+          "type": "missing_section",
+          "evidence": "No GitHub repository link detected.",
+          "confidence": 1
+        },
+        {
+          "type": "chronological_flow",
+          "evidence": "Chronological flow index mismatch: [201, 109, -1, 559].",
+          "confidence": 1
+        },
+        {
+          "type": "unquantified_bullet",
+          "evidence": "Bullet lacks numeric metrics: \"experience in talent acquisition, employ...\"",
+          "confidence": 0.9
+        }
+      ]
+    },
+    "universalResult": {
+      "score": 79,
+      "parserConfidence": 95,
+      "classifiedType": "HR",
+      "classificationConfidence": 0.98,
+      "warningsCount": 2,
+      "warnings": [
+        {
+          "type": "chronological_flow",
+          "evidence": "Chronological flow index mismatch: [201, 109, -1, 559].",
+          "confidence": 1
+        },
+        {
+          "type": "unquantified_bullet",
+          "evidence": "Bullet lacks numeric metrics: \"experience in talent acquisition, employ...\"",
+          "confidence": 0.9
+        }
+      ]
+    }
+  },
+  {
+    "filename": "marketing_resume.txt",
+    "industry": "Marketing",
+    "studentResult": {
+      "score": 64,
+      "parserConfidence": 95,
+      "warningsCount": 3,
+      "warnings": [
+        {
+          "type": "missing_section",
+          "evidence": "No Projects heading detected.",
+          "confidence": 1
+        },
+        {
+          "type": "missing_section",
+          "evidence": "No Certifications heading detected.",
+          "confidence": 1
+        },
+        {
+          "type": "missing_section",
+          "evidence": "No telephone number pattern detected.",
+          "confidence": 0.9
+        }
+      ]
+    },
+    "universalResult": {
+      "score": 92,
+      "parserConfidence": 95,
+      "classifiedType": "Marketing",
+      "classificationConfidence": 0.98,
+      "warningsCount": 1,
+      "warnings": [
+        {
+          "type": "missing_section",
+          "evidence": "No telephone number pattern detected.",
+          "confidence": 0.9
+        }
+      ]
+    }
+  },
+  {
+    "filename": "software_eng_resume.txt",
+    "industry": "Software Engineering",
+    "studentResult": {
+      "score": 92,
+      "parserConfidence": 95,
+      "warningsCount": 2,
+      "warnings": [
+        {
+          "type": "missing_section",
+          "evidence": "No Certifications heading detected.",
+          "confidence": 1
+        },
+        {
+          "type": "chronological_flow",
+          "evidence": "Chronological flow index mismatch: [298, 401, 717, 283].",
+          "confidence": 1
+        }
+      ]
+    },
+    "universalResult": {
+      "score": 96,
+      "parserConfidence": 95,
+      "classifiedType": "Software Engineering",
+      "classificationConfidence": 0.98,
+      "warningsCount": 1,
+      "warnings": [
+        {
+          "type": "chronological_flow",
+          "evidence": "Chronological flow index mismatch: [298, 401, 717, 283].",
+          "confidence": 1
+        }
+      ]
+    }
+  },
+  {
+    "filename": "student_resume.txt",
+    "industry": "Software Engineering",
+    "studentResult": {
+      "score": 83,
+      "parserConfidence": 95,
+      "warningsCount": 2,
+      "warnings": [
+        {
+          "type": "missing_section",
+          "evidence": "No Certifications heading detected.",
+          "confidence": 1
+        },
+        {
+          "type": "chronological_flow",
+          "evidence": "Chronological flow index mismatch: [295, 381, 706, 183].",
+          "confidence": 1
+        }
+      ]
+    },
+    "universalResult": {
+      "score": 87,
+      "parserConfidence": 95,
+      "classifiedType": "Software Engineering",
+      "classificationConfidence": 0.98,
+      "warningsCount": 1,
+      "warnings": [
+        {
+          "type": "chronological_flow",
+          "evidence": "Chronological flow index mismatch: [295, 381, 706, 183].",
+          "confidence": 1
+        }
+      ]
+    }
+  }
+]

@@ -261,6 +261,15 @@ async function runRegressionTest() {
       console.log(`  ✅ Phone number recognized correctly.`);
     }
 
+    // Assert no false summary warnings
+    const hasSummaryWarning = universalResult.verifiedWarnings.some(w => w.warning_type === "missing_section" && w.triggering_pattern === "missing_summary");
+    if (hasSummaryWarning) {
+      console.error(`❌ BENCHMARK FAILURE: False summary warning triggered for ${resume.name}`);
+      failed = true;
+    } else {
+      console.log(`  ✅ Summary recognized correctly.`);
+    }
+
     // Assert no false table warnings (especially on words like "executable")
     const hasTableWarning = universalResult.verifiedWarnings.some(w => w.warning_type === "hidden_table");
     if (hasTableWarning) {
@@ -298,6 +307,55 @@ async function runRegressionTest() {
         failed = true;
       }
     }
+  }
+
+  // --- PART 3: Capital One Calibration Check ---
+  console.log("\n==================================================");
+  console.log("RUNNING CAPITAL ONE ATS CALIBRATION CHECK");
+  console.log("==================================================");
+  const capOnePath = path.join(process.cwd(), "benchmark", "capital_one_resume.txt");
+  if (fs.existsSync(capOnePath)) {
+    const capOneText = fs.readFileSync(capOnePath, "utf-8");
+    const capOneResult = calculateAtsScore(capOneText, "capital_one_resume.txt", undefined, "universal");
+    
+    if (capOneResult.resumeType !== "Business Analyst") {
+      console.error(`❌ CAPITAL ONE CALIBRATION FAILURE: Expected 'Business Analyst', got '${capOneResult.resumeType}'`);
+      failed = true;
+    }
+    
+    const capOnePhoneWarning = capOneResult.verifiedWarnings.some(w => w.warning_type === "missing_section" && w.triggering_pattern === "missing_phone");
+    if (capOnePhoneWarning) {
+      console.error("❌ CAPITAL ONE CALIBRATION FAILURE: Phone number warning triggered.");
+      failed = true;
+    }
+    
+    const capOneSummaryWarning = capOneResult.verifiedWarnings.some(w => w.warning_type === "missing_section" && w.triggering_pattern === "missing_summary");
+    if (capOneSummaryWarning) {
+      console.error("❌ CAPITAL ONE CALIBRATION FAILURE: Summary warning triggered.");
+      failed = true;
+    }
+    
+    const capOneTableWarning = capOneResult.verifiedWarnings.some(w => w.warning_type === "hidden_table");
+    if (capOneTableWarning) {
+      console.error("❌ CAPITAL ONE CALIBRATION FAILURE: Table warning triggered.");
+      failed = true;
+    }
+    
+    const capOneCanvaWarning = capOneResult.verifiedWarnings.some(w => w.warning_type === "grid_layout");
+    if (capOneCanvaWarning) {
+      console.error("❌ CAPITAL ONE CALIBRATION FAILURE: Canva/column warning triggered.");
+      failed = true;
+    }
+
+    if (capOneResult.atsScore < 85) {
+      console.error(`❌ CAPITAL ONE CALIBRATION FAILURE: Score is below expected calibration range (Expected >= 85, got ${capOneResult.atsScore}%)`);
+      failed = true;
+    } else {
+      console.log(`  ✅ Capital One BA Resume parsed successfully. Score: ${capOneResult.atsScore}%.`);
+    }
+  } else {
+    console.error("❌ CAPITAL ONE CALIBRATION FAILURE: capital_one_resume.txt not found.");
+    failed = true;
   }
 
   if (failed) {
